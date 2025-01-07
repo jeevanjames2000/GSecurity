@@ -1,52 +1,63 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import Home from "./Tabs/Home";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Camera from "./Tabs/Camera";
 import Profile from "./Tabs/Profile";
 import MainNavigator from "./MainNavigator";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Image } from "native-base";
+import ReportViolation from "./ReportViolation";
+import Violations from "./Tabs/Violations";
 
 const Tab = createBottomTabNavigator();
 export default function Main() {
   const navigation = useNavigation();
-
+  const icons = {
+    MainNavigator: require("../../assets/home.png"),
+    Violations: require("../../assets/newIcons/risk-management.png"),
+    Profile: require("../../assets/user (1).png"),
+  };
   return (
     <Tab.Navigator
+      initialRouteName="MainNavigator"
       screenOptions={({ route }) => ({
         tabBarLabel: "",
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          let label;
+          const label =
+            route.name === "MainNavigator"
+              ? "Home"
+              : route.name === "Profile"
+              ? "Profile"
+              : "Violations";
 
-          if (route.name === "MainNavigator") {
-            iconName = focused ? "home" : "home-outline";
-            label = "Home";
-          } else if (route.name === "Camera") {
-            iconName = focused ? "camera" : "camera-outline";
-            label = "Camera";
-          } else if (route.name === "Profile") {
-            iconName = focused ? "person" : "person-outline";
-            label = "Profile";
-          }
+          const iconSource = icons[route.name];
 
           return (
             <View
               style={{
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 padding: 5,
-                width: "80%",
+                width: "100%",
               }}
             >
-              <Ionicons name={iconName} size={24} color={color} />
+              <Image
+                source={iconSource}
+                alt={`${label} Icon`}
+                resizeMode="contain"
+                style={{
+                  alignItems: "center",
+                  width: 30,
+                  height: 30,
+                  tintColor: focused ? "green" : "gray",
+                }}
+              />
               <Text
                 style={{
                   color,
                   fontSize: 13,
-                  marginLeft: 5,
                   fontWeight: "bold",
                 }}
               >
@@ -67,6 +78,19 @@ export default function Main() {
       })}
     >
       <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          headerStyle: {
+            backgroundColor: "#FFFFFF",
+          },
+          headerTitle: "Profile",
+          headerTintColor: "#fff",
+          headerTintColor: "#000",
+          headerTitleAlign: "center",
+        }}
+      />
+      <Tab.Screen
         name="MainNavigator"
         component={MainNavigator}
         options={{
@@ -76,15 +100,14 @@ export default function Main() {
       />
 
       <Tab.Screen
-        name="Camera"
-        component={Camera}
+        name="Violations"
+        component={Violations}
         options={{
           headerStyle: {
             backgroundColor: "#007367",
           },
           headerTintColor: "#fff",
           headerTitleAlign: "center",
-
           headerLeft: () => (
             <View
               style={{
@@ -97,50 +120,10 @@ export default function Main() {
               }}
             >
               <TouchableOpacity
-                onPress={() => navigation.goBack()}
+                onPress={() => navigation.navigate("Home")}
                 style={{ marginLeft: 5, alignItems: "center" }}
               >
                 <Ionicons name="arrow-back" size={30} color={"#fff"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          headerStyle: {
-            backgroundColor: "#FFFFFF",
-          },
-          headerTitle: "Profile",
-          headerTintColor: "#fff",
-          headerTintColor: "#000",
-          headerTitleAlign: "center",
-
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-
-                marginLeft: 16,
-                marginBottom: 10,
-                marginTop: 20,
-                borderRadius: 25,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={30} color={"#007367"} />
               </TouchableOpacity>
             </View>
           ),

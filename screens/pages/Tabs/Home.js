@@ -1,83 +1,59 @@
 import React, { useState } from "react";
-import { Box, Text, FlatList, Image, Pressable, VStack } from "native-base";
+import {
+  Box,
+  Text,
+  FlatList,
+  Image,
+  Pressable,
+  HStack,
+  Input,
+  VStack,
+  Button,
+} from "native-base";
 import { useNavigation } from "@react-navigation/native";
-import Location from "../../../assets/location.jpg";
-import Frame3821 from "../../../assets/Frame3281.jpg";
-import violations from "../../../assets/violations.jpg";
-import id from "../../../assets/id.jpg";
-import pay from "../../../assets/pay1.jpg";
-import emergency from "../../../assets/images1.jpg";
-import Media from "../../../assets/image9(1).jpg";
-import Gatepass from "../../../assets/vehicles(1).png";
-import cctc from "../../../assets/cctv-camera-svgrepo-com1.jpg";
-import disha from "../../../assets/45cb6fb47812abc6250c5602ef7a025a_icon1.jpg";
-import Camera from "./Camera";
+import violations from "../../../assets/newIcons/group.png";
+import pay from "../../../assets/newIcons/bribe.png";
+import emergency from "../../../assets/newIcons/ambulance.png";
+import Fire from "../../../assets/newIcons/fire-extinguisher.png";
+import cctc from "../../../assets/newIcons/cctv.png";
+import disha from "../../../assets/newIcons/dishaimg.png";
+import parking from "../../../assets/newIcons/parking.png";
+import police from "../../../assets/newIcons/police-station (1).png";
 
 export default function Home() {
-  const dummyData = [
-    {
-      name: "Face Recognition",
-      img: Frame3821,
-    },
-    {
-      name: "Navigation",
-      img: Location,
-    },
-    {
-      name: "Leaves_Permission",
-      img: violations,
-    },
-    {
-      name: "Visitor",
-      img: id,
-    },
+  const navigation = useNavigation();
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const featuredData = [
     {
       name: "Report Violation",
       img: violations,
     },
+
     {
       name: "Fines",
       img: pay,
     },
     {
-      name: "Emergency",
-      img: emergency,
-    },
-    {
-      name: "Disha",
-      img: disha,
-    },
-    {
       name: "Parking",
-      img: violations,
+      img: parking,
     },
     {
       name: "Cctv",
       img: cctc,
     },
-    {
-      name: "Gatepass",
-      img: Gatepass,
-    },
-    {
-      name: "Media",
-      img: Media,
-    },
   ];
-
-  const navigation = useNavigation();
-  const [selectedIndex, setSelectedIndex] = useState(null);
-
+  const emergencyData = [
+    { name: "Ambulance", img: emergency },
+    {
+      name: "Disha",
+      img: disha,
+    },
+    { name: "Fire", img: Fire },
+    { name: "Police", img: police },
+  ];
   const handleRoute = (item) => {
-    if (item.name === "Face Recognition") {
-      navigation.navigate({ name: "Camera" });
-    } else {
-      navigation.navigate({ name: item.name });
-    }
-    // console.log(item);
-    // navigation.navigate({ name: item.name });
+    navigation.navigate({ name: item.name });
   };
-
   const renderItem = ({ item, index }) => (
     <Pressable
       onPressIn={() => setSelectedIndex(index)}
@@ -87,37 +63,125 @@ export default function Home() {
       margin="2"
     >
       <Box
-        bg={selectedIndex === index ? "gray.200" : "white"}
-        borderRadius="md"
-        p="3"
+        bg="white"
+        borderRadius="xl"
         alignItems="center"
-        shadow="2"
+        justifyContent="center"
+        shadow="3"
+        padding="2"
+        minWidth="80px"
+        minHeight="80px"
       >
-        <Image
-          source={item.img}
-          alt={item.name}
-          size={"sm"}
-          borderRadius="md"
-          style={{ objectFit: "contain" }}
-        />
-        <VStack mt="2" space="1" alignItems="left">
-          <Text fontSize="sm" fontWeight="medium" color="black">
-            {item.name}
-          </Text>
-        </VStack>
+        <Image source={item.img} alt={item.name} size="sm" resizeMode="cover" />
       </Box>
+      <Text
+        fontSize="sm"
+        fontWeight="bold"
+        color="black"
+        mt="2"
+        textAlign={"center"}
+      >
+        {item.name}
+      </Text>
     </Pressable>
   );
 
+  const handleCamera = () => {
+    navigation.navigate("Camera");
+  };
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(
+        `http://172.17.58.151:9000/auth/logout/${"00000"}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.ok) {
+        await AsyncStorage.removeItem("token");
+        navigation.navigate("Splash");
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
   return (
-    <Box flex={1} paddingTop={70}>
-      <FlatList
-        data={dummyData}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        numColumns={2}
-        contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 80 }}
-      />
+    <Box flex={1} backgroundColor="#f5f5f5">
+      {}
+      <Box backgroundColor="#007367" paddingY="4" paddingX="4">
+        <Text
+          fontSize={30}
+          color="white"
+          fontWeight="bold"
+          textAlign="center"
+          zIndex={1000}
+          top={10}
+        >
+          G Security
+        </Text>
+
+        <HStack
+          backgroundColor="white"
+          borderRadius="20"
+          alignItems="center"
+          paddingX="4"
+          paddingY="2"
+          mt="4"
+          shadow="2"
+          zIndex={1000}
+          top={60}
+        >
+          <Input
+            flex={1}
+            placeholder="Search by ID / Vehicle number"
+            variant="unstyled"
+            fontSize="md"
+          />
+          <Pressable onPress={handleCamera}>
+            <Image
+              source={require("../../../assets/qr-code (1).png")}
+              alt="Search Icon"
+              size="sm"
+            />
+          </Pressable>
+        </HStack>
+      </Box>
+      {}
+      <Box paddingX="4" paddingY="4" top={10}>
+        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+          Featured
+        </Text>
+        <FlatList
+          data={featuredData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={3}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+        />
+      </Box>
+      {}
+      <Box
+        paddingX="3"
+        paddingY="4"
+        top={10}
+        backgroundColor={"#ddd"}
+        borderRadius={10}
+      >
+        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+          Emergency
+        </Text>
+        <FlatList
+          data={emergencyData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={4}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+        />
+      </Box>
     </Box>
   );
 }

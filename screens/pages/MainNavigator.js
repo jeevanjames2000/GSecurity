@@ -1,20 +1,8 @@
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NativeBaseProvider, View, extendTheme } from "native-base";
-
-// import GetDetails from "./screens/pages/utils/GetDetails";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
-// import Login from "./screens/auth/Login";
-
-// import Profile from "./screens/pages/Tabs/Profile";
-// import ReportViolation from "./screens/pages/ReportViolation";
-// import Emergency from "./screens/pages/Emergency";
-// import Media from "./screens/pages/Media";
-// import VisitorRegistration from "./screens/pages/VisitorRegistration";
-
-// import Fines from "./screens/pages/Fines";
-// import Main from "./Main";
 import GetDetails from "./utils/GetDetails";
 import ReportViolation from "./ReportViolation";
 import Emergency from "./Emergency";
@@ -27,6 +15,8 @@ import Home from "./Tabs/Home";
 import Parking from "./Parking";
 import Leaves_Permission from "./Leaves_Permission";
 import Gatepass from "./Gatepass";
+import Violations from "./Tabs/Violations";
+import Camera from "./Tabs/Camera";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,7 +38,7 @@ export default function MainNavigator() {
       />
       <Stack.Screen
         name="Report Violation"
-        component={ReportViolation}
+        component={Violations}
         options={{
           headerStyle: {
             backgroundColor: "#ffffff",
@@ -86,6 +76,16 @@ export default function MainNavigator() {
             </View>
           ),
         }}
+      />
+      <Stack.Screen
+        name="Violations"
+        component={Violations}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Camera"
+        component={Camera}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Emergency"
