@@ -38,7 +38,7 @@ export default function MainNavigator() {
       />
       <Stack.Screen
         name="Report Violation"
-        component={Violations}
+        component={ReportViolation}
         options={{
           headerStyle: {
             backgroundColor: "#ffffff",

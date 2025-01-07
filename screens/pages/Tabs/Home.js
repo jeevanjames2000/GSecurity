@@ -7,8 +7,7 @@ import {
   Pressable,
   HStack,
   Input,
-  VStack,
-  Button,
+  ScrollView,
 } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 import violations from "../../../assets/newIcons/group.png";
@@ -89,24 +88,7 @@ export default function Home() {
   const handleCamera = () => {
     navigation.navigate("Camera");
   };
-  const handleLogout = async () => {
-    try {
-      const response = await fetch(
-        `http://172.17.58.151:9000/auth/logout/${"00000"}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
 
-      if (response.ok) {
-        await AsyncStorage.removeItem("token");
-        navigation.navigate("Splash");
-      }
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  };
   return (
     <Box flex={1} backgroundColor="#f5f5f5">
       {}
@@ -149,39 +131,41 @@ export default function Home() {
         </HStack>
       </Box>
       {}
-      <Box paddingX="4" paddingY="4" top={10}>
-        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
-          Featured
-        </Text>
-        <FlatList
-          data={featuredData}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={3}
-          contentContainerStyle={{ paddingBottom: 16 }}
-          columnWrapperStyle={{ justifyContent: "space-between" }}
-        />
-      </Box>
-      {}
-      <Box
-        paddingX="3"
-        paddingY="4"
-        top={10}
-        backgroundColor={"#ddd"}
-        borderRadius={10}
-      >
-        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
-          Emergency
-        </Text>
-        <FlatList
-          data={emergencyData}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={4}
-          contentContainerStyle={{ paddingBottom: 16 }}
-          columnWrapperStyle={{ justifyContent: "space-between" }}
-        />
-      </Box>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Box paddingX="4" paddingY="4" top={10}>
+          <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+            Featured
+          </Text>
+          <FlatList
+            data={featuredData}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.name}
+            numColumns={3}
+            contentContainerStyle={{ paddingBottom: 16 }}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
+          />
+        </Box>
+        {}
+        <Box
+          paddingX="3"
+          paddingY="4"
+          top={10}
+          backgroundColor={"#ddd"}
+          borderRadius={10}
+        >
+          <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+            Emergency
+          </Text>
+          <FlatList
+            data={emergencyData}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.name}
+            numColumns={4}
+            contentContainerStyle={{ paddingBottom: 16 }}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
+          />
+        </Box>
+      </ScrollView>
     </Box>
   );
 }

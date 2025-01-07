@@ -9,10 +9,12 @@ import MainNavigator from "./MainNavigator";
 import { Image } from "native-base";
 import ReportViolation from "./ReportViolation";
 import Violations from "./Tabs/Violations";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
 export default function Main() {
   const navigation = useNavigation();
+  // console.log(AsyncStorage.removeItem("token"));
   const icons = {
     MainNavigator: require("../../assets/home.png"),
     Violations: require("../../assets/newIcons/risk-management.png"),
