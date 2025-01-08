@@ -54,15 +54,18 @@ export default function Profile() {
             borderStyle={"solid"}
           />
         </Center>
-        <ScrollView>
-          <VStack space={4}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <VStack space={1}>
             {[0, 1, 2, 3].map((each) => (
               <Box key={each} flexDirection={"row"} alignItems={"center"}>
-                <Text fontSize={"xl"} width={"2/5"} paddingLeft={6}>
+                <Text fontSize={"lg"} width={"2/5"} paddingLeft={6}>
                   {studKeys[each]}
                 </Text>
                 <Text
-                  fontSize={"xl"}
+                  fontSize={"lg"}
                   width={"3/5"}
                   color={
                     studKeys[each] === "Role"
@@ -82,7 +85,7 @@ export default function Profile() {
             ))}
           </VStack>
 
-          <View marginTop={10} marginBottom={10}>
+          <View marginTop={6} marginBottom={6}>
             <Text style={styles.head_1} marginBottom={5}>
               Private Information
             </Text>
@@ -101,7 +104,7 @@ export default function Profile() {
             </VStack>
           </View>
 
-          <View marginBottom={10} padding={2}>
+          <View marginBottom={6} padding={2}>
             <Text style={styles.head_2}>Violations</Text>
 
             <HStack space={2} justifyContent="center" height={120}>
@@ -113,10 +116,10 @@ export default function Profile() {
                 borderRadius={"sm"}
                 justifyContent={"space-evenly"}
               >
-                <Text fontSize={"3xl"} fontWeight={800}>
+                <Text fontSize={"2xl"} fontWeight={"bold"}>
                   32
                 </Text>
-                <Text fontSize={"md"} fontWeight={600}>
+                <Text fontSize={"lg"} fontWeight={700}>
                   Violations
                 </Text>
               </Center>
@@ -128,10 +131,10 @@ export default function Profile() {
                 borderRadius={"sm"}
                 justifyContent={"space-evenly"}
               >
-                <Text fontSize={"3xl"} fontWeight={800}>
+                <Text fontSize={"2xl"} fontWeight={"bold"}>
                   19
                 </Text>
-                <Text fontSize={"md"} fontWeight={600}>
+                <Text fontSize={"lg"} fontWeight={700}>
                   Pending Fines
                 </Text>
               </Center>
@@ -143,10 +146,10 @@ export default function Profile() {
                 borderRadius={"sm"}
                 justifyContent={"space-evenly"}
               >
-                <Text fontSize={"3xl"} fontWeight={800}>
+                <Text fontSize={"2xl"} fontWeight={"bold"}>
                   07
                 </Text>
-                <Text fontSize={"md"} fontWeight={600}>
+                <Text fontSize={"lg"} fontWeight={700}>
                   Paid fines
                 </Text>
               </Center>
@@ -155,7 +158,6 @@ export default function Profile() {
 
           <Pressable
             bg="#007367"
-            mt={3}
             mb={10}
             borderRadius="md"
             width="100%"

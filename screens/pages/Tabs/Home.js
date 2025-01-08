@@ -16,16 +16,54 @@ export default function Home() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   // console.log(AsyncStorage.removeItem("token"));
   const featuredData = [
-    { name: "Report Violation", img: violations },
-    { name: "Fines", img: pay },
-    { name: "Parking", img: parking },
-    { name: "Cctv", img: cctc },
+    {
+      name: "Report Violation",
+      img: {
+        uri: "http://172.17.58.151:9000/auth/getImage/group.png",
+      },
+    },
+    {
+      name: "Fines",
+      img: {
+        uri: "http://172.17.58.151:9000/auth/getImage/bribe.png",
+      },
+    },
+    {
+      name: "Parking",
+      img: {
+        uri: "http://172.17.58.151:9000/auth/getImage/parking.png",
+      },
+    },
+    {
+      name: "Cctv",
+      img: { uri: "http://172.17.58.151:9000/auth/getImage/cctv.png" },
+    },
   ];
   const emergencyData = [
-    { name: "Ambulance", img: emergency },
-    { name: "Disha", img: disha },
-    { name: "Fire", img: Fire },
-    { name: "Police", img: police },
+    {
+      name: "Ambulance",
+      img: {
+        uri: "http://172.17.58.151:9000/auth/getImage/ambulance.png",
+      },
+    },
+    {
+      name: "Disha",
+      img: {
+        uri: "http://172.17.58.151:9000/auth/getImage/dishaimg.png",
+      },
+    },
+    {
+      name: "Fire",
+      img: {
+        uri: "http://172.17.58.151:9000/auth/getImage/fire-extinguisher.png",
+      },
+    },
+    {
+      name: "Police",
+      img: {
+        uri: "http://172.17.58.151:9000/auth/getImage/police-station.png",
+      },
+    },
   ];
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleCamera = () => navigation.navigate("Camera");
@@ -48,7 +86,12 @@ export default function Home() {
         minWidth="80px"
         minHeight="80px"
       >
-        <Image source={item.img} alt={item.name} size="sm" resizeMode="cover" />
+        <Image
+          source={item.img}
+          alt={item.name}
+          size="sm"
+          resizeMode="contain"
+        />
       </Box>
       <Text
         fontSize="sm"
@@ -132,7 +175,6 @@ export default function Home() {
           columnWrapperStyle={{ justifyContent: "space-between" }}
         />
       </Box>
-      {}
       <Box
         paddingX="3"
         paddingY="4"

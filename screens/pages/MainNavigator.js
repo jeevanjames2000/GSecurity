@@ -56,7 +56,6 @@ export default function MainNavigator() {
                 width: 40,
                 height: 40,
                 color: "#007367",
-
                 borderRadius: 20,
                 shadowColor: "#000",
                 shadowOffset: { width: 2, height: 4 },
@@ -65,7 +64,7 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>
@@ -116,7 +115,7 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>
@@ -191,7 +190,7 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>
@@ -224,7 +223,6 @@ export default function MainNavigator() {
                 width: 40,
                 height: 40,
                 color: "#007367",
-
                 borderRadius: 20,
                 shadowColor: "#000",
                 shadowOffset: { width: 2, height: 4 },
@@ -233,7 +231,7 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>
