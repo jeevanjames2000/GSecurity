@@ -1,12 +1,9 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NativeBaseProvider, View, extendTheme } from "native-base";
+import { NativeBaseProvider } from "native-base";
 
-import GetDetails from "./screens/pages/utils/GetDetails";
-import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
 import Login from "./screens/auth/Login";
 import {
   useFonts,
@@ -16,13 +13,6 @@ import {
 
 // import AppLoading from "expo-app-loading";
 import { CustomTheme } from "./screens/customTheme";
-import Profile from "./screens/pages/Tabs/Profile";
-import ReportViolation from "./screens/pages/ReportViolation";
-import Emergency from "./screens/pages/Emergency";
-import Media from "./screens/pages/Media";
-import VisitorRegistration from "./screens/pages/VisitorRegistration";
-
-import Fines from "./screens/pages/Fines";
 
 import Main from "./screens/pages/Main";
 import SplashScreen from "./screens/auth/Splash";

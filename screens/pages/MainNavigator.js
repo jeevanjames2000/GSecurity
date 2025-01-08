@@ -1,20 +1,15 @@
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NativeBaseProvider, View, extendTheme } from "native-base";
+import { View } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import GetDetails from "./utils/GetDetails";
 import ReportViolation from "./ReportViolation";
 import Emergency from "./Emergency";
-import Media from "./Media";
 import Fines from "./Fines";
-import VisitorRegistration from "./VisitorRegistration";
 import Login from "../auth/Login";
-import Main from "./Main";
 import Home from "./Tabs/Home";
 import Parking from "./Parking";
-import Leaves_Permission from "./Leaves_Permission";
-import Gatepass from "./Gatepass";
 import Violations from "./Tabs/Violations";
 import Camera from "./Tabs/Camera";
 
@@ -70,7 +65,7 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>
@@ -121,54 +116,14 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>
           ),
         }}
       />
-      <Stack.Screen
-        name="Media"
-        component={Media}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Media",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
 
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
       <Stack.Screen
         name="Login"
         component={Login}
@@ -192,7 +147,7 @@ export default function MainNavigator() {
               }}
             >
               <TouchableOpacity
-                onPress={() => navigation.goBack()}
+                onPress={() => navigation.navigate("Home")}
                 style={{ marginLeft: 0, alignItems: "center", marginRight: 5 }}
               >
                 <Ionicons name="arrow-back" size={30} color={"black"} />
@@ -236,49 +191,7 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
-
-      <Stack.Screen
-        name="Visitor"
-        component={VisitorRegistration}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Visitor Registration",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
-
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>
@@ -320,91 +233,7 @@ export default function MainNavigator() {
                 elevation: 10,
               }}
             >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
-
-      <Stack.Screen
-        name="Leaves_Permission"
-        component={Leaves_Permission}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Leaves & Permissions",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
-
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
-
-      <Stack.Screen
-        name="Gatepass"
-        component={Gatepass}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Gatepass",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
-
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.goBack()}>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                 <Ionicons name="arrow-back" size={24} color={"#007367"} />
               </TouchableOpacity>
             </View>

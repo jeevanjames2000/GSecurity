@@ -18,44 +18,28 @@ import cctc from "../../../assets/newIcons/cctv.png";
 import disha from "../../../assets/newIcons/dishaimg.png";
 import parking from "../../../assets/newIcons/parking.png";
 import police from "../../../assets/newIcons/police-station (1).png";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Home() {
   const navigation = useNavigation();
   const [selectedIndex, setSelectedIndex] = useState(null);
+  // console.log(AsyncStorage.removeItem("token"));
   const featuredData = [
-    {
-      name: "Report Violation",
-      img: violations,
-    },
-
-    {
-      name: "Fines",
-      img: pay,
-    },
-    {
-      name: "Parking",
-      img: parking,
-    },
-    {
-      name: "Cctv",
-      img: cctc,
-    },
+    { name: "Report Violation", img: violations },
+    { name: "Fines", img: pay },
+    { name: "Parking", img: parking },
+    { name: "Cctv", img: cctc },
   ];
   const emergencyData = [
     { name: "Ambulance", img: emergency },
-    {
-      name: "Disha",
-      img: disha,
-    },
+    { name: "Disha", img: disha },
     { name: "Fire", img: Fire },
     { name: "Police", img: police },
   ];
-  const handleRoute = (item) => {
-    navigation.navigate({ name: item.name });
-  };
-  const renderItem = ({ item, index }) => (
+  const handleRoute = (item) => navigation.navigate({ name: item.name });
+  const handleCamera = () => navigation.navigate("Camera");
+  const Card = ({ item }) => (
     <Pressable
-      onPressIn={() => setSelectedIndex(index)}
+      onPressIn={() => setSelectedIndex(item.name)}
       onPressOut={() => setSelectedIndex(null)}
       onPress={() => handleRoute(item)}
       flex={1}
@@ -78,32 +62,44 @@ export default function Home() {
         fontWeight="bold"
         color="black"
         mt="2"
-        textAlign={"center"}
+        textAlign="center"
       >
         {item.name}
       </Text>
     </Pressable>
   );
-
-  const handleCamera = () => {
-    navigation.navigate("Camera");
-  };
-
   return (
     <Box flex={1} backgroundColor="#f5f5f5">
       {}
       <Box backgroundColor="#007367" paddingY="4" paddingX="4">
-        <Text
-          fontSize={30}
-          color="white"
-          fontWeight="bold"
-          textAlign="center"
-          zIndex={1000}
+        <HStack
+          alignItems="center"
+          justifyContent="center"
+          position="relative"
           top={10}
         >
-          G Security
-        </Text>
-
+          <Text
+            fontSize={30}
+            color="white"
+            fontWeight="bold"
+            textAlign="center"
+            flex={1}
+          >
+            G Security
+          </Text>
+          <Pressable
+            onPress={() => console.log("Logout pressed")}
+            position="absolute"
+            right={0}
+            paddingX="4"
+          >
+            <Image
+              source={require("../../../assets/newIcons/exit.png")}
+              alt="Logout Icon"
+              size={6}
+            />
+          </Pressable>
+        </HStack>
         <HStack
           backgroundColor="white"
           borderRadius="20"
@@ -112,7 +108,6 @@ export default function Home() {
           paddingY="2"
           mt="4"
           shadow="2"
-          zIndex={1000}
           top={60}
         >
           <Input
@@ -131,41 +126,36 @@ export default function Home() {
         </HStack>
       </Box>
       {}
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Box paddingX="4" paddingY="4" top={10}>
-          <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
-            Featured
-          </Text>
-          <FlatList
-            data={featuredData}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.name}
-            numColumns={3}
-            contentContainerStyle={{ paddingBottom: 16 }}
-            columnWrapperStyle={{ justifyContent: "space-between" }}
-          />
-        </Box>
-        {}
-        <Box
-          paddingX="3"
-          paddingY="4"
-          top={10}
-          backgroundColor={"#ddd"}
-          borderRadius={10}
-        >
-          <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
-            Emergency
-          </Text>
-          <FlatList
-            data={emergencyData}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.name}
-            numColumns={4}
-            contentContainerStyle={{ paddingBottom: 16 }}
-            columnWrapperStyle={{ justifyContent: "space-between" }}
-          />
-        </Box>
-      </ScrollView>
+      <Box paddingX="4" paddingY="4" top={10}>
+        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+          Featured
+        </Text>
+        <FlatList
+          data={featuredData}
+          renderItem={({ item }) => <Card item={item} />}
+          keyExtractor={(item) => item.name}
+          numColumns={3}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+        />
+      </Box>
+      {}
+      <Box
+        paddingX="3"
+        paddingY="4"
+        top={10}
+        backgroundColor="#ddd"
+        borderRadius={10}
+      >
+        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+          Emergency
+        </Text>
+        <HStack justifyContent="space-between" flexWrap="wrap">
+          {emergencyData.map((item, index) => (
+            <Card key={index} item={item} />
+          ))}
+        </HStack>
+      </Box>
     </Box>
   );
 }
