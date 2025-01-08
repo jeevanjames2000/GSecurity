@@ -6,10 +6,10 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 
-export default function Login() {
-  const navigation = useNavigation();
-  const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState();
+export default function Login({ navigation }) {
+  // const navigation = useNavigation();
+  const [username, setUsername] = useState("sample");
+  const [password, setPassword] = useState("123@123");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 

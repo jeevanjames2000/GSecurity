@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "gsecurity",
-    "slug": "gsecurity",
+    "slug": "g-security",
     "newArchEnabled": true,
     "version": "1.0.0",
     "orientation": "portrait",
@@ -42,9 +42,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "56e1af72-4335-4700-ad74-aac89007c452"
+        "projectId": "ff5d7188-adb4-465d-b1a5-d1f43a339702"
       }
     },
-    "owner": "bangarunaiduearle"
+    "owner": "jeevansekhar"
   }
 }

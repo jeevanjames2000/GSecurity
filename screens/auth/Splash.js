@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { BackHandler, Alert } from "react-native";
 import { jwtDecode } from "jwt-decode";
 import { ActivityIndicator } from "react-native";
 import { View, Box, Image, Spinner } from "native-base";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function SplashScreen({ navigation }) {
   const [expired, setExpired] = useState(false);
+
   const checkSession = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -37,9 +39,28 @@ export default function SplashScreen({ navigation }) {
     }
   }, [navigation]);
 
+  const handleBackPress = () => {
+    // Prevent navigating back from splash and close the app
+    Alert.alert("Exit App", "Are you sure you want to exit?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "OK", onPress: () => BackHandler.exitApp() },
+    ]);
+    return true; // Prevent default back button behavior
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+    };
+  }, []);
+
   useEffect(() => {
     checkSession();
   }, [expired, checkSession]);
+
   return (
     <View
       style={{

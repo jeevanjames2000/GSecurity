@@ -1,14 +1,6 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Text,
-  FlatList,
-  Image,
-  Pressable,
-  HStack,
-  Input,
-  ScrollView,
-} from "native-base";
+import { Box, Text, FlatList, Image, HStack, Input } from "native-base";
+import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import violations from "../../../assets/newIcons/group.png";
 import pay from "../../../assets/newIcons/bribe.png";
@@ -37,14 +29,15 @@ export default function Home() {
   ];
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleCamera = () => navigation.navigate("Camera");
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("token");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Splash" }],
+    });
+  };
   const Card = ({ item }) => (
-    <Pressable
-      onPressIn={() => setSelectedIndex(item.name)}
-      onPressOut={() => setSelectedIndex(null)}
-      onPress={() => handleRoute(item)}
-      flex={1}
-      margin="2"
-    >
+    <Pressable onPress={() => handleRoute(item)} flex={1} margin="2">
       <Box
         bg="white"
         borderRadius="xl"
@@ -88,13 +81,13 @@ export default function Home() {
             G Security
           </Text>
           <Pressable
-            onPress={() => console.log("Logout pressed")}
+            onPress={handleLogout}
             position="absolute"
             right={0}
             paddingX="4"
           >
             <Image
-              source={require("../../../assets/newIcons/exit.png")}
+              source={require("../../../assets/newIcons/exit (1).png")}
               alt="Logout Icon"
               size={6}
             />
