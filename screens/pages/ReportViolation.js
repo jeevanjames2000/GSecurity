@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import {
-  View,
-  Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
+  ScrollView,
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { SafeAreaView } from "react-native";
 import {
   FormControl,
   Stack,
+  View,
+  Text,
   Input,
   Button,
   TextArea,
@@ -25,19 +24,23 @@ import {
   Center,
   IconButton,
   useToast,
+  Pressable,
 } from "native-base";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Feather from "react-native-vector-icons/Feather";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 export default function ReportViolation() {
+  const navigation = useNavigation();
   const toast = useToast();
   const [isActionSheetOpen, setActionSheetOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [name, setName] = useState("");
-
   const handlePickImages = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -180,28 +183,32 @@ export default function ReportViolation() {
       );
       const result = await response.json();
       if (response.status === 200) {
-        toast.show({
-          render: () => {
-            return (
-              <Box
-                bg="green.300"
-                px="4"
-                py="2"
-                rounded="md"
-                shadow={2}
-                alignSelf="center"
-              >
-                Violation registered successfully!
-              </Box>
-            );
-          },
-          placement: "top-right",
-        });
-        setName("");
-        setVehicleNumber("");
-        setComments("");
-        setSelectedImages([]);
-        setSelectedValues([]);
+        setTimeout(() => {
+          toast.show({
+            render: () => {
+              return (
+                <Box
+                  bg="green.300"
+                  px="4"
+                  py="2"
+                  rounded="md"
+                  shadow={2}
+                  alignSelf="center"
+                >
+                  Violation registered successfully!
+                </Box>
+              );
+            },
+            placement: "top-right",
+          });
+          navigation.goBack();
+          setName("");
+          setVehicleNumber("");
+          setComments("");
+          setSelectedImages([]);
+          setSelectedValues([]);
+          setIsLoading(false);
+        }, 2000);
       } else {
         const errorMessage =
           result.error || "An error occurred. Please try again.";
@@ -222,6 +229,7 @@ export default function ReportViolation() {
           },
           placement: "bottom",
         });
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error uploading images:", error);
@@ -244,7 +252,6 @@ export default function ReportViolation() {
         placement: "top-right",
       });
       Alert.alert("Error", "Failed to upload violation. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -267,7 +274,7 @@ export default function ReportViolation() {
       >
         <Center
           width={"100%"}
-          height={90}
+          h={20}
           borderColor="#DBDBDB"
           borderWidth={1}
           borderRadius="sm"
@@ -313,156 +320,185 @@ export default function ReportViolation() {
     handleUploadImage(selectedImages);
   };
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <FormControl>
-          <Stack>
-            <FormControl.Label
-              _text={{
-                fontSize: 20,
-                color: "#000",
-                fontWeight: 700,
-                marginBottom: 2,
-              }}
-            >
-              Student / Employee name
-            </FormControl.Label>
-            <Input
-              value={name}
-              onChangeText={setName}
-              placeholder={"Enter Name"}
-              variant="filled"
-              bg="#F0F2F5"
-              p={3}
-              borderRadius="md"
-              width="100%"
-              fontSize={16}
-              _focus={{ bg: "#fff" }}
-            />
-          </Stack>
-          <Stack>
-            <FormControl.Label
-              _text={{
-                fontSize: 20,
-                color: "#000",
-                fontWeight: 700,
-                marginBottom: 2,
-              }}
-            >
-              Vehicle Number
-            </FormControl.Label>
-            <Input
-              value={vehicleNumber}
-              onChangeText={setVehicleNumber}
-              placeholder={"Vehicle Number"}
-              variant="filled"
-              bg="#F0F2F5"
-              p={3}
-              borderRadius="md"
-              width="100%"
-              fontSize={16}
-              _focus={{ bg: "#fff" }}
-            />
-          </Stack>
-          <Stack>
-            <FormControl.Label
-              _text={{
-                fontSize: 20,
-                color: "#000",
-                fontWeight: 700,
-                marginBottom: 2,
-              }}
-            >
-              Violation Category
-            </FormControl.Label>
-            <TouchableOpacity
-              onPress={() => setActionSheetOpen(true)}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: "#F0F2F5",
-                padding: 14,
-                borderRadius: 4,
-              }}
-            >
-              <Text style={{ color: "#637587", fontSize: 16, flex: 1 }}>
-                {selectedValues.length > 0
-                  ? selectedValues.join(", ")
-                  : "Select Violation Type"}
-              </Text>
-              <MaterialIcons
-                name="keyboard-arrow-down"
-                size={24}
-                color="#637587"
-                style={{ marginLeft: "auto" }}
-              />
-            </TouchableOpacity>
-          </Stack>
-          <CustomActionSheet
-            isOpen={isActionSheetOpen}
-            onClose={() => setActionSheetOpen(false)}
-            selectedValues={selectedValues}
-            onSubmit={handleActionSheetSubmit}
-          />
-          <Stack>
-            <FormControl.Label
-              _text={{
-                fontSize: 20,
-                color: "#000",
-                fontWeight: "700",
-                marginBottom: 2,
-              }}
-            >
-              Comments
-            </FormControl.Label>
-            <View style={styles.textAreaContainer}>
-              <TextArea
-                h={20}
-                fontSize={16}
-                w="100%"
-                color="#637587"
-                bg="#F0F2F5"
-                value={comments}
-                placeholder="Enter Violation Information"
-                onChangeText={setComments}
-              />
-            </View>
-          </Stack>
-          <UploadPhoto
-            selectedImages={selectedImages}
-            onPickImages={handlePickImages}
-            onDeleteImage={handleDeleteImage}
-          />
-          <Button
-            bg="#007367"
-            mt={3}
-            mb={10}
-            borderRadius="md"
-            width="100%"
-            p={3}
-            bottom={-40}
-            onPress={handleSubmit}
+    <Box flex={1} backgroundColor="#f5f5f5">
+      <Box backgroundColor="#007367" paddingY="12" paddingX="4">
+        <HStack
+          alignItems="center"
+          justifyContent="space-between"
+          position="relative"
+          top={5}
+        >
+          <Text
+            fontSize={30}
+            color="white"
+            justifyContent={"center"}
+            alignItems={"center"}
+            fontWeight="bold"
+            textAlign="center"
+            flex={1}
           >
-            {isLoading ? (
-              <View>
-                <ActivityIndicator size="large" color="#fff" />
-              </View>
-            ) : (
-              <Text
-                style={{
-                  color: "#fff",
-                  fontWeight: 600,
+            Report Violations
+          </Text>
+          <Ionicons
+            name="arrow-back"
+            size={30}
+            position="absolute"
+            left={0}
+            color="white"
+            onPress={() => navigation.goBack()}
+          />
+        </HStack>
+      </Box>
+      <ScrollView>
+        <Box p={4}>
+          <FormControl>
+            <Stack>
+              <FormControl.Label
+                _text={{
                   fontSize: 20,
-                  textAlign: "center",
+                  color: "#000",
+                  fontWeight: 700,
+                  marginBottom: 2,
                 }}
               >
-                Submit
-              </Text>
-            )}
-          </Button>
-        </FormControl>
+                Student / Employee name
+              </FormControl.Label>
+              <Input
+                value={name}
+                onChangeText={setName}
+                placeholder={"Enter Name"}
+                variant="filled"
+                bg="#F0F2F5"
+                p={3}
+                borderRadius="md"
+                width="100%"
+                fontSize={16}
+                _focus={{ bg: "#fff" }}
+              />
+            </Stack>
+            <Stack>
+              <FormControl.Label
+                _text={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontWeight: 700,
+                  marginBottom: 2,
+                }}
+              >
+                Vehicle Number
+              </FormControl.Label>
+              <Input
+                value={vehicleNumber}
+                onChangeText={setVehicleNumber}
+                placeholder={"Vehicle Number"}
+                variant="filled"
+                bg="#F0F2F5"
+                p={3}
+                borderRadius="md"
+                width="100%"
+                fontSize={16}
+                _focus={{ bg: "#fff" }}
+              />
+            </Stack>
+            <Stack>
+              <FormControl.Label
+                _text={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontWeight: 700,
+                  marginBottom: 2,
+                }}
+              >
+                Violation Category
+              </FormControl.Label>
+              <TouchableOpacity
+                onPress={() => setActionSheetOpen(true)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "#F0F2F5",
+                  padding: 14,
+                  borderRadius: 4,
+                }}
+              >
+                <Text style={{ color: "#637587", fontSize: 16, flex: 1 }}>
+                  {selectedValues.length > 0
+                    ? selectedValues.join(", ")
+                    : "Select Violation Type"}
+                </Text>
+                <MaterialIcons
+                  name="keyboard-arrow-down"
+                  size={24}
+                  color="#637587"
+                  style={{ marginLeft: "auto" }}
+                />
+              </TouchableOpacity>
+            </Stack>
+            <CustomActionSheet
+              isOpen={isActionSheetOpen}
+              onClose={() => setActionSheetOpen(false)}
+              selectedValues={selectedValues}
+              onSubmit={handleActionSheetSubmit}
+            />
+            <Stack>
+              <FormControl.Label
+                _text={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontWeight: "700",
+                  marginBottom: 2,
+                }}
+              >
+                Comments
+              </FormControl.Label>
+              <View style={styles.textAreaContainer}>
+                <TextArea
+                  h={20}
+                  fontSize={16}
+                  w="100%"
+                  color="#637587"
+                  bg="#F0F2F5"
+                  value={comments}
+                  placeholder="Enter Violation Information"
+                  onChangeText={setComments}
+                />
+              </View>
+            </Stack>
+            <UploadPhoto
+              selectedImages={selectedImages}
+              onPickImages={handlePickImages}
+              onDeleteImage={handleDeleteImage}
+            />
+            <Button
+              bg="#007367"
+              borderRadius="md"
+              width="100%"
+              mt={2}
+              p={3}
+              bottom={0}
+              onPress={handleSubmit}
+            >
+              {isLoading ? (
+                <View>
+                  <ActivityIndicator size="large" color="#fff" />
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: 20,
+                    textAlign: "center",
+                  }}
+                >
+                  Submit
+                </Text>
+              )}
+            </Button>
+          </FormControl>
+        </Box>
       </ScrollView>
-    </SafeAreaView>
+    </Box>
   );
 }
 const styles = StyleSheet.create({
@@ -511,7 +547,7 @@ const styles = StyleSheet.create({
   imageWrapper: {
     marginRight: 10,
     width: 100,
-    height: 100,
+    height: 90,
     borderColor: "#DBDBDB",
     borderWidth: 1,
     borderRadius: 10,

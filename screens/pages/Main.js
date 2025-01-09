@@ -10,38 +10,40 @@ import { Image } from "native-base";
 import ReportViolation from "./ReportViolation";
 import Violations from "./Tabs/Violations";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 const Tab = createBottomTabNavigator();
 export default function Main() {
   const navigation = useNavigation();
-  // console.log(AsyncStorage.removeItem("token"));
   const icons = {
-    MainNavigator: require("../../assets/home.png"),
-    Violations: require("../../assets/newIcons/risk-management.png"),
-    Profile: require("../../assets/user (1).png"),
+    MainNavigator: {
+      uri: "http://172.17.58.151:9000/auth/getImage/home.png",
+    },
+    Qr: {
+      uri: "http://172.17.58.151:9000/auth/getImage/qr-code1.png",
+    },
+    Profile: {
+      uri: "http://172.17.58.151:9000/auth/getImage/user1.png",
+    },
   };
   return (
     <Tab.Navigator
       initialRouteName="MainNavigator"
       screenOptions={({ route }) => ({
         tabBarLabel: "",
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           const label =
             route.name === "MainNavigator"
               ? "Home"
               : route.name === "Profile"
               ? "Profile"
-              : "Violations";
-
+              : "sds";
           const iconSource = icons[route.name];
-
           return (
             <View
               style={{
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: 5,
+                padding: 15,
                 width: "100%",
               }}
             >
@@ -51,20 +53,25 @@ export default function Main() {
                 resizeMode="contain"
                 style={{
                   alignItems: "center",
-                  width: 30,
-                  height: 30,
+                  width: route.name === "Qr" ? 50 : 30,
+                  height: route.name === "Qr" ? 50 : 30,
                   tintColor: focused ? "green" : "gray",
+                  padding: route.name === "Qr" ? 10 : 0,
+                  // backgroundColor: route.name === "Qr" ? "#dddd" : "",
+                  // borderRadius: route.name === "Qr" ? 50 : 0,
                 }}
               />
-              <Text
-                style={{
-                  color,
-                  fontSize: 13,
-                  fontWeight: "bold",
-                }}
-              >
-                {label}
-              </Text>
+              {route.name !== "Qr" && (
+                <Text
+                  style={{
+                    color,
+                    fontSize: 12,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {label}
+                </Text>
+              )}
             </View>
           );
         },
@@ -80,19 +87,6 @@ export default function Main() {
       })}
     >
       <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          headerStyle: {
-            backgroundColor: "#FFFFFF",
-          },
-          headerTitle: "Profile",
-          headerTintColor: "#fff",
-          headerTintColor: "#000",
-          headerTitleAlign: "center",
-        }}
-      />
-      <Tab.Screen
         name="MainNavigator"
         component={MainNavigator}
         options={{
@@ -102,14 +96,16 @@ export default function Main() {
       />
 
       <Tab.Screen
-        name="Violations"
-        component={Violations}
+        name="Qr"
+        component={Camera}
         options={{
           headerStyle: {
             backgroundColor: "#007367",
           },
           headerTintColor: "#fff",
           headerTitleAlign: "center",
+          tabBarLabel: "",
+          headerShown: true,
           headerLeft: () => (
             <View
               style={{
@@ -131,6 +127,19 @@ export default function Main() {
           ),
         }}
       />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          headerStyle: {
+            backgroundColor: "#FFFFFF",
+          },
+          headerTitle: "Profile",
+          headerTintColor: "#000",
+          headerTitleAlign: "center",
+        }}
+      />
+      {}
     </Tab.Navigator>
   );
 }

@@ -12,6 +12,9 @@ import Home from "./Tabs/Home";
 import Parking from "./Parking";
 import Violations from "./Tabs/Violations";
 import Camera from "./Tabs/Camera";
+import GatePass from "./Gatepass";
+import VisitorsList from "./Vms/VisitorList";
+import AddVisitor from "./Vms/AddVisitor";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,42 +37,7 @@ export default function MainNavigator() {
       <Stack.Screen
         name="Report Violation"
         component={ReportViolation}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Report Violation",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Violations"
@@ -128,6 +96,11 @@ export default function MainNavigator() {
         component={Login}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="AddVisitor"
+        component={AddVisitor}
+        options={{ headerShown: false }}
+      />
 
       <Stack.Screen
         name="Get Details"
@@ -157,86 +130,15 @@ export default function MainNavigator() {
       />
 
       <Stack.Screen
-        name="Fines"
-        component={Fines}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Fines",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
-
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
+        name="VMS"
+        component={VisitorsList}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen
-        name="Parking"
-        component={Parking}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Parking",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
+        name="GatePass"
+        component={GatePass}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

@@ -1,19 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Text, FlatList, Image, HStack, Input, View } from "native-base";
-import { Pressable } from "react-native";
+import { Pressable, Linking } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import violations from "../../../assets/newIcons/group.png";
-import pay from "../../../assets/newIcons/bribe.png";
-import emergency from "../../../assets/newIcons/ambulance.png";
-import Fire from "../../../assets/newIcons/fire-extinguisher.png";
-import cctc from "../../../assets/newIcons/cctv.png";
-import disha from "../../../assets/newIcons/dishaimg.png";
-import parking from "../../../assets/newIcons/parking.png";
-import police from "../../../assets/newIcons/police-station (1).png";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Home() {
   const navigation = useNavigation();
-  const [selectedIndex, setSelectedIndex] = useState(null);
+
   // console.log(AsyncStorage.removeItem("token"));
   const featuredData = [
     {
@@ -23,15 +15,15 @@ export default function Home() {
       },
     },
     {
-      name: "Fines",
+      name: "VMS",
       img: {
-        uri: "http://172.17.58.151:9000/auth/getImage/bribe.png",
+        uri: "http://172.17.58.151:9000/auth/getImage/reception.png",
       },
     },
     {
-      name: "Parking",
+      name: "GatePass",
       img: {
-        uri: "http://172.17.58.151:9000/auth/getImage/parking.png",
+        uri: "http://172.17.58.151:9000/auth/getImage/toll-road_829376.png",
       },
     },
     {
@@ -45,27 +37,37 @@ export default function Home() {
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/ambulance.png",
       },
+      phone: "108",
     },
     {
       name: "Disha",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/dishaimg.png",
       },
+      phone: "181",
     },
     {
       name: "Fire",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/fire-extinguisher.png",
       },
+      phone: "104",
     },
     {
       name: "Police",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/police-station.png",
       },
+      phone: "100",
     },
   ];
   const handleRoute = (item) => navigation.navigate({ name: item.name });
+  const handleEmergencyRoute = (item) => {
+    const phoneNumber = `tel:${item.phone}`;
+    Linking.openURL(phoneNumber).catch((err) =>
+      console.error("Error opening dialer:", err)
+    );
+  };
   const handleCamera = () => navigation.navigate("Camera");
   const handleLogout = async () => {
     await AsyncStorage.removeItem("token");
@@ -74,7 +76,7 @@ export default function Home() {
       routes: [{ name: "Splash" }],
     });
   };
-  const Card = ({ item }) => (
+  const FeaturedCard = ({ item }) => (
     <Pressable onPress={() => handleRoute(item)} flex={1} margin="2">
       <Box
         bg="white"
@@ -104,9 +106,39 @@ export default function Home() {
       </Text>
     </Pressable>
   );
+  const EmergencyCard = ({ item }) => (
+    <Pressable onPress={() => handleEmergencyRoute(item)} flex={1} margin="2">
+      <Box
+        bg="white"
+        borderRadius="xl"
+        alignItems="center"
+        justifyContent="center"
+        shadow="3"
+        padding="2"
+        minWidth="80px"
+        minHeight="80px"
+      >
+        <Image
+          source={item.img}
+          alt={item.name}
+          size="sm"
+          resizeMode="contain"
+        />
+      </Box>
+      <Text
+        fontSize="sm"
+        fontWeight="bold"
+        color="black"
+        mt="2"
+        textAlign="center"
+      >
+        {item.name}
+      </Text>
+    </Pressable>
+  );
+
   return (
     <Box flex={1} backgroundColor="#f5f5f5">
-      {}
       <Box backgroundColor="#007367" paddingY="4" paddingX="4">
         <HStack
           alignItems="center"
@@ -141,10 +173,10 @@ export default function Home() {
           borderRadius="20"
           alignItems="center"
           paddingX="4"
-          paddingY="2"
+          paddingY="4"
           mt="4"
           shadow="2"
-          top={60}
+          top={50}
         >
           <Input
             flex={1}
@@ -154,21 +186,22 @@ export default function Home() {
           />
           <Pressable onPress={handleCamera}>
             <Image
-              source={require("../../../assets/qr-code (1).png")}
+              source={{
+                uri: "http://172.17.58.151:9000/auth/getImage/paper.png",
+              }}
               alt="Search Icon"
-              size="sm"
+              size={8}
             />
           </Pressable>
         </HStack>
       </Box>
-      {}
       <Box paddingX="4" paddingY="4" top={10}>
         <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
           Featured
         </Text>
         <FlatList
           data={featuredData}
-          renderItem={({ item }) => <Card item={item} />}
+          renderItem={({ item }) => <FeaturedCard item={item} />}
           keyExtractor={(item) => item.name}
           numColumns={3}
           contentContainerStyle={{ paddingBottom: 16 }}
@@ -188,7 +221,7 @@ export default function Home() {
           </Text>
           <HStack justifyContent="space-between" flexWrap="wrap">
             {emergencyData.map((item, index) => (
-              <Card key={index} item={item} />
+              <EmergencyCard key={index} item={item} />
             ))}
           </HStack>
         </Box>
