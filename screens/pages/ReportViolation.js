@@ -32,13 +32,12 @@ import Feather from "react-native-vector-icons/Feather";
 export default function ReportViolation() {
   const toast = useToast();
   const [isActionSheetOpen, setActionSheetOpen] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [name, setName] = useState("");
-  const [placeholder, setPlaceholder] = useState("Select Violation Type");
+
   const handlePickImages = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -63,7 +62,6 @@ export default function ReportViolation() {
     );
   };
   const [fine, setFine] = useState(0);
-  console.log("fine: ", fine);
   const CustomActionSheet = ({ isOpen, onClose, onSubmit, selectedValues }) => {
     const [tempSelectedValues, setTempSelectedValues] =
       useState(selectedValues);
@@ -152,12 +150,7 @@ export default function ReportViolation() {
   const handleActionSheetSubmit = (values, fines) => {
     setSelectedValues(values);
     setFine(fines);
-
-    setPlaceholder(
-      values.length > 0 ? values.join(", ") : "Select Violation Type"
-    );
   };
-
   const [comments, setComments] = useState("");
   const handleUploadImage = async () => {
     setIsLoading(true);
