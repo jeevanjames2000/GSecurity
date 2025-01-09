@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Text, FlatList, Image, HStack, Input } from "native-base";
+import { Box, Text, FlatList, Image, HStack, Input, View } from "native-base";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import violations from "../../../assets/newIcons/group.png";
@@ -175,22 +175,24 @@ export default function Home() {
           columnWrapperStyle={{ justifyContent: "space-between" }}
         />
       </Box>
-      <Box
-        paddingX="3"
-        paddingY="4"
-        top={10}
-        backgroundColor="#ddd"
-        borderRadius={10}
-      >
-        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
-          Emergency
-        </Text>
-        <HStack justifyContent="space-between" flexWrap="wrap">
-          {emergencyData.map((item, index) => (
-            <Card key={index} item={item} />
-          ))}
-        </HStack>
-      </Box>
+      <View paddingX="4">
+        <Box
+          paddingX="3"
+          paddingY="4"
+          top={10}
+          backgroundColor="#ddd"
+          borderRadius={10}
+        >
+          <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+            Emergency
+          </Text>
+          <HStack justifyContent="space-between" flexWrap="wrap">
+            {emergencyData.map((item, index) => (
+              <Card key={index} item={item} />
+            ))}
+          </HStack>
+        </Box>
+      </View>
     </Box>
   );
 }

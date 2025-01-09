@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native";
@@ -13,7 +15,6 @@ import {
   Stack,
   Input,
   Button,
-  Modal,
   TextArea,
   Image,
   Actionsheet,
@@ -23,17 +24,21 @@ import {
   Wrap,
   Center,
   IconButton,
+  useToast,
 } from "native-base";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Feather from "react-native-vector-icons/Feather";
-import LoadingDots from "react-native-loading-dots";
 export default function ReportViolation() {
+  const toast = useToast();
   const [isActionSheetOpen, setActionSheetOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   const [vehicleNumber, setVehicleNumber] = useState("");
+  const [name, setName] = useState("");
+  const [placeholder, setPlaceholder] = useState("Select Violation Type");
   const handlePickImages = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -57,20 +62,44 @@ export default function ReportViolation() {
       prevImages.filter((_, imgIndex) => imgIndex !== index)
     );
   };
+  const [fine, setFine] = useState(0);
+  console.log("fine: ", fine);
   const CustomActionSheet = ({ isOpen, onClose, onSubmit, selectedValues }) => {
     const [tempSelectedValues, setTempSelectedValues] =
       useState(selectedValues);
+    const [totalFines, setTotalFines] = useState(0);
+    const fines = {
+      Accident: 2000,
+      "Incorrect parking": 500,
+      "Over speeding": 1000,
+      "Drunk & drive": 3000,
+      "No Helmet": 500,
+      Others: 0,
+    };
     const handleCheckboxChange = (value) => {
-      setTempSelectedValues((prev) =>
-        prev.includes(value)
+      setTempSelectedValues((prev) => {
+        const updatedValues = prev.includes(value)
           ? prev.filter((item) => item !== value)
-          : [...prev, value]
-      );
+          : [...prev, value];
+        const total = updatedValues.reduce(
+          (sum, violation) => sum + fines[violation],
+          0
+        );
+        setTotalFines(total);
+        return updatedValues;
+      });
     };
     const handleSubmit = () => {
-      onSubmit(tempSelectedValues);
+      onSubmit(tempSelectedValues, totalFines);
       onClose();
     };
+    useEffect(() => {
+      const total = tempSelectedValues.reduce(
+        (sum, violation) => sum + fines[violation],
+        0
+      );
+      setTotalFines(total);
+    }, [tempSelectedValues]);
     return (
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content alignItems="left" padding={6}>
@@ -86,14 +115,7 @@ export default function ReportViolation() {
               Violation Type
             </Text>
           </Box>
-          {[
-            "Accident",
-            "Incorrect parking",
-            "Over speeding",
-            "Drunk & drive",
-            "No Helmet",
-            "Others",
-          ].map((label, index) => (
+          {Object.keys(fines).map((label, index) => (
             <Checkbox
               key={index}
               value={label}
@@ -102,9 +124,14 @@ export default function ReportViolation() {
               isChecked={tempSelectedValues.includes(label)}
               onChange={() => handleCheckboxChange(label)}
             >
-              {label}
+              {`${label} - ₹${fines[label]}`}
             </Checkbox>
           ))}
+          <Box mt={4}>
+            <Text style={{ fontSize: 18, fontWeight: "700" }}>
+              Total Fines: ₹{totalFines}
+            </Text>
+          </Box>
           <HStack w="100%" justifyContent="space-evenly" mt={4}>
             <Button
               flex={1}
@@ -122,10 +149,20 @@ export default function ReportViolation() {
       </Actionsheet>
     );
   };
+  const handleActionSheetSubmit = (values, fines) => {
+    setSelectedValues(values);
+    setFine(fines);
+
+    setPlaceholder(
+      values.length > 0 ? values.join(", ") : "Select Violation Type"
+    );
+  };
+
   const [comments, setComments] = useState("");
   const handleUploadImage = async () => {
+    setIsLoading(true);
     const formData = new FormData();
-    selectedImages.forEach((imageUri, index) => {
+    selectedImages.forEach((imageUri) => {
       const image = {
         uri: imageUri,
         type: "image/jpeg",
@@ -133,7 +170,9 @@ export default function ReportViolation() {
       };
       formData.append("images[]", image);
     });
+    formData.append("name", name);
     formData.append("vehicle_number", vehicleNumber);
+    formData.append("totalFines", fine);
     selectedValues.forEach((violation) => {
       formData.append("violationType[]", violation);
     });
@@ -144,18 +183,76 @@ export default function ReportViolation() {
         {
           method: "POST",
           body: formData,
-          headers: {},
         }
       );
       const result = await response.json();
       if (response.status === 200) {
+        toast.show({
+          render: () => {
+            return (
+              <Box
+                bg="green.300"
+                px="4"
+                py="2"
+                rounded="md"
+                shadow={2}
+                alignSelf="center"
+              >
+                Violation registered successfully!
+              </Box>
+            );
+          },
+          placement: "top-right",
+        });
+        setName("");
         setVehicleNumber("");
         setComments("");
-        setSelectedImages("");
-        setSelectedValues("");
+        setSelectedImages([]);
+        setSelectedValues([]);
+      } else {
+        const errorMessage =
+          result.error || "An error occurred. Please try again.";
+        toast.show({
+          render: () => {
+            return (
+              <Box
+                bg="red.300"
+                px="4"
+                py="2"
+                rounded="md"
+                shadow={2}
+                alignSelf="flex-end"
+              >
+                {errorMessage}
+              </Box>
+            );
+          },
+          placement: "bottom",
+        });
       }
     } catch (error) {
       console.error("Error uploading images:", error);
+      toast.show({
+        render: () => {
+          return (
+            <Box
+              bg="red.300"
+              px="4"
+              py="2"
+              rounded="md"
+              shadow={2}
+              alignSelf="flex-end"
+              mt={13}
+            >
+              Failed to upload violation. Please try again.
+            </Box>
+          );
+        },
+        placement: "top-right",
+      });
+      Alert.alert("Error", "Failed to upload violation. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
   const UploadPhoto = ({ selectedImages, onPickImages, onDeleteImage }) => (
@@ -219,13 +316,6 @@ export default function ReportViolation() {
       )}
     </Stack>
   );
-  const [placeholder, setPlaceholder] = useState("Select Violation Type");
-  const handleActionSheetSubmit = (values) => {
-    setSelectedValues(values);
-    setPlaceholder(
-      values.length > 0 ? values.join(", ") : "Select Violation Type"
-    );
-  };
   const handleSubmit = () => {
     handleUploadImage(selectedImages);
   };
@@ -233,6 +323,30 @@ export default function ReportViolation() {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <FormControl>
+          <Stack>
+            <FormControl.Label
+              _text={{
+                fontSize: 20,
+                color: "#000",
+                fontWeight: 700,
+                marginBottom: 2,
+              }}
+            >
+              Student / Employee name
+            </FormControl.Label>
+            <Input
+              value={name}
+              onChangeText={setName}
+              placeholder={"Enter Name"}
+              variant="filled"
+              bg="#F0F2F5"
+              p={3}
+              borderRadius="md"
+              width="100%"
+              fontSize={16}
+              _focus={{ bg: "#fff" }}
+            />
+          </Stack>
           <Stack>
             <FormControl.Label
               _text={{
@@ -310,7 +424,7 @@ export default function ReportViolation() {
             </FormControl.Label>
             <View style={styles.textAreaContainer}>
               <TextArea
-                h={40}
+                h={20}
                 fontSize={16}
                 w="100%"
                 color="#637587"
@@ -319,32 +433,7 @@ export default function ReportViolation() {
                 placeholder="Enter Violation Information"
                 onChangeText={setComments}
               />
-              <TouchableOpacity
-                style={styles.micIcon}
-                onPress={() => setModalOpen(true)}
-              >
-                <Feather name="mic" size={24} color="#637587" />
-              </TouchableOpacity>
             </View>
-            <Modal
-              isOpen={isModalOpen}
-              onClose={() => setModalOpen(false)}
-              size="xl"
-            >
-              <Modal.Content maxH="300">
-                <Modal.CloseButton />
-                <Modal.Body padding={16} alignItems="center">
-                  <View style={styles.dotsContainer}>
-                    <LoadingDots
-                      dots={3}
-                      colors={["#BBE8DA", "#8BCBB7", "#007367"]}
-                      bounceHeight={4}
-                      size={10}
-                    />
-                  </View>
-                </Modal.Body>
-              </Modal.Content>
-            </Modal>
           </Stack>
           <UploadPhoto
             selectedImages={selectedImages}
@@ -361,16 +450,22 @@ export default function ReportViolation() {
             bottom={-40}
             onPress={handleSubmit}
           >
-            <Text
-              style={{
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 20,
-                textAlign: "center",
-              }}
-            >
-              Submit
-            </Text>
+            {isLoading ? (
+              <View>
+                <ActivityIndicator size="large" color="#fff" />
+              </View>
+            ) : (
+              <Text
+                style={{
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: 20,
+                  textAlign: "center",
+                }}
+              >
+                Submit
+              </Text>
+            )}
           </Button>
         </FormControl>
       </ScrollView>
