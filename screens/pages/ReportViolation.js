@@ -94,35 +94,37 @@ const ReportViolation = () => {
       shadow={2}
       borderWidth={0.5}
       borderColor={item.status === "pending" ? "orange.400" : "green.400"}
-      onTouchEnd={() => handleItemPress(item)}
+      // onTouchEnd={() => handleItemPress(item)}
     >
-      <HStack justifyContent="space-between" alignItems="center">
-        <VStack flex={1}>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            Name:{" "}
-            <Text fontSize="md" fontWeight="medium" color="gray.600">
-              {item.name}
+      <TouchableOpacity onPress={() => handleItemPress(item)}>
+        <HStack justifyContent="space-between" alignItems="center">
+          <VStack flex={1}>
+            <Text fontSize="lg" fontWeight="bold" color="gray.800">
+              Name:{" "}
+              <Text fontSize="md" fontWeight="medium" color="gray.600">
+                {item.name}
+              </Text>
             </Text>
-          </Text>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            Vehicle Number:{" "}
-            <Text fontSize="md" fontWeight="medium" color="gray.600">
-              {item.vehicle_number}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800">
+              Vehicle Number:{" "}
+              <Text fontSize="md" fontWeight="medium" color="gray.600">
+                {item.vehicle_number}
+              </Text>
             </Text>
-          </Text>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            Violation:{" "}
-            <Text fontSize="md" fontWeight="medium" color="gray.600">
-              {item.violation_type}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800">
+              Violation:{" "}
+              <Text fontSize="md" fontWeight="medium" color="gray.600">
+                {item.violation_type}
+              </Text>
             </Text>
-          </Text>
-        </VStack>
-        <HStack space={4}>
-          <Text fontSize={15} fontWeight={"bold"} color={"orange"}>
-            ₹{item.totalFines}
-          </Text>
+          </VStack>
+          <HStack space={4}>
+            <Text fontSize={15} fontWeight={"bold"} color={"orange"}>
+              ₹{item.totalFines}
+            </Text>
+          </HStack>
         </HStack>
-      </HStack>
+      </TouchableOpacity>
     </Box>
   );
   const fetchViolations = async () => {
@@ -273,7 +275,7 @@ const ReportViolation = () => {
           <Pressable>
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/paper.png",
+                uri: "http://172.17.58.151:9000/auth/getImage/search.png",
               }}
               alt="Search Icon"
               size={8}

@@ -161,18 +161,7 @@ export default function Home() {
           >
             G Security
           </Text>
-          {/* <Pressable
-            onPress={handleLogout}
-            position="absolute"
-            right={0}
-            paddingX="4"
-          >
-            <Image
-              source={require("../../../assets/newIcons/exit (1).png")}
-              alt="Logout Icon"
-              size={6}
-            />
-          </Pressable> */}
+
           <Ionicons
             name="log-out-outline"
             size={30}
@@ -199,10 +188,10 @@ export default function Home() {
             variant="unstyled"
             fontSize="md"
           />
-          <Pressable onPress={handleCamera}>
+          <Pressable>
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/paper.png",
+                uri: "http://172.17.58.151:9000/auth/getImage/search.png",
               }}
               alt="Search Icon"
               size={8}

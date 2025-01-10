@@ -199,7 +199,7 @@ const Violations = () => {
           <Pressable>
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/paper.png",
+                uri: "http://172.17.58.151:9000/auth/getImage/search.png",
               }}
               alt="Search Icon"
               size={8}

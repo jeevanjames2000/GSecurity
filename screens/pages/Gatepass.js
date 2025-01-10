@@ -112,46 +112,51 @@ const GatePass = () => {
       shadow={2}
       borderWidth={0.5}
       borderColor={item.status === "pending" ? "orange.400" : "green.400"}
-      onTouchEnd={() => handleView(item)}
     >
-      <HStack justifyContent="space-between" alignItems="center">
-        <VStack flex={1}>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            Pass Type:{" "}
-            <Text fontSize="md" fontWeight="medium" color="gray.600">
-              {item.pass_type}
+      <TouchableOpacity onPress={() => handleView(item)}>
+        <HStack justifyContent="space-between" alignItems="center">
+          <VStack flex={1}>
+            <Text fontSize="lg" fontWeight="bold" color="gray.800">
+              Pass Type:{" "}
+              <Text fontSize="md" fontWeight="medium" color="gray.600">
+                {item.pass_type}
+              </Text>
             </Text>
-          </Text>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            Vehicle Number:{" "}
-            <Text fontSize="md" fontWeight="medium" color="gray.600">
-              {item.vehicle_num}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800">
+              Vehicle Number:{" "}
+              <Text fontSize="md" fontWeight="medium" color="gray.600">
+                {item.vehicle_num}
+              </Text>
             </Text>
-          </Text>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            Issued Date:{" "}
-            <Text fontSize="md" fontWeight="medium" color="gray.600">
-              {item.date}
+            <Text fontSize="lg" fontWeight="bold" color="gray.800">
+              Issued Date:{" "}
+              <Text fontSize="md" fontWeight="medium" color="gray.600">
+                {item.date}
+              </Text>
             </Text>
-          </Text>
-        </VStack>
-        {}
-        <HStack space={3}>
+          </VStack>
           {}
-          <Ionicons
-            name="eye-off-outline"
-            size={26}
-            color="#007367"
-            onPress={() => handleView(item)}
-          />
-          {}
-          {item.status === "pending" ? (
-            <Ionicons name="time-outline" size={26} color="orange" />
-          ) : (
-            <Ionicons name="checkmark-circle-outline" size={26} color="green" />
-          )}
+          <HStack space={3}>
+            {}
+            <Ionicons
+              name="eye-off-outline"
+              size={26}
+              color="#007367"
+              onPress={() => handleView(item)}
+            />
+            {}
+            {item.status === "pending" ? (
+              <Ionicons name="time-outline" size={26} color="orange" />
+            ) : (
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={26}
+                color="green"
+              />
+            )}
+          </HStack>
         </HStack>
-      </HStack>
+      </TouchableOpacity>
     </Box>
   );
   return (
@@ -200,7 +205,7 @@ const GatePass = () => {
           <Pressable>
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/paper.png",
+                uri: "http://172.17.58.151:9000/auth/getImage/search.png",
               }}
               alt="Search Icon"
               size={8}

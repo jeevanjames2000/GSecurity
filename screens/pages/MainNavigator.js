@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import GetDetails from "./utils/GetDetails";
 import ReportViolation from "./ReportViolation";
-import Emergency from "./Emergency";
 import Login from "../auth/Login";
 import Home from "./Tabs/Home";
 import Violations from "./Tabs/Violations";
@@ -14,6 +13,7 @@ import GatePass from "./Gatepass";
 import VisitorsList from "./Vms/VisitorList";
 import AddVisitor from "./Vms/AddVisitor";
 import AddViolations from "./Vms/AddViolations";
+import CCTV from "./CCTV";
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigator() {
@@ -38,6 +38,11 @@ export default function MainNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="Cctv"
+        component={CCTV}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="Violations"
         component={Violations}
         options={{ headerShown: false }}
@@ -51,47 +56,6 @@ export default function MainNavigator() {
         name="Camera"
         component={Camera}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Emergency"
-        component={Emergency}
-        options={{
-          headerStyle: {
-            backgroundColor: "#ffffff",
-          },
-          headerTitleAlign: "center",
-          headerShown: true,
-          headerTintColor: "#000",
-          headerTitle: "Emergency",
-          headerTitleStyle: {
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#ffffff",
-                width: 40,
-                height: 40,
-                color: "#007367",
-
-                borderRadius: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 2, height: 4 },
-                shadowOpacity: 0.6,
-                shadowRadius: 20,
-                elevation: 10,
-              }}
-            >
-              <TouchableOpacity onPress={() => navigation.navigate("Main")}>
-                <Ionicons name="arrow-back" size={24} color={"#007367"} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
       />
 
       <Stack.Screen

@@ -68,7 +68,9 @@ export default function SplashScreen({ navigation, route }) {
       }}
     >
       <Image
-        source={require("../../assets/gitam-logo-circle.png")}
+        source={{
+          uri: "http://172.17.58.151:9000/auth/getImage/gitam-logo-circle.png",
+        }}
         style={{
           width: "100%",
           height: "80%",

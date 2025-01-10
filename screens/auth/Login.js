@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, Box, Image, VStack, Input, Spinner } from "native-base";
-import GitamLogo from "../../assets/GitamLogo.jpg";
-import Frame1 from "../../assets/Frame1.png";
-import { useNavigation } from "@react-navigation/native";
+import { Text, Box, Image, VStack, Input, Spinner } from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 export default function Login({ navigation }) {
   // const navigation = useNavigation();
@@ -50,14 +47,16 @@ export default function Login({ navigation }) {
     <Box flex={1} bg="white" justifyContent="center" alignItems="center">
       <Box
         position="absolute"
-        top={20}
+        top={10}
         justifyContent="center"
         alignItems="center"
       >
         <Image
-          source={GitamLogo}
-          alt="GITAM Logo"
-          width="xl"
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/GitamLogo.jpg",
+          }}
+          alt="Search Icon"
+          size="xl"
           resizeMode="contain"
         />
       </Box>
@@ -66,12 +65,14 @@ export default function Login({ navigation }) {
         position="absolute"
         top={100}
         width="100%"
-        height="40%"
+        height="50%"
         justifyContent="center"
         alignItems="center"
       >
         <Image
-          source={Frame1}
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/Frame1.png",
+          }}
           alt="Illustration"
           resizeMode="contain"
           style={{ width: "90%", height: "90%" }}

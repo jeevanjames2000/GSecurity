@@ -28,35 +28,61 @@ const HistoryCard = ({ data, setShowModal }) => {
         justifyContent={"space-between"}
         borderRadius={"lg"}
         marginBottom={"2"}
-        borderWidth={1}
+        borderWidth={0.5}
         borderColor={data.status === "Approved" ? "green.500" : "orange.400"}
         shadow={1}
       >
-        {}
         <VStack flex={1} alignItems={"flex-start"} space={2}>
-          <Text fontSize={"md"} fontWeight={"bold"} color={"#007367"}>
-            RQ Name: {data.rqName}
+          <Text fontSize={"md"} fontWeight={"bold"} color={"black"}>
+            RQ Name:{" "}
+            <Text fontSize={"md"} fontWeight={"normal"} color={"black"}>
+              {data.rqName}
+            </Text>
           </Text>
-          <Text fontSize={"md"} fontWeight={"semibold"} color={"gray.700"}>
-            Visitor: {data.visitorName}
+          <Text fontSize={"md"} fontWeight={"bold"} color={"black"}>
+            Visitor:{" "}
+            <Text fontSize={"md"} fontWeight={"normal"} color={"black"}>
+              {data.visitorName}
+            </Text>
           </Text>
         </VStack>
         {}
         <VStack alignItems={"flex-end"} space={2}>
-          <Text fontSize={"sm"} fontWeight={"semibold"} color={"gray.600"}>
+          <Text fontSize={"sm"} fontWeight={"normal"} color={"gray.600"}>
             {data.time}
           </Text>
           <Badge
-            colorScheme={data.status === "Approved" ? "success" : "warning"}
             variant="subtle"
             borderRadius={"md"}
-            px={3}
-            py={1}
+            px={2}
+            py={2}
             _text={{
               fontSize: "xs",
               fontWeight: "bold",
               textTransform: "uppercase",
+              textAlign: "center",
             }}
+            style={{
+              width: 100,
+              borderWidth: 0.5,
+              borderColor:
+                data.status === "Approved"
+                  ? "green"
+                  : data.status === "Pending"
+                  ? "orange"
+                  : data.status === "Denied"
+                  ? "red"
+                  : "gray",
+            }}
+            colorScheme={
+              data.status === "Approved"
+                ? "success"
+                : data.status === "Pending"
+                ? "warning"
+                : data.status === "Denied"
+                ? "danger"
+                : "gray"
+            }
           >
             {data.status}
           </Badge>
@@ -178,7 +204,7 @@ const VisitorsList = () => {
           <Pressable>
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/paper.png",
+                uri: "http://172.17.58.151:9000/auth/getImage/search.png",
               }}
               alt="Search Icon"
               size={8}

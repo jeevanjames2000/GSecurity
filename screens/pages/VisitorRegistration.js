@@ -18,8 +18,6 @@ import {
   VStack,
 } from "native-base";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import camImg from "../../assets/camImg.png";
-import VideocamImg from "../../assets/videocamImg.png";
 import { StyleSheet } from "react-native";
 
 const studentInfo = {
@@ -30,7 +28,6 @@ const studentInfo = {
 };
 
 const VisitorRegistration = () => {
-  const img = require("../../assets/progfile_sec.jpg");
   const studKeys = Object.keys(studentInfo);
   const studValeus = Object.values(studentInfo);
 
@@ -61,7 +58,13 @@ const VisitorRegistration = () => {
                 alignItems="center"
                 style={{ borderRadius: 10, justifyContent: "space-between" }}
               >
-                <Image borderStyle={"solid"} source={camImg} alt="camera" />
+                <Image
+                  borderStyle={"solid"}
+                  source={{
+                    uri: "http://172.17.58.151:9000/auth/getImage/camImg.png",
+                  }}
+                  alt="camera"
+                />
                 <Text color={"rgba(0,0,0,0.5)"}>Take a photo</Text>
               </View>
             </HStack>
@@ -215,7 +218,9 @@ const VisitorRegistration = () => {
 
                   <Center paddingBottom={10}>
                     <Image
-                      source={img}
+                      source={{
+                        uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg",
+                      }}
                       alt="Alternate Text"
                       size="md"
                       //   borderColor={"#007367"}

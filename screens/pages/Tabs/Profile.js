@@ -28,7 +28,6 @@ const studentPrivt = {
 
 export default function Profile() {
   const navigation = useNavigation();
-  const img = require("../../../assets/progfile_sec.jpg");
   const studKeys = Object.keys(studentInfo);
   const studValeus = Object.values(studentInfo);
 
@@ -36,8 +35,7 @@ export default function Profile() {
   const studPrivValeus = Object.values(studentPrivt);
 
   const navigationToViolation = () => {
-    // console.log("Home");
-    navigation.navigate("Report Violation");
+    navigation.navigate("AddViolations");
   };
 
   return (
@@ -45,7 +43,9 @@ export default function Profile() {
       <SafeAreaView style={styles.container}>
         <Center paddingBottom={10}>
           <Image
-            source={img}
+            source={{
+              uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg",
+            }}
             alt="Alternate Text"
             size="xl"
             borderColor={"#007367"}
