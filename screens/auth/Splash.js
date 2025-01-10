@@ -4,14 +4,12 @@ import { jwtDecode } from "jwt-decode";
 import { ActivityIndicator } from "react-native";
 import { View, Box, Image, Spinner } from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-export default function SplashScreen({ navigation }) {
+import { useFocusEffect } from "@react-navigation/native";
+export default function SplashScreen({ navigation, route }) {
   const [expired, setExpired] = useState(false);
-
   const checkSession = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-
       if (!token) {
         setTimeout(() => {
           navigation.navigate("Login");
@@ -38,29 +36,28 @@ export default function SplashScreen({ navigation }) {
       console.error("Error checking session:", error);
     }
   }, [navigation]);
-
-  const handleBackPress = () => {
-    // Prevent navigating back from splash and close the app
-    Alert.alert("Exit App", "Are you sure you want to exit?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "OK", onPress: () => BackHandler.exitApp() },
-    ]);
-    return true; // Prevent default back button behavior
+  const handleBackPress = (routeName) => {
+    if (routeName === "Home" || routeName === "Splash") {
+      Alert.alert("Exit App", "Are you sure you want to exit?", [
+        { text: "Cancel", style: "cancel" },
+        { text: "OK", onPress: () => BackHandler.exitApp() },
+      ]);
+      return true;
+    }
+    return false;
   };
-
-  useEffect(() => {
-    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
-    };
-  }, []);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      const backHandler = () => handleBackPress(route.name);
+      BackHandler.addEventListener("hardwareBackPress", backHandler);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", backHandler);
+      };
+    }, [route.name])
+  );
   useEffect(() => {
     checkSession();
   }, [expired, checkSession]);
-
   return (
     <View
       style={{

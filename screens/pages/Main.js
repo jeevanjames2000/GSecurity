@@ -17,7 +17,7 @@ export default function Main() {
     MainNavigator: {
       uri: "http://172.17.58.151:9000/auth/getImage/home.png",
     },
-    Qr: {
+    QR: {
       uri: "http://172.17.58.151:9000/auth/getImage/qr-code1.png",
     },
     Profile: {
@@ -35,7 +35,7 @@ export default function Main() {
               ? "Home"
               : route.name === "Profile"
               ? "Profile"
-              : "sds";
+              : "QR";
           const iconSource = icons[route.name];
           return (
             <View
@@ -53,15 +53,15 @@ export default function Main() {
                 resizeMode="contain"
                 style={{
                   alignItems: "center",
-                  width: route.name === "Qr" ? 50 : 30,
-                  height: route.name === "Qr" ? 50 : 30,
+                  width: route.name === "QR" ? 50 : 30,
+                  height: route.name === "QR" ? 50 : 30,
                   tintColor: focused ? "green" : "gray",
-                  padding: route.name === "Qr" ? 10 : 0,
+                  padding: route.name === "QR" ? 10 : 0,
                   // backgroundColor: route.name === "Qr" ? "#dddd" : "",
                   // borderRadius: route.name === "Qr" ? 50 : 0,
                 }}
               />
-              {route.name !== "Qr" && (
+              {route.name !== "QR" && (
                 <Text
                   style={{
                     color,
@@ -96,7 +96,7 @@ export default function Main() {
       />
 
       <Tab.Screen
-        name="Qr"
+        name="QR"
         component={Camera}
         options={{
           headerStyle: {

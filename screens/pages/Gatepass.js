@@ -120,6 +120,7 @@ const GatePass = () => {
       shadow={2}
       borderWidth={0.5}
       borderColor={item.status === "pending" ? "orange.400" : "green.400"}
+      onTouchEnd={() => handleView(item)}
     >
       <HStack justifyContent="space-between" alignItems="center">
         <VStack flex={1}>

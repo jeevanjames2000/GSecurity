@@ -6,16 +6,14 @@ import { TouchableOpacity } from "react-native";
 import GetDetails from "./utils/GetDetails";
 import ReportViolation from "./ReportViolation";
 import Emergency from "./Emergency";
-import Fines from "./Fines";
 import Login from "../auth/Login";
 import Home from "./Tabs/Home";
-import Parking from "./Parking";
 import Violations from "./Tabs/Violations";
 import Camera from "./Tabs/Camera";
 import GatePass from "./Gatepass";
 import VisitorsList from "./Vms/VisitorList";
 import AddVisitor from "./Vms/AddVisitor";
-
+import AddViolations from "./Vms/AddViolations";
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigator() {
@@ -42,6 +40,11 @@ export default function MainNavigator() {
       <Stack.Screen
         name="Violations"
         component={Violations}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddViolations"
+        component={AddViolations}
         options={{ headerShown: false }}
       />
       <Stack.Screen

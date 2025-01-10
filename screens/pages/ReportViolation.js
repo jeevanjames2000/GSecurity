@@ -1,343 +1,245 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  ScrollView,
-  Alert,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import {
-  FormControl,
-  Stack,
-  View,
-  Text,
-  Input,
-  Button,
-  TextArea,
-  Image,
-  Actionsheet,
   Box,
-  Checkbox,
+  Text,
+  FlatList,
+  VStack,
   HStack,
-  Wrap,
-  Center,
-  IconButton,
-  useToast,
+  Modal,
+  Button,
   Pressable,
+  Input,
+  Image,
+  View,
+  Actionsheet,
+  useDisclose,
 } from "native-base";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Feather from "react-native-vector-icons/Feather";
-import { Ionicons } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-export default function ReportViolation() {
+import { useFocusEffect } from "@react-navigation/native";
+const ReportViolation = () => {
   const navigation = useNavigation();
-  const toast = useToast();
-  const [isActionSheetOpen, setActionSheetOpen] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedValues, setSelectedValues] = useState([]);
-  const [vehicleNumber, setVehicleNumber] = useState("");
-  const [name, setName] = useState("");
-  const handlePickImages = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-      selectionLimit: 5,
-      quality: 1,
-    });
-    if (!result.canceled) {
-      const newImages = result.assets.map((asset) => asset.uri);
-      setSelectedImages((prevImages) => [...prevImages, ...newImages]);
-    }
+  const { isOpen, onOpen, onClose } = useDisclose();
+  const [sortOption, setSortOption] = useState("");
+  const dummypasses = [
+    {
+      id: 1,
+      name: "Courtney Henry",
+      vehicle_num: "ABC-1234",
+      violation: "No Helmet",
+      fine: "1000",
+    },
+    {
+      id: 2,
+      name: "Henry",
+      vehicle_num: "SDS-232323",
+      violation: "Over Speeding",
+      fine: "2000",
+    },
+    {
+      id: 3,
+      name: "John",
+      vehicle_num: "WER-1212",
+      violation: "Drunk and Drive",
+      fine: "3000",
+    },
+    {
+      id: 4,
+      name: "Courtney Henry",
+      vehicle_num: "ABC-1234",
+      violation: "No Helmet",
+      fine: "1000",
+    },
+    {
+      id: 5,
+      name: "Henry",
+      vehicle_num: "SDS-232323",
+      violation: "Over Speeding",
+      fine: "2000",
+    },
+    {
+      id: 6,
+      name: "John",
+      vehicle_num: "WER-1212",
+      violation: "Drunk and Drive",
+      fine: "3000",
+    },
+  ];
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [violations, setViolations] = useState([]);
+  console.log("violations: ", violations);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const handleItemPress = (item) => {
+    setSelectedItem(item);
+    setIsModalVisible(true);
   };
-  const handleDeleteImage = (index) => {
-    setSelectedImages((prevImages) =>
-      prevImages.filter((_, imgIndex) => imgIndex !== index)
-    );
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setSelectedItem(null);
   };
-  const [fine, setFine] = useState(0);
-  const CustomActionSheet = ({ isOpen, onClose, onSubmit, selectedValues }) => {
-    const [tempSelectedValues, setTempSelectedValues] =
-      useState(selectedValues);
-    const [totalFines, setTotalFines] = useState(0);
-    const fines = {
-      Accident: 2000,
-      "Incorrect parking": 500,
-      "Over speeding": 1000,
-      "Drunk & drive": 3000,
-      "No Helmet": 500,
-      Others: 0,
-    };
-    const handleCheckboxChange = (value) => {
-      setTempSelectedValues((prev) => {
-        const updatedValues = prev.includes(value)
-          ? prev.filter((item) => item !== value)
-          : [...prev, value];
-        const total = updatedValues.reduce(
-          (sum, violation) => sum + fines[violation],
-          0
-        );
-        setTotalFines(total);
-        return updatedValues;
-      });
-    };
-    const handleSubmit = () => {
-      onSubmit(tempSelectedValues, totalFines);
-      onClose();
-    };
-    useEffect(() => {
-      const total = tempSelectedValues.reduce(
-        (sum, violation) => sum + fines[violation],
-        0
-      );
-      setTotalFines(total);
-    }, [tempSelectedValues]);
-    return (
-      <Actionsheet isOpen={isOpen} onClose={onClose}>
-        <Actionsheet.Content alignItems="left" padding={6}>
-          <Box
-            w="100%"
-            h={60}
-            px={4}
-            justifyContent="center"
-            alignItems="center"
-            mb={4}
-          >
-            <Text style={{ fontSize: 24, fontWeight: "700" }}>
-              Violation Type
+  const handleSortChange = (value) => {
+    setSortOption(value);
+    onClose();
+  };
+  const filterOptions = [
+    { label: "Fines", value: "fines" },
+    { label: "Violation type", value: "violationType" },
+  ];
+  const Passes = ({ item }) => (
+    <Box
+      bg="white"
+      borderRadius="lg"
+      p={3}
+      mb={2}
+      shadow={2}
+      borderWidth={0.5}
+      borderColor={item.status === "pending" ? "orange.400" : "green.400"}
+      onTouchEnd={() => handleItemPress(item)}
+    >
+      <HStack justifyContent="space-between" alignItems="center">
+        <VStack flex={1}>
+          <Text fontSize="lg" fontWeight="bold" color="gray.800">
+            Name:{" "}
+            <Text fontSize="md" fontWeight="medium" color="gray.600">
+              {item.name}
             </Text>
-          </Box>
-          {Object.keys(fines).map((label, index) => (
-            <Checkbox
-              key={index}
-              value={label}
-              accessibilityLabel={label}
-              marginBottom={2}
-              isChecked={tempSelectedValues.includes(label)}
-              onChange={() => handleCheckboxChange(label)}
-            >
-              {`${label} - ₹${fines[label]}`}
-            </Checkbox>
-          ))}
-          <Box mt={4}>
-            <Text style={{ fontSize: 18, fontWeight: "700" }}>
-              Total Fines: ₹{totalFines}
+          </Text>
+          <Text fontSize="lg" fontWeight="bold" color="gray.800">
+            Vehicle Number:{" "}
+            <Text fontSize="md" fontWeight="medium" color="gray.600">
+              {item.vehicle_number}
             </Text>
-          </Box>
-          <HStack w="100%" justifyContent="space-evenly" mt={4}>
-            <Button
-              flex={1}
-              mr={2}
-              backgroundColor="#007367"
-              onPress={handleSubmit}
-            >
-              Submit
-            </Button>
-            <Button flex={1} ml={2} variant="outline" onPress={onClose}>
-              Cancel
-            </Button>
-          </HStack>
-        </Actionsheet.Content>
-      </Actionsheet>
-    );
-  };
-  const handleActionSheetSubmit = (values, fines) => {
-    setSelectedValues(values);
-    setFine(fines);
-  };
-  const [comments, setComments] = useState("");
-  const handleUploadImage = async () => {
-    setIsLoading(true);
-    const formData = new FormData();
-    selectedImages.forEach((imageUri) => {
-      const image = {
-        uri: imageUri,
-        type: "image/jpeg",
-        name: imageUri.split("/").pop(),
-      };
-      formData.append("images[]", image);
-    });
-    formData.append("name", name);
-    formData.append("vehicle_number", vehicleNumber);
-    formData.append("totalFines", fine);
-    selectedValues.forEach((violation) => {
-      formData.append("violationType[]", violation);
-    });
-    formData.append("comments", comments);
+          </Text>
+          <Text fontSize="lg" fontWeight="bold" color="gray.800">
+            Violation:{" "}
+            <Text fontSize="md" fontWeight="medium" color="gray.600">
+              {item.violation_type}
+            </Text>
+          </Text>
+        </VStack>
+        <HStack space={4}>
+          <Text fontSize={15} fontWeight={"bold"} color={"orange"}>
+            ₹{item.totalFines}
+          </Text>
+        </HStack>
+      </HStack>
+    </Box>
+  );
+  const fetchViolations = async () => {
     try {
       const response = await fetch(
-        "http://172.17.58.151:9000/auth/reportViolation",
+        "http://172.17.58.151:9000/auth/getViolations",
         {
-          method: "POST",
-          body: formData,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
-      const result = await response.json();
-      if (response.status === 200) {
-        setTimeout(() => {
-          toast.show({
-            render: () => {
-              return (
-                <Box
-                  bg="green.300"
-                  px="4"
-                  py="2"
-                  rounded="md"
-                  shadow={2}
-                  alignSelf="center"
-                >
-                  Violation registered successfully!
-                </Box>
-              );
-            },
-            placement: "top-right",
-          });
-          navigation.goBack();
-          setName("");
-          setVehicleNumber("");
-          setComments("");
-          setSelectedImages([]);
-          setSelectedValues([]);
-          setIsLoading(false);
-        }, 2000);
-      } else {
-        const errorMessage =
-          result.error || "An error occurred. Please try again.";
-        toast.show({
-          render: () => {
-            return (
-              <Box
-                bg="red.300"
-                px="4"
-                py="2"
-                rounded="md"
-                shadow={2}
-                alignSelf="flex-end"
-              >
-                {errorMessage}
-              </Box>
-            );
-          },
-          placement: "bottom",
-        });
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch violations");
       }
+      const data = await response.json();
+      setViolations(data);
     } catch (error) {
-      console.error("Error uploading images:", error);
-      toast.show({
-        render: () => {
-          return (
-            <Box
-              bg="red.300"
-              px="4"
-              py="2"
-              rounded="md"
-              shadow={2}
-              alignSelf="flex-end"
-              mt={13}
-            >
-              Failed to upload violation. Please try again.
-            </Box>
-          );
-        },
-        placement: "top-right",
-      });
-      Alert.alert("Error", "Failed to upload violation. Please try again.");
-      setIsLoading(false);
+      console.error("Error fetching violations:", error);
+    } finally {
     }
   };
-  const UploadPhoto = ({ selectedImages, onPickImages, onDeleteImage }) => (
-    <Stack>
-      <FormControl.Label
-        _text={{
-          fontSize: 20,
-          color: "#000",
-          fontWeight: 700,
-          marginBottom: 2,
-        }}
-      >
-        Upload Photo
-      </FormControl.Label>
-      <Wrap
-        space={4}
-        style={{ alignItems: "center", justifyContent: "center" }}
-        flexDirection="row"
-      >
-        <Center
-          width={"100%"}
-          h={20}
-          borderColor="#DBDBDB"
-          borderWidth={1}
-          borderRadius="sm"
-          padding={4}
-        >
-          <TouchableOpacity
-            onPress={onPickImages}
-            style={{ alignItems: "center" }}
-          >
-            <MaterialCommunityIcons
-              name="camera-plus-outline"
-              size={30}
-              color="black"
-            />
-            <Text style={{ marginTop: 5, fontSize: 14 }}>Add Photo</Text>
-          </TouchableOpacity>
-        </Center>
-      </Wrap>
-      {}
-      {selectedImages.length > 0 && (
-        <View style={styles.galleryContainer}>
-          <ScrollView horizontal>
-            {selectedImages.map((imageUri, index) => (
-              <View key={index} style={styles.imageWrapper}>
-                <Image
-                  source={{ uri: imageUri }}
-                  alt={`Selected ${index}`}
-                  style={styles.image}
-                />
-                <IconButton
-                  icon={<Feather name="x-circle" size={25} color="white" />}
-                  onPress={() => onDeleteImage(index)}
-                  style={styles.deleteIcon}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-    </Stack>
+
+  // Fetch data when the screen gains focus
+  useFocusEffect(
+    useCallback(() => {
+      console.log("refreshing");
+      fetchViolations();
+    }, [])
   );
-  const handleSubmit = () => {
-    handleUploadImage(selectedImages);
+  const ModalContent = ({ selectedItem }) => {
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const imageUrls = selectedItem.pics.split(",");
+    const renderItem = ({ item, index }) => (
+      <Image
+        source={{ uri: item }}
+        style={{
+          width: 300,
+          height: 200,
+          borderRadius: 10,
+          marginHorizontal: 5,
+        }}
+        resizeMode="cover"
+      />
+    );
+    const onScrollEnd = (event) => {
+      const contentOffsetX = event.nativeEvent.contentOffset.x;
+      const index = Math.floor(contentOffsetX / 300);
+      setActiveImageIndex(index);
+    };
+    return (
+      <>
+        <Text fontSize="lg" fontWeight="bold" color="gray.800">
+          Name:{" "}
+          <Text fontSize="md" fontWeight="medium" color="gray.600">
+            {selectedItem.name}
+          </Text>
+        </Text>
+        <Text fontSize="lg" fontWeight="bold" color="gray.800">
+          Vehicle Number:{" "}
+          <Text fontSize="md" fontWeight="medium" color="gray.600">
+            {selectedItem.vehicle_number}
+          </Text>
+        </Text>
+        <Text fontSize="lg" fontWeight="bold" color="gray.800">
+          Violation:{" "}
+          <Text fontSize="md" fontWeight="medium" color="gray.600">
+            {selectedItem.violation_type}
+          </Text>
+        </Text>
+        <Text fontSize="lg" fontWeight="bold" color="gray.800">
+          Fine:{" "}
+          <Text fontSize="md" fontWeight="medium" color="gray.600">
+            ₹{selectedItem.totalFines}
+          </Text>
+        </Text>
+        <Text fontSize="lg" fontWeight="bold" color="gray.800" mt={4}>
+          Violation Images:
+        </Text>
+        {}
+        <FlatList
+          data={imageUrls}
+          horizontal
+          renderItem={renderItem}
+          keyExtractor={(item) => item.Id}
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onScrollEnd}
+          contentContainerStyle={{
+            paddingVertical: 10,
+          }}
+        />
+        {}
+        <Text mt={2} fontSize="md" color="gray.600">
+          Image {activeImageIndex + 1} of {imageUrls.length}
+        </Text>
+      </>
+    );
   };
   return (
     <Box flex={1} backgroundColor="#f5f5f5">
-      <Box backgroundColor="#007367" paddingY="12" paddingX="4">
+      <Box backgroundColor="#007367" paddingY="4" paddingX="4">
         <HStack
           alignItems="center"
-          justifyContent="space-between"
+          justifyContent="center"
           position="relative"
-          top={5}
+          top={10}
         >
           <Text
             fontSize={30}
             color="white"
-            justifyContent={"center"}
-            alignItems={"center"}
             fontWeight="bold"
             textAlign="center"
             flex={1}
           >
-            Report Violations
+            Violations
           </Text>
           <Ionicons
             name="arrow-back"
@@ -347,221 +249,109 @@ export default function ReportViolation() {
             color="white"
             onPress={() => navigation.goBack()}
           />
+          <Ionicons
+            name="person-add-outline"
+            size={30}
+            position="absolute"
+            right={0}
+            color="white"
+            onPress={() => navigation.navigate("AddViolations")}
+          />
+        </HStack>
+        <HStack
+          backgroundColor="white"
+          borderRadius="20"
+          alignItems="center"
+          paddingX="4"
+          paddingY="4"
+          mt="4"
+          shadow="2"
+          top={50}
+        >
+          <Input
+            flex={1}
+            placeholder="Search by ID / Vehicle number"
+            variant="unstyled"
+            fontSize="md"
+          />
+          <Pressable>
+            <Image
+              source={{
+                uri: "http://172.17.58.151:9000/auth/getImage/paper.png",
+              }}
+              alt="Search Icon"
+              size={8}
+            />
+          </Pressable>
         </HStack>
       </Box>
-      <ScrollView>
-        <Box p={4}>
-          <FormControl>
-            <Stack>
-              <FormControl.Label
-                _text={{
-                  fontSize: 20,
-                  color: "#000",
-                  fontWeight: 700,
-                  marginBottom: 2,
-                }}
+      <View style={{ flex: 1, position: "relative", top: 40 }} p={4}>
+        <FlatList
+          data={violations}
+          renderItem={({ item }) => <Passes item={item} />}
+          keyExtractor={(item) => item.Id}
+          showsVerticalScrollIndicator={false}
+          mt={2}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          pb={6}
+        />
+        <TouchableOpacity
+          style={{
+            zIndex: 1000,
+            position: "absolute",
+            bottom: 48,
+            right: 15,
+            backgroundColor: "#007367",
+            borderRadius: 50,
+            paddingVertical: 8,
+            paddingHorizontal: 15,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+          onPress={onOpen}
+        >
+          <Ionicons name="filter-outline" size={22} color="white" />
+          <Text color="white" style={{ marginLeft: 5, fontSize: 16 }}>
+            Filter
+          </Text>
+        </TouchableOpacity>
+        <Actionsheet isOpen={isOpen} onClose={onClose}>
+          <Actionsheet.Content>
+            {filterOptions.map((option, index) => (
+              <Actionsheet.Item
+                key={index}
+                onPress={() => handleSortChange(option.value)}
+                borderBottomWidth={index !== filterOptions.length - 1 ? 1 : 0}
+                borderBottomColor="gray.300"
+                py={3}
               >
-                Student / Employee name
-              </FormControl.Label>
-              <Input
-                value={name}
-                onChangeText={setName}
-                placeholder={"Enter Name"}
-                variant="filled"
-                bg="#F0F2F5"
-                p={3}
-                borderRadius="md"
-                width="100%"
-                fontSize={16}
-                _focus={{ bg: "#fff" }}
-              />
-            </Stack>
-            <Stack>
-              <FormControl.Label
-                _text={{
-                  fontSize: 20,
-                  color: "#000",
-                  fontWeight: 700,
-                  marginBottom: 2,
-                }}
-              >
-                Vehicle Number
-              </FormControl.Label>
-              <Input
-                value={vehicleNumber}
-                onChangeText={setVehicleNumber}
-                placeholder={"Vehicle Number"}
-                variant="filled"
-                bg="#F0F2F5"
-                p={3}
-                borderRadius="md"
-                width="100%"
-                fontSize={16}
-                _focus={{ bg: "#fff" }}
-              />
-            </Stack>
-            <Stack>
-              <FormControl.Label
-                _text={{
-                  fontSize: 20,
-                  color: "#000",
-                  fontWeight: 700,
-                  marginBottom: 2,
-                }}
-              >
-                Violation Category
-              </FormControl.Label>
-              <TouchableOpacity
-                onPress={() => setActionSheetOpen(true)}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: "#F0F2F5",
-                  padding: 14,
-                  borderRadius: 4,
-                }}
-              >
-                <Text style={{ color: "#637587", fontSize: 16, flex: 1 }}>
-                  {selectedValues.length > 0
-                    ? selectedValues.join(", ")
-                    : "Select Violation Type"}
-                </Text>
-                <MaterialIcons
-                  name="keyboard-arrow-down"
-                  size={24}
-                  color="#637587"
-                  style={{ marginLeft: "auto" }}
-                />
-              </TouchableOpacity>
-            </Stack>
-            <CustomActionSheet
-              isOpen={isActionSheetOpen}
-              onClose={() => setActionSheetOpen(false)}
-              selectedValues={selectedValues}
-              onSubmit={handleActionSheetSubmit}
-            />
-            <Stack>
-              <FormControl.Label
-                _text={{
-                  fontSize: 20,
-                  color: "#000",
-                  fontWeight: "700",
-                  marginBottom: 2,
-                }}
-              >
-                Comments
-              </FormControl.Label>
-              <View style={styles.textAreaContainer}>
-                <TextArea
-                  h={20}
-                  fontSize={16}
-                  w="100%"
-                  color="#637587"
-                  bg="#F0F2F5"
-                  value={comments}
-                  placeholder="Enter Violation Information"
-                  onChangeText={setComments}
-                />
-              </View>
-            </Stack>
-            <UploadPhoto
-              selectedImages={selectedImages}
-              onPickImages={handlePickImages}
-              onDeleteImage={handleDeleteImage}
-            />
-            <Button
-              bg="#007367"
-              borderRadius="md"
-              width="100%"
-              mt={2}
-              p={3}
-              bottom={0}
-              onPress={handleSubmit}
-            >
-              {isLoading ? (
-                <View>
-                  <ActivityIndicator size="large" color="#fff" />
-                </View>
-              ) : (
                 <Text
-                  style={{
-                    color: "#fff",
-                    fontWeight: 600,
-                    fontSize: 20,
-                    textAlign: "center",
-                  }}
+                  fontSize="md"
+                  fontWeight="bold"
+                  color="green.800"
+                  borderBottomColor={"black"}
                 >
-                  Submit
+                  {option.label}
                 </Text>
-              )}
-            </Button>
-          </FormControl>
-        </Box>
-      </ScrollView>
+              </Actionsheet.Item>
+            ))}
+            {}
+          </Actionsheet.Content>
+        </Actionsheet>
+      </View>
+      <Modal isOpen={isModalVisible} onClose={handleCloseModal}>
+        <Modal.Content maxHeight="100%" width={"100%"} top={10}>
+          <Modal.CloseButton />
+          <Modal.Header>Violation Details</Modal.Header>
+          <Modal.Body>
+            {selectedItem && <ModalContent selectedItem={selectedItem} />}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onPress={handleCloseModal}>Close</Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
     </Box>
   );
-}
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-    paddingHorizontal: 16,
-    paddingVertical: 24,
-  },
-  textAreaContainer: {
-    position: "relative",
-    width: "100%",
-  },
-  dotsContainer: {
-    width: 60,
-    padding: 10,
-    marginTop: 16,
-  },
-  micIcon: {
-    position: "absolute",
-    right: 10,
-    bottom: 10,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 10,
-  },
-  findEle: {
-    borderColor: "#000",
-    borderWidth: 1,
-    borderStyle: "solid",
-  },
-  dotsContainer: {
-    width: 60,
-    padding: 10,
-    marginTop: 16,
-  },
-  galleryContainer: {
-    marginTop: 10,
-    flexDirection: "row",
-  },
-  imageWrapper: {
-    marginRight: 10,
-    width: 100,
-    height: 90,
-    borderColor: "#DBDBDB",
-    borderWidth: 1,
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  deleteIcon: {
-    position: "absolute",
-    top: -10,
-    right: -10,
-    borderRadius: 50,
-  },
-});
+};
+export default ReportViolation;

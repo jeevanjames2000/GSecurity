@@ -3,6 +3,7 @@ import { Box, Text, FlatList, Image, HStack, Input, View } from "native-base";
 import { Pressable, Linking } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 export default function Home() {
   const navigation = useNavigation();
 
@@ -77,7 +78,12 @@ export default function Home() {
     });
   };
   const FeaturedCard = ({ item }) => (
-    <Pressable onPress={() => handleRoute(item)} flex={1} margin="2">
+    <Pressable
+      onPress={() => handleRoute(item)}
+      flex={1}
+      margin="2"
+      marginBottom="8"
+    >
       <Box
         bg="white"
         borderRadius="xl"
@@ -155,7 +161,7 @@ export default function Home() {
           >
             G Security
           </Text>
-          <Pressable
+          {/* <Pressable
             onPress={handleLogout}
             position="absolute"
             right={0}
@@ -166,7 +172,16 @@ export default function Home() {
               alt="Logout Icon"
               size={6}
             />
-          </Pressable>
+          </Pressable> */}
+          <Ionicons
+            name="log-out-outline"
+            size={30}
+            position="absolute"
+            right={0}
+            alignItems="center"
+            color="white"
+            onPress={handleLogout}
+          />
         </HStack>
         <HStack
           backgroundColor="white"
