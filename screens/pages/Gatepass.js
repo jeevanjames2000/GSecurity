@@ -13,6 +13,7 @@ import {
   View,
   Actionsheet,
   useDisclose,
+  Badge,
 } from "native-base";
 import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -42,7 +43,7 @@ const GatePass = () => {
       pass_type: "Jane Smith",
       vehicle_num: "LMN-9101",
       date: "2025-01-11",
-      status: "pending",
+      status: "denied",
     },
     {
       id: 1,
@@ -63,7 +64,7 @@ const GatePass = () => {
       pass_type: "Jane Smith",
       vehicle_num: "LMN-9101",
       date: "2025-01-11",
-      status: "pending",
+      status: "denied",
     },
     {
       id: 1,
@@ -135,16 +136,14 @@ const GatePass = () => {
               </Text>
             </Text>
           </VStack>
-          {}
           <HStack space={3}>
-            {}
             <Ionicons
               name="eye-off-outline"
               size={26}
               color="#007367"
               onPress={() => handleView(item)}
             />
-            {}
+
             {item.status === "pending" ? (
               <Ionicons name="time-outline" size={26} color="orange" />
             ) : (
@@ -154,6 +153,41 @@ const GatePass = () => {
                 color="green"
               />
             )}
+            {/* <Badge
+              variant="subtle"
+              borderRadius={"md"}
+              px={2}
+              py={2}
+              _text={{
+                fontSize: "xs",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                textAlign: "center",
+              }}
+              style={{
+                width: 100,
+                borderWidth: 0.5,
+                borderColor:
+                  item.status === "approved"
+                    ? "green"
+                    : item.status === "pending"
+                    ? "orange"
+                    : item.status === "denied"
+                    ? "red"
+                    : "gray",
+              }}
+              colorScheme={
+                item.status === "approved"
+                  ? "success"
+                  : item.status === "pending"
+                  ? "warning"
+                  : item.status === "denied"
+                  ? "danger"
+                  : "gray"
+              }
+            >
+              {item.status}
+            </Badge> */}
           </HStack>
         </HStack>
       </TouchableOpacity>
@@ -218,10 +252,11 @@ const GatePass = () => {
           data={dummypasses}
           renderItem={Passes}
           keyExtractor={(item) => item.id.toString()}
-          showsVerticalScrollIndicator={false}
           mt={2}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          pb={6}
+          showsVerticalScrollIndicator={false}
         />
-        {}
         <TouchableOpacity
           style={{
             zIndex: 1000,
@@ -264,42 +299,6 @@ const GatePass = () => {
                 </Text>
               </Actionsheet.Item>
             ))}
-            {}
-            {/* <Actionsheet.Item>
-              <Text>Pass Type</Text>
-              <Select
-                h={10}
-                selectedValue={sortOption}
-                onValueChange={handleSortChange}
-                placeholder="Select Pass Type"
-                _selectedItem={{
-                  bg: "teal.600",
-                  endIcon: <CheckIcon size="5" />,
-                }}
-                w="100%"
-              >
-                <Select.Item label="Pass Type 1" value="pass_type_1" />
-                <Select.Item label="Pass Type 2" value="pass_type_2" />
-              </Select>
-            </Actionsheet.Item>
-            {}
-            {/* <Actionsheet.Item>
-              <Text>Status</Text>
-              <Select
-                h={10}
-                selectedValue={sortOption}
-                onValueChange={handleSortChange}
-                placeholder="Select Status"
-                _selectedItem={{
-                  bg: "teal.600",
-                  endIcon: <CheckIcon size="5" />,
-                }}
-                w="100%"
-              >
-                <Select.Item label="Pending" value="pending" />
-                <Select.Item label="Approved" value="approved" />
-              </Select>
-            </Actionsheet.Item> */}
           </Actionsheet.Content>
         </Actionsheet>
         {}
