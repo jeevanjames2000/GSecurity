@@ -10,17 +10,13 @@ import {
   Pressable,
   Input,
   Image,
-  Select,
-  CheckIcon,
   View,
   Actionsheet,
-  IconButton,
   useDisclose,
 } from "native-base";
 import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import DatePicker from "react-native-date-picker";
 const GatePass = () => {
   const navigation = useNavigation();
   const { isOpen, onOpen, onClose } = useDisclose();
@@ -91,12 +87,8 @@ const GatePass = () => {
       status: "pending",
     },
   ];
-  const handleApprove = (id) => {
-    console.log(`Approved pass with ID: ${id}`);
-  };
-  const handleCancel = (id) => {
-    console.log(`Canceled pass with ID: ${id}`);
-  };
+  const handleApprove = (id) => {};
+  const handleCancel = (id) => {};
   const handleView = (item) => {
     setSelectedPass(item);
     setModalVisible(true);

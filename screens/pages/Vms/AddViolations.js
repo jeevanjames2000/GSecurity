@@ -24,7 +24,6 @@ import {
   Center,
   IconButton,
   useToast,
-  Pressable,
 } from "native-base";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";

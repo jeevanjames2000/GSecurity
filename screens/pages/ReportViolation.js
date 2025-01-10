@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Box,
   Text,
@@ -68,7 +68,6 @@ const ReportViolation = () => {
   ];
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [violations, setViolations] = useState([]);
-  console.log("violations: ", violations);
   const [selectedItem, setSelectedItem] = useState(null);
   const handleItemPress = (item) => {
     setSelectedItem(item);
@@ -147,11 +146,8 @@ const ReportViolation = () => {
     } finally {
     }
   };
-
-  // Fetch data when the screen gains focus
   useFocusEffect(
     useCallback(() => {
-      console.log("refreshing");
       fetchViolations();
     }, [])
   );
