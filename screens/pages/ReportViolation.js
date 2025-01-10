@@ -22,50 +22,7 @@ const ReportViolation = () => {
   const navigation = useNavigation();
   const { isOpen, onOpen, onClose } = useDisclose();
   const [sortOption, setSortOption] = useState("");
-  const dummypasses = [
-    {
-      id: 1,
-      name: "Courtney Henry",
-      vehicle_num: "ABC-1234",
-      violation: "No Helmet",
-      fine: "1000",
-    },
-    {
-      id: 2,
-      name: "Henry",
-      vehicle_num: "SDS-232323",
-      violation: "Over Speeding",
-      fine: "2000",
-    },
-    {
-      id: 3,
-      name: "John",
-      vehicle_num: "WER-1212",
-      violation: "Drunk and Drive",
-      fine: "3000",
-    },
-    {
-      id: 4,
-      name: "Courtney Henry",
-      vehicle_num: "ABC-1234",
-      violation: "No Helmet",
-      fine: "1000",
-    },
-    {
-      id: 5,
-      name: "Henry",
-      vehicle_num: "SDS-232323",
-      violation: "Over Speeding",
-      fine: "2000",
-    },
-    {
-      id: 6,
-      name: "John",
-      vehicle_num: "WER-1212",
-      violation: "Drunk and Drive",
-      fine: "3000",
-    },
-  ];
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [violations, setViolations] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);

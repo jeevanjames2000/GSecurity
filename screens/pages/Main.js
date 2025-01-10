@@ -7,9 +7,6 @@ import Camera from "./Tabs/Camera";
 import Profile from "./Tabs/Profile";
 import MainNavigator from "./MainNavigator";
 import { Image } from "native-base";
-import ReportViolation from "./ReportViolation";
-import Violations from "./Tabs/Violations";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 const Tab = createBottomTabNavigator();
 export default function Main() {
   const navigation = useNavigation();
@@ -57,8 +54,6 @@ export default function Main() {
                   height: route.name === "QR" ? 50 : 30,
                   tintColor: focused ? "green" : "gray",
                   padding: route.name === "QR" ? 10 : 0,
-                  // backgroundColor: route.name === "Qr" ? "#dddd" : "",
-                  // borderRadius: route.name === "Qr" ? 50 : 0,
                 }}
               />
               {route.name !== "QR" && (
@@ -94,7 +89,6 @@ export default function Main() {
           headerShown: false,
         }}
       />
-
       <Tab.Screen
         name="QR"
         component={Camera}
@@ -102,6 +96,7 @@ export default function Main() {
           headerStyle: {
             backgroundColor: "#007367",
           },
+          headerTitle: () => null,
           headerTintColor: "#fff",
           headerTitleAlign: "center",
           tabBarLabel: "",
@@ -115,6 +110,7 @@ export default function Main() {
                 backgroundColor: "#007367",
                 width: "100%",
                 height: "auto",
+                marginLeft: 10,
               }}
             >
               <TouchableOpacity
