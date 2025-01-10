@@ -30,6 +30,7 @@ const GatePass = () => {
       vehicle_num: "ABC-1234",
       date: "2025-01-09",
       status: "pending",
+      time: "2:00 pm",
     },
     {
       id: 2,
@@ -37,6 +38,7 @@ const GatePass = () => {
       vehicle_num: "XYZ-5678",
       date: "2025-01-10",
       status: "approved",
+      time: "3:00 pm",
     },
     {
       id: 3,
@@ -44,48 +46,55 @@ const GatePass = () => {
       vehicle_num: "LMN-9101",
       date: "2025-01-11",
       status: "denied",
+      time: "8:00 am",
     },
     {
-      id: 1,
+      id: 4,
       pass_type: "Courtney Henry",
       vehicle_num: "ABC-1234",
       date: "2025-01-09",
       status: "pending",
+      time: "12:00 pm",
     },
     {
-      id: 2,
+      id: 5,
       pass_type: "John Doe",
       vehicle_num: "XYZ-5678",
       date: "2025-01-10",
       status: "approved",
+      time: "6:00 pm",
     },
     {
-      id: 3,
+      id: 6,
       pass_type: "Jane Smith",
       vehicle_num: "LMN-9101",
       date: "2025-01-11",
       status: "denied",
+      time: "4:00 pm",
     },
     {
-      id: 1,
+      id: 7,
       pass_type: "Courtney Henry",
       vehicle_num: "ABC-1234",
       date: "2025-01-09",
       status: "pending",
+      time: "3:00 pm",
     },
     {
-      id: 2,
+      id: 8,
       pass_type: "John Doe",
       vehicle_num: "XYZ-5678",
       date: "2025-01-10",
       status: "approved",
+      time: "3:30 pm",
     },
     {
-      id: 3,
+      id: 9,
       pass_type: "Jane Smith",
       vehicle_num: "LMN-9101",
       date: "2025-01-11",
       status: "pending",
+      time: "2:00 pm",
     },
   ];
   const handleApprove = (id) => {};
@@ -101,8 +110,9 @@ const GatePass = () => {
     onClose();
   };
   const filterOptions = [
-    { label: "Pending", value: "pending" },
+    { label: "IssuedDate", value: "date" },
     { label: "Approved", value: "approved" },
+    { label: "Pending", value: "pending" },
   ];
   const Passes = ({ item }) => (
     <Box
@@ -111,7 +121,7 @@ const GatePass = () => {
       p={3}
       mb={2}
       shadow={2}
-      borderWidth={0.5}
+      borderLeftWidth={2}
       borderColor={item.status === "pending" ? "orange.400" : "green.400"}
     >
       <TouchableOpacity onPress={() => handleView(item)}>
@@ -136,59 +146,30 @@ const GatePass = () => {
               </Text>
             </Text>
           </VStack>
-          <HStack space={3}>
-            <Ionicons
-              name="eye-off-outline"
-              size={26}
-              color="#007367"
-              onPress={() => handleView(item)}
-            />
+
+          <VStack
+            flexDirection={"row"}
+            gap={4}
+            alignItems="center"
+            justifyContent={"center"}
+            top={-25}
+          >
+            <Text
+              fontSize={"sm"}
+              fontWeight={"normal"}
+              color={"gray.600"}
+              alignItems="center"
+              justifyContent="center"
+            >
+              {item.time}{" "}
+            </Text>
 
             {item.status === "pending" ? (
-              <Ionicons name="time-outline" size={26} color="orange" />
+              <Ionicons name="time" size={26} color="orange" />
             ) : (
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={26}
-                color="green"
-              />
+              <Ionicons name="checkmark-done-circle" size={26} color="green" />
             )}
-            {/* <Badge
-              variant="subtle"
-              borderRadius={"md"}
-              px={2}
-              py={2}
-              _text={{
-                fontSize: "xs",
-                fontWeight: "bold",
-                textTransform: "uppercase",
-                textAlign: "center",
-              }}
-              style={{
-                width: 100,
-                borderWidth: 0.5,
-                borderColor:
-                  item.status === "approved"
-                    ? "green"
-                    : item.status === "pending"
-                    ? "orange"
-                    : item.status === "denied"
-                    ? "red"
-                    : "gray",
-              }}
-              colorScheme={
-                item.status === "approved"
-                  ? "success"
-                  : item.status === "pending"
-                  ? "warning"
-                  : item.status === "denied"
-                  ? "danger"
-                  : "gray"
-              }
-            >
-              {item.status}
-            </Badge> */}
-          </HStack>
+          </VStack>
         </HStack>
       </TouchableOpacity>
     </Box>
@@ -291,7 +272,11 @@ const GatePass = () => {
                   fontSize="md"
                   fontWeight="bold"
                   color={
-                    option.label === "Pending" ? "orange.600" : "green.600"
+                    option.label === "Pending"
+                      ? "orange.500"
+                      : option.label === "Approved"
+                      ? "green.600"
+                      : "black.200"
                   }
                   borderBottomColor={"black"}
                 >
@@ -306,7 +291,7 @@ const GatePass = () => {
       <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
         <Modal.Content maxWidth="400px">
           <Modal.CloseButton />
-          <Modal.Header>Pass Details</Modal.Header>
+          <Modal.Header>GatePass Details</Modal.Header>
           <Modal.Body>
             {selectedPass && (
               <VStack space={2}>

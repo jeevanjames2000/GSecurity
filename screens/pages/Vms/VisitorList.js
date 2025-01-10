@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import {
   ScrollView,
   HStack,
@@ -14,6 +14,8 @@ import {
   Modal,
   Pressable,
   Image,
+  Actionsheet,
+  useDisclose,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -28,8 +30,14 @@ const HistoryCard = ({ data, setShowModal }) => {
         justifyContent={"space-between"}
         borderRadius={"lg"}
         marginBottom={"2"}
-        borderWidth={0.5}
-        borderColor={data.status === "Approved" ? "green.500" : "orange.400"}
+        borderLeftWidth={2}
+        borderColor={
+          data.status === "Approved"
+            ? "green.500"
+            : data.status === "Denied"
+            ? "red.500"
+            : "orange.400"
+        }
         shadow={1}
       >
         <VStack flex={1} alignItems={"flex-start"} space={2}>
@@ -47,12 +55,24 @@ const HistoryCard = ({ data, setShowModal }) => {
           </Text>
         </VStack>
         {}
-        <VStack alignItems={"flex-end"} space={2}>
-          <Text fontSize={"sm"} fontWeight={"normal"} color={"gray.600"}>
-            {data.time}
+        <VStack
+          flexDirection={"row"}
+          gap={4}
+          alignItems="center"
+          justifyContent={"center"}
+          top={-15}
+        >
+          <Text
+            fontSize={"sm"}
+            fontWeight={"normal"}
+            color={"gray.600"}
+            alignItems="center"
+            justifyContent="center"
+          >
+            {data.time}{" "}
           </Text>
-          <Badge
-            variant="subtle"
+          {/* <Badge
+            variant="solid"
             borderRadius={"md"}
             px={2}
             py={2}
@@ -85,13 +105,27 @@ const HistoryCard = ({ data, setShowModal }) => {
             }
           >
             {data.status}
-          </Badge>
+          </Badge> */}
+          {data.status === "Pending" ? (
+            <Ionicons name="time" size={26} color="orange" />
+          ) : data.status === "Denied" ? (
+            <Ionicons name="close-circle" size={26} color="#FF204E" />
+          ) : (
+            <Ionicons name="checkmark-done-circle" size={26} color="green" />
+          )}
         </VStack>
       </HStack>
     </Pressable>
   );
 };
 const VisitorsList = () => {
+  const { isOpen, onOpen, onClose } = useDisclose();
+  const filterOptions = [
+    { label: "Approved", value: "approved" },
+    { label: "Pending", value: "pending" },
+    { label: "Denied", value: "denied" },
+  ];
+
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
   const visitorsData = [
@@ -222,6 +256,54 @@ const VisitorsList = () => {
           <HistoryCard key={i} data={visitor} setShowModal={setShowModal} />
         ))}
       </ScrollView>
+      <TouchableOpacity
+        style={{
+          zIndex: 1000,
+          position: "absolute",
+          bottom: 10,
+          right: 16,
+          backgroundColor: "#007367",
+          borderRadius: 50,
+          paddingVertical: 8,
+          paddingHorizontal: 15,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+        onPress={onOpen}
+      >
+        <Ionicons name="filter-outline" size={22} color="white" />
+        <Text color="white" style={{ marginLeft: 5, fontSize: 16 }}>
+          Filter
+        </Text>
+      </TouchableOpacity>
+      <Actionsheet isOpen={isOpen} onClose={onClose}>
+        <Actionsheet.Content>
+          {filterOptions.map((option, index) => (
+            <Actionsheet.Item
+              key={index}
+              onPress={() => handleSortChange(option.value)}
+              borderBottomWidth={index !== filterOptions.length - 1 ? 1 : 0}
+              borderBottomColor="gray.300"
+              py={3}
+            >
+              <Text
+                fontSize="md"
+                fontWeight="bold"
+                color={
+                  option.label === "Approved"
+                    ? "green.600"
+                    : option.label === "Denied"
+                    ? "red.500"
+                    : "orange.400"
+                }
+                borderBottomColor={"black"}
+              >
+                {option.label}
+              </Text>
+            </Actionsheet.Item>
+          ))}
+        </Actionsheet.Content>
+      </Actionsheet>
       <Center>
         <Modal size="xl" isOpen={showModal} onClose={() => setShowModal(false)}>
           <Modal.Content maxWidth="400px" borderRadius="10">

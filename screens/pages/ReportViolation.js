@@ -76,7 +76,7 @@ const ReportViolation = () => {
             </Text>
           </VStack>
           <HStack space={4}>
-            <Text fontSize={15} fontWeight={"bold"} color={"orange"}>
+            <Text fontSize={15} fontWeight={"bold"} color={"red.500"}>
               ₹{item.totalFines}
             </Text>
           </HStack>
@@ -113,18 +113,31 @@ const ReportViolation = () => {
   const ModalContent = ({ selectedItem }) => {
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const imageUrls = selectedItem.pics.split(",");
-    const renderItem = ({ item, index }) => (
-      <Image
-        source={{ uri: item }}
-        style={{
-          width: 300,
-          height: 200,
-          borderRadius: 10,
-          marginHorizontal: 5,
-        }}
-        resizeMode="cover"
-      />
-    );
+    const renderItem = ({ item, index }) =>
+      item ? (
+        <Image
+          source={{ uri: item }}
+          style={{
+            width: 300,
+            height: 300,
+            borderRadius: 10,
+            marginHorizontal: 5,
+          }}
+          resizeMode="cover"
+        />
+      ) : (
+        <View
+          flexDirection={"row"}
+          justifyContent={"center"}
+          flex={1}
+          alignItems={"center"}
+        >
+          <Text justifyContent="center" alignItems="center" color="red.400">
+            No images found!
+          </Text>
+        </View>
+      );
+
     const onScrollEnd = (event) => {
       const contentOffsetX = event.nativeEvent.contentOffset.x;
       const index = Math.floor(contentOffsetX / 300);
@@ -151,15 +164,15 @@ const ReportViolation = () => {
           </Text>
         </Text>
         <Text fontSize="lg" fontWeight="bold" color="gray.800">
-          Fine:{" "}
-          <Text fontSize="md" fontWeight="medium" color="gray.600">
+          Total Fine:{" "}
+          <Text fontSize="md" fontWeight="medium" color="red.500">
             ₹{selectedItem.totalFines}
           </Text>
         </Text>
-        <Text fontSize="lg" fontWeight="bold" color="gray.800" mt={4}>
+        <Text fontSize="lg" fontWeight="bold" color="gray.800">
           Violation Images:
         </Text>
-        {}
+
         <FlatList
           data={imageUrls}
           horizontal
@@ -171,10 +184,6 @@ const ReportViolation = () => {
             paddingVertical: 10,
           }}
         />
-        {}
-        <Text mt={2} fontSize="md" color="gray.600">
-          Image {activeImageIndex + 1} of {imageUrls.length}
-        </Text>
       </>
     );
   };
@@ -240,15 +249,13 @@ const ReportViolation = () => {
           </Pressable>
         </HStack>
       </Box>
-      <View style={{ flex: 1, position: "relative", top: 40 }} p={4}>
+      <View style={{ flex: 1, position: "relative", top: 30 }} p={4}>
         <FlatList
           data={violations}
           renderItem={({ item }) => <Passes item={item} />}
           keyExtractor={(item) => item.Id}
           showsVerticalScrollIndicator={false}
-          mt={2}
           contentContainerStyle={{ paddingBottom: 20 }}
-          pb={6}
         />
         <TouchableOpacity
           style={{
@@ -283,7 +290,7 @@ const ReportViolation = () => {
                 <Text
                   fontSize="md"
                   fontWeight="bold"
-                  color="green.800"
+                  color={option.label === "Fines" ? "red.500" : "green.800"}
                   borderBottomColor={"black"}
                 >
                   {option.label}
@@ -302,7 +309,26 @@ const ReportViolation = () => {
             {selectedItem && <ModalContent selectedItem={selectedItem} />}
           </Modal.Body>
           <Modal.Footer>
-            <Button onPress={handleCloseModal}>Close</Button>
+            <View flexDirection={"row"} gap={2}>
+              <Button
+                size={"md"}
+                height="10"
+                width="100"
+                colorScheme={"orange"}
+                onPress={handleCloseModal}
+              >
+                Print
+              </Button>
+              <Button
+                size={"md"}
+                height="10"
+                width="100"
+                colorScheme={"red"}
+                onPress={handleCloseModal}
+              >
+                Close
+              </Button>
+            </View>
           </Modal.Footer>
         </Modal.Content>
       </Modal>
