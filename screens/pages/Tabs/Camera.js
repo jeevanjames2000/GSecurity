@@ -1,101 +1,218 @@
-import { Text, View } from "native-base";
-import React, { useState, useEffect } from "react";
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Camera,
+  useCameraDevice,
+  useCameraPermission,
+  useCodeScanner,
+} from "react-native-vision-camera";
 import { Ionicons } from "@expo/vector-icons";
-export default function Camera() {
-  const [facing, setFacing] = useState("back");
-  const [permission, requestPermission] = useCameraPermissions();
+import * as ImagePicker from "expo-image-picker";
+export default function QrCamera() {
+  const [isFlashOn, setIsFlashOn] = useState(false);
+  const [cameraFacing, setCameraFacing] = useState("back");
+  const device = useCameraDevice(cameraFacing);
+  const camera = useRef(null);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const [animationValue] = useState(new Animated.Value(0));
   useEffect(() => {
-    if (permission && !permission.granted) {
+    if (!hasPermission) {
       requestPermission();
     }
-  }, [permission, requestPermission]);
-  if (!permission) {
-    return <View />;
-  }
-  if (!permission.granted) {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(animationValue, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(animationValue, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [hasPermission]);
+  const translateY = animationValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-130, 130],
+  });
+  if (!device) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.message}>
-          We need your permission to open the camera
-        </Text>
+      <View style={styles.centeredContainer}>
+        <Ionicons name="alert-circle-outline" size={40} color="red" />
+        <Text style={styles.text}>Camera device not found!</Text>
       </View>
     );
   }
-  function toggleCameraFacing() {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  }
+  const handlePickImages = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const newImages = result.assets.map((asset) => asset.uri);
+      setSelectedImages((prevImages) => [...prevImages, ...newImages]);
+    }
+  };
+  const toggleFlash = () => {
+    setIsFlashOn((prev) => !prev);
+  };
+  const toggleCameraFacing = () => {
+    setCameraFacing((prev) => (prev === "back" ? "front" : "back"));
+  };
+  const capturePhoto = async () => {
+    if (camera.current) {
+      const photo = await camera.current.takePhoto({
+        flash: isFlashOn ? "on" : "off",
+      });
+      console.log("Captured photo path:", photo.path);
+    }
+  };
   return (
-    <CameraView style={styles.camera} facing={facing}>
+    <View style={styles.container}>
+      {}
+      <Camera
+        ref={camera}
+        style={StyleSheet.absoluteFill}
+        device={device}
+        isActive={true}
+        photo={true}
+        enableZoomGesture={true}
+      />
+      {}
+      <View style={styles.overlay}>
+        <View style={styles.qrFrame}>
+          <Animated.View
+            style={[styles.scanLine, { transform: [{ translateY }] }]}
+          />
+        </View>
+      </View>
+      {}
+      <TouchableOpacity style={styles.flashButton} onPress={toggleFlash}>
+        <Ionicons
+          name={isFlashOn ? "flash" : "flash-off"}
+          size={30}
+          color="white"
+        />
+      </TouchableOpacity>
+      {}
       <View style={styles.bottomContainer}>
+        {}
+        <TouchableOpacity
+          style={styles.galleryButton}
+          onPress={handlePickImages}
+        >
+          <Ionicons name="images-outline" size={30} color="white" />
+        </TouchableOpacity>
+        {}
+        <TouchableOpacity style={styles.captureButton} onPress={capturePhoto}>
+          <Ionicons name="camera-outline" size={40} color="black" />
+        </TouchableOpacity>
+        {}
         <TouchableOpacity
           style={styles.flipButton}
           onPress={toggleCameraFacing}
         >
-          <Ionicons name="sync-circle-outline" size={40} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.captureButton} onPress={() => {}}>
-          <Ionicons name="camera-outline" size={40} color="black" />
+          <Ionicons name="camera-reverse-outline" size={30} color="white" />
         </TouchableOpacity>
       </View>
-    </CameraView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
   },
-  message: {
-    textAlign: "center",
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1,
+  },
+  qrFrame: {
+    width: 300,
+    height: 300,
+    borderWidth: 5,
+    borderColor: "#007367",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  scanLine: {
+    width: "100%",
+    height: 2,
+    backgroundColor: "white",
+  },
+  flashButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2,
   },
   bottomContainer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 30,
     left: 0,
     right: 0,
     flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    zIndex: 2,
+  },
+  galleryButton: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 25,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  captureButton: {
+    backgroundColor: "#fff",
+    borderRadius: 35,
+    width: 70,
+    height: 70,
     justifyContent: "center",
     alignItems: "center",
   },
   flipButton: {
-    backgroundColor: "#ffff",
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    borderRadius: 50,
-    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 25,
+    width: 60,
+    height: 60,
     justifyContent: "center",
-    marginRight: 20,
-  },
-  captureButton: {
-    backgroundColor: "#ffff",
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    borderRadius: 50,
     alignItems: "center",
-    justifyContent: "center",
   },
-  captureText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
-  },
-  button: {
+  centeredContainer: {
     flex: 1,
-    alignSelf: "flex-end",
+    justifyContent: "center",
     alignItems: "center",
   },
   text: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 16,
     color: "white",
-    padding: 5,
+    textAlign: "center",
+    marginTop: 10,
   },
 });

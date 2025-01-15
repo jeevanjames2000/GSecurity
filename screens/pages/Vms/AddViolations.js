@@ -69,12 +69,12 @@ export default function AddViolations() {
       useState(selectedValues);
     const [totalFines, setTotalFines] = useState(0);
     const fines = {
-      Accident: 2000,
+      Accident: "",
       "Incorrect parking": 500,
       "Over speeding": 1000,
-      "Drunk & drive": 3000,
+      "Drink & drive": 3000,
       "No Helmet": 500,
-      Others: 0,
+      Others: "",
     };
     const handleCheckboxChange = (value) => {
       setTempSelectedValues((prev) => {

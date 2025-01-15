@@ -7,6 +7,7 @@ import Camera from "./Tabs/Camera";
 import Profile from "./Tabs/Profile";
 import MainNavigator from "./MainNavigator";
 import { Image } from "native-base";
+import QrCamera from "./Tabs/Camera";
 const Tab = createBottomTabNavigator();
 export default function Main() {
   const navigation = useNavigation();
@@ -91,7 +92,7 @@ export default function Main() {
       />
       <Tab.Screen
         name="QR"
-        component={Camera}
+        component={QrCamera}
         options={{
           headerStyle: {
             backgroundColor: "#007367",

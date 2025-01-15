@@ -105,9 +105,9 @@ const ReportViolation = () => {
     }, 500);
   };
   const filterOptions = [
+    { label: "All", value: "all" },
     { label: "Paid", value: "paid" },
     { label: "UnPaid", value: "unpaid" },
-    { label: "All", value: "all" },
   ];
   const Passes = ({ item }) => (
     <Box
@@ -272,8 +272,11 @@ const ReportViolation = () => {
             color="white"
             onPress={() => navigation.goBack()}
           />
-          <Ionicons
-            name="person-add-outline"
+          <Image
+            source={{
+              uri: "http://172.17.58.151:9000/auth/getImage/addIcon2.png",
+            }}
+            alt="Add Icon"
             size={30}
             position="absolute"
             right={0}
@@ -394,7 +397,13 @@ const ReportViolation = () => {
                 <Text
                   fontSize="md"
                   fontWeight="bold"
-                  color={option.label === "unPaid" ? "red.500" : "green.800"}
+                  color={
+                    {
+                      UnPaid: "red.400",
+                      Paid: "green.600",
+                      All: "gray.500",
+                    }[option.label] || "gray.700"
+                  }
                   borderBottomColor={"black"}
                 >
                   {option.label}

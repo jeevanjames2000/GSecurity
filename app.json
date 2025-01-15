@@ -5,10 +5,10 @@
     "newArchEnabled": true,
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/gitam-logo-circle.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/gitam-logo-circle.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/gitam-logo-circle.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -27,7 +27,7 @@
       "package": "com.bangarunaiduearle.gsecurity"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/gitam-logo-circle.png"
     },
     "plugins": [
       [
@@ -38,7 +38,16 @@
           "recordAudioAndroid": true
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+          "enableMicrophonePermission": true,
+          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone.",
+          "enableCodeScanner": true
+        }
+      ]
     ],
     "extra": {
       "eas": {

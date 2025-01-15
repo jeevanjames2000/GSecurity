@@ -200,7 +200,7 @@ const VisitorsList = () => {
             textAlign="center"
             flex={1}
           >
-            VMS
+            Visitor Management
           </Text>
           <Ionicons
             name="arrow-back"

@@ -2,9 +2,8 @@ import { StyleSheet } from "react-native";
 import { View, Text, HStack } from "native-base";
 
 import React from "react";
-import LoadingDots from "react-native-loading-dots";
 
-export default function Leaves_Permission() {
+export default function () {
   return (
     <View style={styles.maincontainer}>
       <HStack>
@@ -16,14 +15,6 @@ export default function Leaves_Permission() {
         >
           Coming Soon
         </Text>
-        <View style={styles.dotsWrapper}>
-          <LoadingDots
-            dots={3}
-            colors={["#007367", "#8BCBB7", "#BBE8DA"]}
-            bounceHeight={3}
-            size={10}
-          />
-        </View>
       </HStack>
     </View>
   );

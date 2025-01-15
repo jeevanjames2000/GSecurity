@@ -14,6 +14,8 @@ import VisitorsList from "./Vms/VisitorList";
 import AddVisitor from "./Vms/AddVisitor";
 import AddViolations from "./Vms/AddViolations";
 import CCTV from "./CCTV";
+import Leaves_Permission from "./Leaves_Permission";
+import QrCamera from "./Tabs/Camera";
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigator() {
@@ -33,12 +35,12 @@ export default function MainNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Report Violation"
+        name="Report-Violation"
         component={ReportViolation}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Cctv"
+        name="CCTV"
         component={CCTV}
         options={{ headerShown: false }}
       />
@@ -54,7 +56,7 @@ export default function MainNavigator() {
       />
       <Stack.Screen
         name="Camera"
-        component={Camera}
+        component={QrCamera}
         options={{ headerShown: false }}
       />
 
@@ -97,13 +99,18 @@ export default function MainNavigator() {
       />
 
       <Stack.Screen
-        name="VMS"
+        name="Visitor Management"
         component={VisitorsList}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Leaves & Permissions"
+        component={Leaves_Permission}
         options={{ headerShown: false }}
       />
 
       <Stack.Screen
-        name="GatePass"
+        name="Gate-Pass"
         component={GatePass}
         options={{ headerShown: false }}
       />

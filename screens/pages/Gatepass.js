@@ -240,7 +240,7 @@ const GatePass = () => {
             textAlign="center"
             flex={1}
           >
-            Gate Pass
+            Gate-Pass
           </Text>
           <Ionicons
             name="arrow-back"

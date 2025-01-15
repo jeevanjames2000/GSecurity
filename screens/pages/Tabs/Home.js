@@ -10,26 +10,34 @@ export default function Home() {
   // console.log(AsyncStorage.removeItem("token"));
   const featuredData = [
     {
-      name: "Report Violation",
+      name: "Report-Violation",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/group.png",
       },
     },
     {
-      name: "VMS",
+      name: "Visitor Management",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/reception.png",
       },
     },
     {
-      name: "GatePass",
+      name: "Gate-Pass",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/toll-road_829376.png",
       },
     },
     {
-      name: "Cctv",
+      name: "CCTV",
       img: { uri: "http://172.17.58.151:9000/auth/getImage/cctv.png" },
+    },
+    {
+      name: "Material-Pass",
+      img: { uri: "http://172.17.58.151:9000/auth/getImage/materialpass.png" },
+    },
+    {
+      name: "Leaves & Permissions",
+      img: { uri: "http://172.17.58.151:9000/auth/getImage/leaves.png" },
     },
   ];
   const emergencyData = [
@@ -159,7 +167,7 @@ export default function Home() {
             textAlign="center"
             flex={1}
           >
-            G Security
+            G-Security
           </Text>
 
           <Ionicons
@@ -200,9 +208,6 @@ export default function Home() {
         </HStack>
       </Box>
       <Box paddingX="4" paddingY="4" top={10}>
-        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
-          Featured
-        </Text>
         <FlatList
           data={featuredData}
           renderItem={({ item }) => <FeaturedCard item={item} />}
