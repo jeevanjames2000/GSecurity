@@ -72,7 +72,6 @@ const ReportViolation = () => {
     setIsModalVisible(false);
     setSelectedItem(null);
   };
-
   const handleSearchChange = (query) => {
     setSearchQuery(query);
     setIsLoading(true);
@@ -174,6 +173,7 @@ const ReportViolation = () => {
       item ? (
         <Image
           source={{ uri: item }}
+          alt="report violation images"
           style={{
             width: 300,
             height: 300,
@@ -232,7 +232,7 @@ const ReportViolation = () => {
           data={imageUrls}
           horizontal
           renderItem={renderItem}
-          keyExtractor={(item) => item.Id}
+          keyExtractor={(item, index) => `${item}-${index}`}
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={onScrollEnd}
           contentContainerStyle={{
@@ -251,10 +251,18 @@ const ReportViolation = () => {
       <Box backgroundColor="#007367" paddingY="4" paddingX="4">
         <HStack
           alignItems="center"
-          justifyContent="center"
+          justifyContent="space-between"
           position="relative"
           top={10}
+          px={2}
         >
+          <Ionicons
+            name="arrow-back"
+            size={30}
+            color="white"
+            onPress={() => navigation.goBack()}
+          />
+
           <Text
             fontSize={30}
             color="white"
@@ -264,25 +272,21 @@ const ReportViolation = () => {
           >
             Violations
           </Text>
-          <Ionicons
-            name="arrow-back"
-            size={30}
-            position="absolute"
-            left={0}
-            color="white"
-            onPress={() => navigation.goBack()}
-          />
-          <Image
-            source={{
-              uri: "http://172.17.58.151:9000/auth/getImage/addIcon2.png",
-            }}
-            alt="Add Icon"
-            size={30}
-            position="absolute"
-            right={0}
-            color="white"
+
+          <TouchableOpacity
             onPress={() => navigation.navigate("AddViolations")}
-          />
+          >
+            <Image
+              source={{
+                uri: "http://172.17.58.151:9000/auth/getImage/violation1.png",
+              }}
+              alt="Add Icon"
+              style={{
+                width: 30,
+                height: 30,
+              }}
+            />
+          </TouchableOpacity>
         </HStack>
         <HStack
           backgroundColor="white"

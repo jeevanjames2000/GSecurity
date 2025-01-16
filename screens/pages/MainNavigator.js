@@ -16,6 +16,7 @@ import AddViolations from "./Vms/AddViolations";
 import CCTV from "./CCTV";
 import Leaves_Permission from "./Leaves_Permission";
 import QrCamera from "./Tabs/Camera";
+import MaterialPass from "./MaterialPass";
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigator() {
@@ -68,6 +69,11 @@ export default function MainNavigator() {
       <Stack.Screen
         name="AddVisitor"
         component={AddVisitor}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Material-Pass"
+        component={MaterialPass}
         options={{ headerShown: false }}
       />
 

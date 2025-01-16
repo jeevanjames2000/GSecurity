@@ -1,5 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Modal,
+  Image,
+  FlatList,
+} from "react-native";
+import { Button, Text } from "native-base";
 import {
   Camera,
   useCameraDevice,
@@ -8,6 +17,7 @@ import {
 } from "react-native-vision-camera";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 export default function QrCamera() {
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [cameraFacing, setCameraFacing] = useState("back");
@@ -16,6 +26,8 @@ export default function QrCamera() {
   const [selectedImages, setSelectedImages] = useState([]);
   const { hasPermission, requestPermission } = useCameraPermission();
   const [animationValue] = useState(new Animated.Value(0));
+  const [showImagePopup, setShowImagePopup] = useState(false);
+  const [barcodeMode, setBarcodeMode] = useState(false);
   useEffect(() => {
     if (!hasPermission) {
       requestPermission();
@@ -63,6 +75,7 @@ export default function QrCamera() {
     if (!result.canceled) {
       const newImages = result.assets.map((asset) => asset.uri);
       setSelectedImages((prevImages) => [...prevImages, ...newImages]);
+      setShowImagePopup(true);
     }
   };
   const toggleFlash = () => {
@@ -71,34 +84,70 @@ export default function QrCamera() {
   const toggleCameraFacing = () => {
     setCameraFacing((prev) => (prev === "back" ? "front" : "back"));
   };
+  const toggleBarcodeMode = () => {
+    setBarcodeMode((prev) => !prev);
+  };
+  const closeImages = () => {
+    setSelectedImages([]);
+    setShowImagePopup(false);
+  };
   const capturePhoto = async () => {
     if (camera.current) {
       const photo = await camera.current.takePhoto({
         flash: isFlashOn ? "on" : "off",
       });
-      console.log("Captured photo path:", photo.path);
+      console.log("photo path:", photo.path);
+      CameraRoll.saveAsset(photo.path);
     }
   };
+  const [scannedData, setScannedData] = useState(null);
+  const codeScanner = useCodeScanner({
+    codeTypes: [
+      "qr",
+      "ean-13",
+      "ean-8",
+      "upc-a",
+      "upc-e",
+      "code-128",
+      "code-39",
+      "code-93",
+      "codabar",
+      "aztec",
+      "data-matrix",
+    ],
+    onCodeScanned: (codes) => {
+      if (codes.length > 0) {
+        codes.forEach((code, index) => {
+          setScannedData(code.value);
+        });
+      }
+    },
+  });
   return (
     <View style={styles.container}>
-      {}
       <Camera
         ref={camera}
         style={StyleSheet.absoluteFill}
         device={device}
+        codeScanner={barcodeMode ? codeScanner : undefined}
         isActive={true}
-        photo={true}
+        photo={!barcodeMode}
         enableZoomGesture={true}
       />
-      {}
       <View style={styles.overlay}>
         <View style={styles.qrFrame}>
-          <Animated.View
-            style={[styles.scanLine, { transform: [{ translateY }] }]}
-          />
+          {barcodeMode && (
+            <Animated.View
+              style={[styles.scanLine, { transform: [{ translateY }] }]}
+            />
+          )}
         </View>
+        {scannedData?.length > 0 && (
+          <Text fontSize={20} color="#fff" padding={4}>
+            {scannedData}
+          </Text>
+        )}
       </View>
-      {}
       <TouchableOpacity style={styles.flashButton} onPress={toggleFlash}>
         <Ionicons
           name={isFlashOn ? "flash" : "flash-off"}
@@ -106,20 +155,28 @@ export default function QrCamera() {
           color="white"
         />
       </TouchableOpacity>
-      {}
+      <TouchableOpacity
+        style={styles.barcodeButton}
+        onPress={toggleBarcodeMode}
+      >
+        <Ionicons
+          name={!barcodeMode ? "barcode-outline" : "camera-outline"}
+          size={30}
+          color="white"
+        />
+      </TouchableOpacity>
       <View style={styles.bottomContainer}>
-        {}
         <TouchableOpacity
           style={styles.galleryButton}
           onPress={handlePickImages}
         >
           <Ionicons name="images-outline" size={30} color="white" />
         </TouchableOpacity>
-        {}
-        <TouchableOpacity style={styles.captureButton} onPress={capturePhoto}>
-          <Ionicons name="camera-outline" size={40} color="black" />
-        </TouchableOpacity>
-        {}
+        {!barcodeMode && (
+          <TouchableOpacity style={styles.captureButton} onPress={capturePhoto}>
+            <Ionicons name="camera-outline" size={40} color="black" />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.flipButton}
           onPress={toggleCameraFacing}
@@ -127,6 +184,32 @@ export default function QrCamera() {
           <Ionicons name="camera-reverse-outline" size={30} color="white" />
         </TouchableOpacity>
       </View>
+      <Modal visible={showImagePopup} transparent={true} animationType="slide">
+        <View style={styles.popupContainer}>
+          <FlatList
+            data={selectedImages}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal
+            renderItem={({ item }) => (
+              <Image source={{ uri: item }} style={styles.imagePreview} />
+            )}
+          />
+          <Button
+            variant={"outline"}
+            colorScheme={"red"}
+            style={{ bottom: 20 }}
+            onPress={closeImages}
+          >
+            Clear all selected images
+          </Button>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setShowImagePopup(false)}
+          >
+            <Ionicons name="close-circle-outline" size={40} color="black" />
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -214,5 +297,35 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginTop: 10,
+  },
+  barcodeButton: {
+    position: "absolute",
+    top: 90,
+    right: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2,
+  },
+  popupContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ffff",
+  },
+  imagePreview: {
+    width: 300,
+    height: "100%",
+    resizeMode: "contain",
+    marginHorizontal: 10,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 20,
+    right: 10,
+    zIndex: 1,
   },
 });
