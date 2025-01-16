@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
 import {
   ScrollView,
   HStack,
@@ -7,21 +6,105 @@ import {
   VStack,
   View,
   Input,
-  Center,
-  Button,
   Box,
-  Badge,
   Modal,
   Pressable,
   Image,
   Actionsheet,
   useDisclose,
+  Center,
+  Button,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-const HistoryCard = ({ data, setShowModal }) => {
+import { TouchableOpacity } from "react-native";
+const visitorsData = [
+  {
+    requestId: "REQ001",
+    visitorName: "Taru Kumar",
+    visitDate: "12 Jan 2025",
+    contactNo: "7894561230",
+    createdOn: "10 Jan 2025, 2:30 PM",
+    status: "Pending",
+    otp: "",
+    rqName: "John Doe",
+    time: "2:30 PM",
+  },
+  {
+    requestId: "REQ002",
+    visitorName: "Bangaru Naidu",
+    visitDate: "11 Jan 2025",
+    contactNo: "9876543210",
+    createdOn: "09 Jan 2025, 1:00 PM",
+    status: "Approved",
+    otp: "",
+    rqName: "Jane Smith",
+    time: "1:00 PM",
+  },
+  {
+    requestId: "REQ003",
+    visitorName: "Meera Sharma",
+    visitDate: "14 Jan 2025",
+    contactNo: "9658741230",
+    createdOn: "12 Jan 2025, 11:00 AM",
+    status: "Pending",
+    otp: "",
+    rqName: "Mark Johnson",
+    time: "11:00 AM",
+  },
+  {
+    requestId: "REQ004",
+    visitorName: "Rahul Gupta",
+    visitDate: "15 Jan 2025",
+    contactNo: "8523697410",
+    createdOn: "13 Jan 2025, 3:45 PM",
+    status: "Rejected",
+    otp: "",
+    rqName: "Emily Davis",
+    time: "3:45 PM",
+  },
+  {
+    requestId: "REQ005",
+    visitorName: "Anjali Verma",
+    visitDate: "16 Jan 2025",
+    contactNo: "9236547891",
+    createdOn: "14 Jan 2025, 10:15 AM",
+    status: "Approved",
+    otp: "",
+    rqName: "Chris Lee",
+    time: "10:15 AM",
+  },
+  {
+    requestId: "REQ006",
+    visitorName: "Vikram Roy",
+    visitDate: "18 Jan 2025",
+    contactNo: "7854129630",
+    createdOn: "16 Jan 2025, 9:20 AM",
+    status: "Pending",
+    otp: "",
+    rqName: "Sara Miller",
+    time: "9:20 AM",
+  },
+  {
+    requestId: "REQ007",
+    visitorName: "Sonia Khanna",
+    visitDate: "19 Jan 2025",
+    contactNo: "7891236540",
+    createdOn: "17 Jan 2025, 4:00 PM",
+    status: "Approved",
+    otp: "",
+    rqName: "David Brown",
+    time: "4:00 PM",
+  },
+];
+const HistoryCard = ({ data, setShowModal, setSelectedVisitor }) => {
   return (
-    <Pressable onPress={() => setShowModal(true)}>
+    <Pressable
+      onPress={() => {
+        setShowModal(true);
+        setSelectedVisitor(data);
+      }}
+    >
       <HStack
         bgColor={"#F0F4F8"}
         paddingY={"2"}
@@ -54,58 +137,15 @@ const HistoryCard = ({ data, setShowModal }) => {
             </Text>
           </Text>
         </VStack>
-        {}
         <VStack
           flexDirection={"row"}
           gap={4}
-          alignItems="center"
-          justifyContent={"center"}
-          top={-15}
+          alignItems={"flex-start"}
+          justifyContent={"flex-start"}
         >
-          <Text
-            fontSize={"sm"}
-            fontWeight={"normal"}
-            color={"gray.600"}
-            alignItems="center"
-            justifyContent="center"
-          >
+          <Text fontSize={"sm"} fontWeight={"normal"} color={"gray.600"}>
             {data.time}{" "}
           </Text>
-          {/* <Badge
-            variant="solid"
-            borderRadius={"md"}
-            px={2}
-            py={2}
-            _text={{
-              fontSize: "xs",
-              fontWeight: "bold",
-              textTransform: "uppercase",
-              textAlign: "center",
-            }}
-            style={{
-              width: 100,
-              borderWidth: 0.5,
-              borderColor:
-                data.status === "Approved"
-                  ? "green"
-                  : data.status === "Pending"
-                  ? "orange"
-                  : data.status === "Denied"
-                  ? "red"
-                  : "gray",
-            }}
-            colorScheme={
-              data.status === "Approved"
-                ? "success"
-                : data.status === "Pending"
-                ? "warning"
-                : data.status === "Denied"
-                ? "danger"
-                : "gray"
-            }
-          >
-            {data.status}
-          </Badge> */}
           {data.status === "Pending" ? (
             <Ionicons name="time" size={26} color="orange" />
           ) : data.status === "Denied" ? (
@@ -120,81 +160,60 @@ const HistoryCard = ({ data, setShowModal }) => {
 };
 const VisitorsList = () => {
   const { isOpen, onOpen, onClose } = useDisclose();
+  const navigation = useNavigation();
+  const [otp, setOtp] = useState("");
+  const [sortOption, setSortOption] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedVisitor, setSelectedVisitor] = useState(null);
+  const [isOtpSubmitted, setIsOtpSubmitted] = useState(false);
+  const [filteredVisitors, setFilteredVisitors] = useState(visitorsData);
+  const handleSearchChange = (query) => {
+    setSearchQuery(query);
+    clearTimeout(searchDebounce);
+    const searchDebounce = setTimeout(() => {
+      applyFilters(query, sortOption);
+    }, 300);
+  };
   const filterOptions = [
+    { label: "All", value: "all" },
     { label: "Approved", value: "approved" },
     { label: "Pending", value: "pending" },
     { label: "Denied", value: "denied" },
   ];
-
-  const navigation = useNavigation();
-  const [showModal, setShowModal] = useState(false);
-  const visitorsData = [
-    {
-      rqName: "Kelivin Fryimnk",
-      visitorName: "Annonyms",
-      time: "02:00 pm",
-      status: "Approved",
-    },
-    {
-      rqName: "John Doe",
-      visitorName: "Jane Smith",
-      time: "03:00 pm",
-      status: "Pending",
-    },
-    {
-      rqName: "Alex Carter",
-      visitorName: "Anonymous",
-      time: "04:00 pm",
-      status: "Denied",
-    },
-    {
-      rqName: "John Doe",
-      visitorName: "Jane Smith",
-      time: "03:00 pm",
-      status: "Pending",
-    },
-    {
-      rqName: "Kelivin Fryimnk",
-      visitorName: "Annonyms",
-      time: "02:00 pm",
-      status: "Approved",
-    },
-    {
-      rqName: "John Doe",
-      visitorName: "Jane Smith",
-      time: "03:00 pm",
-      status: "Pending",
-    },
-    {
-      rqName: "Alex Carter",
-      visitorName: "Anonymous",
-      time: "04:00 pm",
-      status: "Denied",
-    },
-    {
-      rqName: "John Doe",
-      visitorName: "Jane Smith",
-      time: "03:00 pm",
-      status: "Pending",
-    },
-    {
-      rqName: "Kelivin Fryimnk",
-      visitorName: "Annonyms",
-      time: "02:00 pm",
-      status: "Approved",
-    },
-  ];
+  const applyFilters = (query, filter) => {
+    let updatedVisitors = visitorsData.filter((visitor) => {
+      const matchesSearch = Object.values(visitor).some((value) =>
+        value.toString().toLowerCase().includes(query.toLowerCase())
+      );
+      const matchesFilter =
+        filter === "all" || visitor.status.toLowerCase() === filter;
+      return matchesSearch && matchesFilter;
+    });
+    setFilteredVisitors(updatedVisitors);
+  };
+  const handleSortChange = (value) => {
+    setSortOption(value);
+    applyFilters(searchQuery, value);
+    onClose();
+  };
   return (
     <View style={{ flex: 1 }}>
       <Box backgroundColor="#007367" paddingY="4" paddingX="4">
         <HStack
           alignItems="center"
-          justifyContent="center"
+          justifyContent="space-between"
           position="relative"
           top={10}
+          py={3}
         >
+          {}
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={30} color="white" />
+          </TouchableOpacity>
+          {}
           <Text
-            fontSize={30}
+            fontSize={24}
             color="white"
             fontWeight="bold"
             textAlign="center"
@@ -202,22 +221,19 @@ const VisitorsList = () => {
           >
             Visitor Management
           </Text>
-          <Ionicons
-            name="arrow-back"
-            size={30}
-            position="absolute"
-            left={0}
-            color="white"
-            onPress={() => navigation.goBack()}
-          />
-          <Ionicons
-            name="person-add-outline"
-            size={30}
-            position="absolute"
-            right={0}
-            color="white"
-            onPress={() => navigation.navigate("AddVisitor")}
-          />
+          {}
+          <TouchableOpacity onPress={() => navigation.navigate("AddVisitor")}>
+            <Image
+              source={{
+                uri: "http://172.17.58.151:9000/auth/getImage/violation1.png",
+              }}
+              alt="Add Icon"
+              style={{
+                width: 30,
+                height: 30,
+              }}
+            />
+          </TouchableOpacity>
         </HStack>
         <HStack
           backgroundColor="white"
@@ -234,6 +250,8 @@ const VisitorsList = () => {
             placeholder="Search by ID / Vehicle number"
             variant="unstyled"
             fontSize="md"
+            value={searchQuery}
+            onChangeText={handleSearchChange}
           />
           <Pressable>
             <Image
@@ -249,11 +267,15 @@ const VisitorsList = () => {
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16 }}
         showsVerticalScrollIndicator={false}
-        padding={"0"}
         marginTop={"12"}
       >
-        {visitorsData.map((visitor, i) => (
-          <HistoryCard key={i} data={visitor} setShowModal={setShowModal} />
+        {filteredVisitors.map((visitor, i) => (
+          <HistoryCard
+            key={i}
+            data={visitor}
+            setShowModal={setShowModal}
+            setSelectedVisitor={setSelectedVisitor}
+          />
         ))}
       </ScrollView>
       <TouchableOpacity
@@ -272,7 +294,7 @@ const VisitorsList = () => {
         onPress={onOpen}
       >
         <Ionicons name="filter-outline" size={22} color="white" />
-        <Text color="white" style={{ marginLeft: 5, fontSize: 16 }}>
+        <Text style={{ marginLeft: 5, fontSize: 16, color: "white" }}>
           Filter
         </Text>
       </TouchableOpacity>
@@ -296,7 +318,6 @@ const VisitorsList = () => {
                     ? "red.500"
                     : "orange.400"
                 }
-                borderBottomColor={"black"}
               >
                 {option.label}
               </Text>
@@ -306,104 +327,83 @@ const VisitorsList = () => {
       </Actionsheet>
       <Center>
         <Modal size="xl" isOpen={showModal} onClose={() => setShowModal(false)}>
-          <Modal.Content maxWidth="400px" borderRadius="10">
+          <Modal.Content maxWidth={["90%", "400px"]} borderRadius="10">
             <Modal.CloseButton />
             <Modal.Header>
-              <Text fontSize="lg" fontWeight="bold" color={"#007367"}>
+              <Text fontSize={["md", "lg"]} fontWeight="bold" color={"#007367"}>
                 Visitor Details
               </Text>
             </Modal.Header>
             <Modal.Body>
-              <VStack space={4}>
-                {}
-                <HStack justifyContent="space-between">
-                  <Text fontWeight="bold" color="gray.600">
-                    Request ID
-                  </Text>
-                  <Text color="gray.800">Bangaru Naidu</Text>
-                </HStack>
-                {}
-                <HStack justifyContent="space-between">
-                  <Text fontWeight="bold" color="gray.600">
-                    Visitor Name
-                  </Text>
-                  <Text color="gray.800">Taru Kumar</Text>
-                </HStack>
-                {}
-                <HStack justifyContent="space-between">
-                  <Text fontWeight="bold" color="gray.600">
-                    Visit Date
-                  </Text>
-                  <Text color="gray.800">12 Jan 2025</Text>
-                </HStack>
-                {}
-                <HStack justifyContent="space-between">
-                  <Text fontWeight="bold" color="gray.600">
-                    Contact No
-                  </Text>
-                  <Text color="gray.800">7894561230</Text>
-                </HStack>
-                {}
-                <HStack justifyContent="space-between">
-                  <Text fontWeight="bold" color="gray.600">
-                    Created On
-                  </Text>
-                  <Text color="gray.800">10 Jan 2025, 2:30 PM</Text>
-                </HStack>
-                {}
-                <HStack justifyContent="space-between">
-                  <Text fontWeight="bold" color="gray.600">
-                    Status
-                  </Text>
-                  <Badge colorScheme="warning" borderRadius="md">
-                    Pending
-                  </Badge>
-                </HStack>
-                {}
-                <HStack justifyContent="space-between">
-                  <Text fontWeight="bold" color="gray.600">
-                    Enter OTP
-                  </Text>
-                  <Input
-                    variant="filled"
-                    placeholder="Enter OTP"
-                    keyboardType="numeric"
-                    maxLength={6}
-                    borderWidth={2}
-                    borderColor="#007367"
-                    borderRadius="8"
-                    minWidth="160px"
-                    fontSize="lg"
-                    textAlign="center"
-                    _focus={{
-                      borderColor: "#007367",
-                      backgroundColor: "white",
-                    }}
-                    _placeholder={{
-                      color: "gray.500",
-                    }}
-                  />
-                </HStack>
-              </VStack>
+              <ScrollView>
+                <VStack space={4}>
+                  {}
+                  {Object.entries(selectedVisitor || {}).map(([key, value]) => (
+                    <HStack justifyContent="space-between" key={key}>
+                      <Text fontWeight="bold" color="gray.600">
+                        {key.replace(/([A-Z])/g, " $1").toUpperCase()}
+                      </Text>
+                      <Text color="gray.800">{value || "N/A"}</Text>
+                    </HStack>
+                  ))}
+                  {}
+                  {selectedVisitor?.status === "Pending" && !isOtpSubmitted ? (
+                    <VStack space={4} mt={4}>
+                      <Text fontWeight="bold" color="gray.600">
+                        Enter OTP
+                      </Text>
+                      <Input
+                        placeholder="Enter OTP"
+                        value={otp}
+                        onChangeText={(text) => setOtp(text)}
+                        keyboardType="numeric"
+                        maxLength={6}
+                      />
+                      <Button
+                        colorScheme="teal"
+                        onPress={() => {
+                          if (otp === "123456") {
+                            setIsOtpSubmitted(true);
+                          } else {
+                            alert("Invalid OTP. Please try again.");
+                          }
+                        }}
+                      >
+                        Submit OTP
+                      </Button>
+                    </VStack>
+                  ) : (
+                    ""
+                  )}
+                  {}
+                  {isOtpSubmitted && (
+                    <VStack space={4} mt={4}>
+                      <Button colorScheme="teal">Download Visitor Pass</Button>
+                    </VStack>
+                  )}
+                </VStack>
+              </ScrollView>
             </Modal.Body>
             <Modal.Footer>
-              <Button.Group space={2}>
+              <HStack space={4} justifyContent="flex-end" width="100%">
+                {}
                 <Button
                   variant="outline"
-                  colorScheme="blueGray"
+                  colorScheme="coolGray"
                   onPress={() => setShowModal(false)}
                 >
-                  Close
+                  Cancel
                 </Button>
+                {}
                 <Button
-                  bgColor={"#007367"}
+                  colorScheme="teal"
                   onPress={() => {
                     setShowModal(false);
                   }}
                 >
                   Confirm
                 </Button>
-              </Button.Group>
+              </HStack>
             </Modal.Footer>
           </Modal.Content>
         </Modal>
@@ -412,9 +412,3 @@ const VisitorsList = () => {
   );
 };
 export default VisitorsList;
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
-});
