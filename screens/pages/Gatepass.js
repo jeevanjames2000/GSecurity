@@ -229,10 +229,17 @@ const GatePass = () => {
       <Box backgroundColor="#007367" paddingY="4" paddingX="4">
         <HStack
           alignItems="center"
-          justifyContent="center"
+          justifyContent="space-between"
           position="relative"
           top={10}
+          px={2}
         >
+          <Ionicons
+            name="arrow-back"
+            size={30}
+            color="white"
+            onPress={() => navigation.goBack()}
+          />
           <Text
             fontSize={30}
             color="white"
@@ -242,14 +249,18 @@ const GatePass = () => {
           >
             Gate-Pass
           </Text>
-          <Ionicons
-            name="arrow-back"
-            size={30}
-            position="absolute"
-            left={0}
-            color="white"
-            onPress={() => navigation.goBack()}
-          />
+          <TouchableOpacity onPress={() => navigation.navigate("Create Pass")}>
+            <Image
+              source={{
+                uri: "http://172.17.58.151:9000/auth/getImage/add (2).png",
+              }}
+              alt="Add Icon"
+              style={{
+                width: 30,
+                height: 30,
+              }}
+            />
+          </TouchableOpacity>
         </HStack>
         <HStack
           backgroundColor="white"

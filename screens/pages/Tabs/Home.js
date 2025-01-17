@@ -17,13 +17,13 @@ export default function Home() {
   const navigation = useNavigation();
   const featuredData = [
     {
-      name: "Report-Violation",
+      name: "Violation",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/group.png",
       },
     },
     {
-      name: "Visitor Management",
+      name: "Visitors",
       img: {
         uri: "http://172.17.58.151:9000/auth/getImage/reception.png",
       },
@@ -43,7 +43,7 @@ export default function Home() {
       img: { uri: "http://172.17.58.151:9000/auth/getImage/materialpass.png" },
     },
     {
-      name: "Leaves & Permissions",
+      name: "Leaves",
       img: { uri: "http://172.17.58.151:9000/auth/getImage/leaves.png" },
     },
   ];

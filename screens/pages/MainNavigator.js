@@ -17,6 +17,7 @@ import CCTV from "./CCTV";
 import Leaves_Permission from "./Leaves_Permission";
 import QrCamera from "./Tabs/Camera";
 import MaterialPass from "./MaterialPass";
+import AddGatepass from "./utils/AddGatepass";
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigator() {
@@ -36,7 +37,7 @@ export default function MainNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Report-Violation"
+        name="Violation"
         component={ReportViolation}
         options={{ headerShown: false }}
       />
@@ -45,11 +46,11 @@ export default function MainNavigator() {
         component={CCTV}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Violations"
         component={Violations}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="AddViolations"
         component={AddViolations}
@@ -105,12 +106,17 @@ export default function MainNavigator() {
       />
 
       <Stack.Screen
-        name="Visitor Management"
+        name="Visitors"
         component={VisitorsList}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Leaves & Permissions"
+        name="Create Pass"
+        component={AddGatepass}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Leaves"
         component={Leaves_Permission}
         options={{ headerShown: false }}
       />

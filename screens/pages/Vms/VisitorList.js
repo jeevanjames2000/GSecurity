@@ -221,11 +221,10 @@ const VisitorsList = () => {
           >
             Visitor Management
           </Text>
-          {}
           <TouchableOpacity onPress={() => navigation.navigate("AddVisitor")}>
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/violation1.png",
+                uri: "http://172.17.58.151:9000/auth/getImage/add (2).png",
               }}
               alt="Add Icon"
               style={{

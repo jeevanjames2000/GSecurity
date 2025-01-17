@@ -153,7 +153,7 @@ const ReportViolation = () => {
               </Text>
             </HStack>
             <Text fontSize="lg" fontWeight="bold" color="gray.800">
-              Vehicle Number:{" "}
+              Vehicle:{" "}
               <Text fontSize="md" fontWeight="medium" color="gray.600">
                 {item.vehicle_number}
               </Text>
@@ -290,7 +290,7 @@ const ReportViolation = () => {
           >
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/violation1.png",
+                uri: "http://172.17.58.151:9000/auth/getImage/add (2).png",
               }}
               alt="Add Icon"
               style={{
