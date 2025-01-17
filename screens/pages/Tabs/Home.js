@@ -1,13 +1,20 @@
-import React from "react";
-import { Box, Text, FlatList, Image, HStack, Input, View } from "native-base";
+import React, { useState } from "react";
+import {
+  Box,
+  Text,
+  FlatList,
+  Image,
+  HStack,
+  Input,
+  View,
+  Avatar,
+  VStack,
+} from "native-base";
 import { Pressable, Linking } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
 export default function Home() {
   const navigation = useNavigation();
-
-  // console.log(AsyncStorage.removeItem("token"));
   const featuredData = [
     {
       name: "Report-Violation",
@@ -150,7 +157,11 @@ export default function Home() {
       </Text>
     </Pressable>
   );
-
+  const [isOpen, setIsOpen] = useState(false);
+  const handleProfile = () => {
+    navigation.navigate("Profile");
+    setIsOpen(false);
+  };
   return (
     <Box flex={1} backgroundColor="#f5f5f5">
       <Box backgroundColor="#007367" paddingY="4" paddingX="4">
@@ -160,25 +171,47 @@ export default function Home() {
           position="relative"
           top={10}
         >
-          <Text
-            fontSize={30}
-            color="white"
+          <VStack alignItems="center" flex={1}>
+            <Text
+              fontSize={30}
+              color="white"
+              fontWeight="bold"
+              textAlign="center"
+            >
+              G-Security
+            </Text>
+            <Pressable
+              position="absolute"
+              right={0}
+              onPress={() => navigation.navigate("Profile")}
+            >
+              <Avatar
+                borderColor={"blueGray.200"}
+                bg="green.500"
+                borderWidth={2}
+                alt="Profile icon"
+                size="md"
+                source={{
+                  uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg",
+                }}
+              >
+                P
+              </Avatar>
+            </Pressable>
+          </VStack>
+        </HStack>
+        <HStack top={12} justifyContent={"center"}>
+          {/* <Text
+            fontSize={20}
+            color="orange.400"
             fontWeight="bold"
-            textAlign="center"
-            flex={1}
+            textAlign="left"
           >
-            G-Security
+            Welcome!
+          </Text> */}
+          <Text fontSize={18} color="white" fontWeight="thin" textAlign="left">
+            Darlene Robertson
           </Text>
-
-          <Ionicons
-            name="log-out-outline"
-            size={30}
-            position="absolute"
-            right={0}
-            alignItems="center"
-            color="white"
-            onPress={handleLogout}
-          />
         </HStack>
         <HStack
           backgroundColor="white"

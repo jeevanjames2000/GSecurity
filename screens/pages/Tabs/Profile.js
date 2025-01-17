@@ -1,6 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import {
   Box,
+  Button,
   Center,
   HStack,
   Image,
@@ -36,6 +39,13 @@ export default function Profile() {
 
   const navigationToViolation = () => {
     navigation.navigate("AddViolations");
+  };
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("token");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Splash" }],
+    });
   };
 
   return (
@@ -104,7 +114,7 @@ export default function Profile() {
             </VStack>
           </View>
 
-          <View marginBottom={6} padding={2}>
+          <View marginBottom={1} padding={2}>
             <Text style={styles.head_2}>Violations</Text>
 
             <HStack space={2} justifyContent="center" height={120}>
@@ -158,7 +168,7 @@ export default function Profile() {
 
           <Pressable
             bg="#007367"
-            mb={10}
+            mb={5}
             borderRadius="md"
             width="100%"
             p={3}
@@ -172,6 +182,27 @@ export default function Profile() {
             >
               Report a Violation
             </Text>
+          </Pressable>
+          <Pressable
+            bg="#007367"
+            mb={10}
+            borderRadius="md"
+            width="100%"
+            p={3}
+            alignItems="center"
+            onPress={handleLogout}
+          >
+            <HStack alignItems="center" justifyContent="center" space={2}>
+              <Text
+                textAlign="center"
+                fontSize={20}
+                fontWeight={600}
+                color="#fff"
+              >
+                Logout
+              </Text>
+              <Ionicons name="log-out-outline" size={20} color="white" />
+            </HStack>
           </Pressable>
         </ScrollView>
       </SafeAreaView>

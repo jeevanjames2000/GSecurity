@@ -71,9 +71,10 @@ export default function SplashScreen({ navigation, route }) {
         source={{
           uri: "http://172.17.58.151:9000/auth/getImage/gitam-logo-circle.png",
         }}
+        alt="Gitam-Logo"
         style={{
           width: "100%",
-          height: "80%",
+          height: "90%",
           backgroundColor: "transparent",
         }}
         resizeMode="contain"

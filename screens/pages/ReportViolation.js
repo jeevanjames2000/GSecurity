@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Box,
   Text,
@@ -72,12 +72,19 @@ const ReportViolation = () => {
     setIsModalVisible(false);
     setSelectedItem(null);
   };
+  const cache = useMemo(() => ({}), []);
   const handleSearchChange = (query) => {
     setSearchQuery(query);
     setIsLoading(true);
-    applyFilters(query, sortOption);
+    const cacheKey = `${query}-${sortOption}`;
+    if (cache[cacheKey]) {
+      setFilteredViolations(cache[cacheKey]);
+      setIsLoading(false);
+    } else {
+      applyFilters(query, sortOption, cacheKey);
+    }
   };
-  const applyFilters = (query, filter) => {
+  const applyFilters = (query, filter, cacheKey) => {
     setIsLoading(true);
     let updatedViolations = violations.filter((violation) => {
       const matchesSearch = Object.values(violation).some((value) =>
@@ -98,6 +105,7 @@ const ReportViolation = () => {
     } else if (filter === "paid" || filter === "unpaid") {
       updatedViolations.sort((a, b) => a.name.localeCompare(b.name));
     }
+    cache[cacheKey] = updatedViolations;
     setFilteredViolations(updatedViolations);
     setTimeout(() => {
       setIsLoading(false);
@@ -163,8 +171,14 @@ const ReportViolation = () => {
   );
   const handleSortChange = (value) => {
     setSortOption(value);
-    applyFilters(searchQuery, value);
-    onClose();
+    setIsLoading(true);
+    const cacheKey = `${searchQuery}-${value}`;
+    if (cache[cacheKey]) {
+      setFilteredViolations(cache[cacheKey]);
+      setIsLoading(false);
+    } else {
+      applyFilters(searchQuery, value, cacheKey);
+    }
   };
   const ModalContent = ({ selectedItem }) => {
     const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -262,7 +276,6 @@ const ReportViolation = () => {
             color="white"
             onPress={() => navigation.goBack()}
           />
-
           <Text
             fontSize={30}
             color="white"
@@ -272,7 +285,6 @@ const ReportViolation = () => {
           >
             Violations
           </Text>
-
           <TouchableOpacity
             onPress={() => navigation.navigate("AddViolations")}
           >
