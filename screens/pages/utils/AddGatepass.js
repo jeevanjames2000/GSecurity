@@ -12,18 +12,22 @@ import {
   Text,
   Select,
   IconButton,
+  useToast,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Keyboard } from "react-native";
 export default function AddGatepass() {
+  const toast = useToast();
   const navigation = useNavigation();
   const [passType, setPassType] = useState("");
-  const [issuedTo, setIssuedTo] = useState("gitamEmployee");
-  const [issuedBy, setIssuedBy] = useState(""); // we need to get this data from login user api data
-  const [issuedFrom, setIssuedFrom] = useState(""); // we need to get this data from login user api data
-  const [mobile, setMobile] = useState(""); // we need to get this data from login user api data
-  // created on date also
+  const [issuedTo, setIssuedTo] = useState("Employee");
+  const [issuedBy, setIssuedBy] = useState("");
+  const [issuedFrom, setIssuedFrom] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [vehicle, setVehicle] = useState("");
+  const [empId, setEmpId] = useState("");
+  const [name, setName] = useState("");
+  const [remarks, setRemarks] = useState("");
   const [particulars, setParticulars] = useState([
     { id: 1, particular: "", qty: 0 },
   ]);
@@ -45,10 +49,74 @@ export default function AddGatepass() {
         : prev
     );
   };
-  const handleSubmit = () => {};
+  const handleSubmit = async () => {
+    const formData = {
+      pass_type: passType,
+      issued_by: "CAO",
+      issued_to: issuedTo,
+      issuer_mobile: "6302816551",
+      campus: "VSP",
+      receiver_emp_id: "878787",
+      receiver_type: issuedTo,
+      receiver_name: name,
+      receiver_mobile_number: mobile,
+      vehicle_number: vehicle,
+      remarks: remarks,
+      particulars: particulars,
+    };
+    const response = await fetch(
+      "http://172.17.58.151:9000/gatepass/createGatePass",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.show({
+        render: () => {
+          return (
+            <Box
+              bg="green.300"
+              px="4"
+              py="2"
+              rounded="md"
+              shadow={2}
+              alignSelf="center"
+            >
+              GatePass created successfully!
+            </Box>
+          );
+        },
+        placement: "top-right",
+      });
+    } else {
+      const errorMessage =
+        response.error || "An error occurred. Please try again.";
+      toast.show({
+        render: () => {
+          return (
+            <Box
+              bg="red.300"
+              px="4"
+              py="2"
+              rounded="md"
+              shadow={2}
+              alignSelf="flex-end"
+            >
+              {errorMessage}
+            </Box>
+          );
+        },
+        placement: "top-right",
+      });
+    }
+  };
   return (
     <Box flex={1} bg="#f5f5f5">
-      {}
       <Box backgroundColor="#007367" paddingY="10" paddingX="4">
         <HStack
           alignItems="center"
@@ -97,16 +165,15 @@ export default function AddGatepass() {
                 endIcon: <Ionicons name="checkmark" size={20} color="black" />,
               }}
             >
-              <Select.Item label="Returnable" value="returnable" />
-              <Select.Item label="Non-Returnable" value="non-returnable" />
-              <Select.Item label="Domestic Waste" value="domestic-waste" />
+              <Select.Item label="Returnable" value="Returnable" />
+              <Select.Item label="Non-Returnable" value="Non-returnable" />
+              <Select.Item label="Domestic Waste" value="Domestic-waste" />
               <Select.Item
                 label="Construction Waste/Scrap"
-                value="construction-waste"
+                value="Construction-waste"
               />
             </Select>
           </FormControl>
-
           <VStack space={4}>
             <FormControl mb={4} isReadOnly>
               <FormControl.Label _text={{ fontSize: 16, fontWeight: "bold" }}>
@@ -128,34 +195,47 @@ export default function AddGatepass() {
                   ),
                 }}
               >
-                <Select.Item label="Gitam Employee" value="gitamEmployee" />
+                <Select.Item label="Gitam Employee" value="Employee" />
                 <Select.Item label="Other" value="other" />
               </Select>
             </FormControl>
-
             <Stack>
               <FormControl.Label _text={{ fontSize: 16, fontWeight: "bold" }}>
-                Receiver {issuedTo === "gitamEmployee" ? "EMPID" : "Name"}
+                Receiver {issuedTo === "Employee" ? "EMPID" : "Name"}
               </FormControl.Label>
               <Input
                 placeholder={`Enter ${
-                  issuedTo === "gitamEmployee" ? "EMPID" : "Name"
+                  issuedTo === "Employee" ? "EMPID" : "Name"
                 }`}
                 bg="#ffff"
                 p={3}
+                value={name}
+                onChangeText={setName}
               />
             </Stack>
             <Stack>
               <FormControl.Label _text={{ fontSize: 16, fontWeight: "bold" }}>
                 Receiver Mobile No
               </FormControl.Label>
-              <Input placeholder="Enter Mobile Number" bg="#ffff" p={3} />
+              <Input
+                placeholder="Enter Mobile Number"
+                bg="#ffff"
+                p={3}
+                value={mobile}
+                onChangeText={setMobile}
+              />
             </Stack>
             <Stack>
               <FormControl.Label _text={{ fontSize: 16, fontWeight: "bold" }}>
                 Receiver Vehicle No
               </FormControl.Label>
-              <Input placeholder="Enter Vehicle Number" bg="#ffff" p={3} />
+              <Input
+                placeholder="Enter Vehicle Number"
+                bg="#ffff"
+                p={3}
+                value={vehicle}
+                onChangeText={setVehicle}
+              />
             </Stack>
             <FormControl>
               <FormControl.Label _text={{ fontSize: 16, fontWeight: "bold" }}>
@@ -191,7 +271,7 @@ export default function AddGatepass() {
                       }
                       onPress={addNewField}
                     />
-                    {}
+
                     {particulars.length > 1 && (
                       <IconButton
                         icon={
@@ -212,10 +292,14 @@ export default function AddGatepass() {
               <FormControl.Label _text={{ fontSize: 16, fontWeight: "bold" }}>
                 Remarks
               </FormControl.Label>
-              <TextArea placeholder="Enter Remarks" bg="#ffff" />
+              <TextArea
+                placeholder="Enter Remarks"
+                bg="#ffff"
+                value={remarks}
+                onChangeText={setRemarks}
+              />
             </Stack>
           </VStack>
-          {}
           <HStack justifyContent="space-between" mt={4}>
             <Button
               flex={1}

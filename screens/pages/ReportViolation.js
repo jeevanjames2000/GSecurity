@@ -179,6 +179,7 @@ const ReportViolation = () => {
     } else {
       applyFilters(searchQuery, value, cacheKey);
     }
+    onClose();
   };
   const ModalContent = ({ selectedItem }) => {
     const [activeImageIndex, setActiveImageIndex] = useState(0);

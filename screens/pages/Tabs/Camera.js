@@ -132,7 +132,6 @@ export default function QrCamera() {
         codeScanner={barcodeMode ? codeScanner : undefined}
         isActive={true}
         photo={!barcodeMode}
-        enableZoomGesture={true}
       />
       <View style={styles.overlay}>
         <View style={styles.qrFrame}>

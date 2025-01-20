@@ -7,8 +7,6 @@ import GetDetails from "./utils/GetDetails";
 import ReportViolation from "./ReportViolation";
 import Login from "../auth/Login";
 import Home from "./Tabs/Home";
-import Violations from "./Tabs/Violations";
-import Camera from "./Tabs/Camera";
 import GatePass from "./Gatepass";
 import VisitorsList from "./Vms/VisitorList";
 import AddVisitor from "./Vms/AddVisitor";
