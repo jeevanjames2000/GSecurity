@@ -20,6 +20,7 @@
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
+    "@reduxjs/toolkit": "^2.5.0",
     "expo": "~52.0.20",
     "expo-calendar": "~14.0.5",
     "expo-dev-client": "~5.0.7",
@@ -40,7 +41,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-snap-carousel": "^4.0.0-beta.6",
     "react-native-svg": "^15.8.0",
-    "react-native-vision-camera": "^4.6.3"
+    "react-native-vision-camera": "^4.6.3",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

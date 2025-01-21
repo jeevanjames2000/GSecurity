@@ -2,35 +2,28 @@ import React, { useState } from "react";
 import { Text, Box, Image, VStack, Input, Spinner } from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, TouchableOpacity } from "react-native";
-
 export default function Login({ navigation }) {
-  // const navigation = useNavigation();
   const [username, setUsername] = useState("sample");
   const [password, setPassword] = useState("123@123");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
   const handleLogin = async () => {
     if (!username || !password) {
       setError("Please enter both username and password.");
       return;
     }
-
     setIsLoading(true);
     setError(null);
-
     try {
       const response = await fetch("http://172.17.58.151:9000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-
       const data = await response.json();
-
-      console.log("response: ", response);
       if (response.ok) {
         await AsyncStorage.setItem("token", data.token);
+        await AsyncStorage.setItem("userName", username);
         navigation.navigate("Main");
       } else {
         setError(data.message || "Invalid credentials.");
@@ -42,7 +35,6 @@ export default function Login({ navigation }) {
       setIsLoading(false);
     }
   };
-
   return (
     <Box flex={1} bg="white" justifyContent="center" alignItems="center">
       <Box
@@ -60,7 +52,6 @@ export default function Login({ navigation }) {
           resizeMode="contain"
         />
       </Box>
-
       <Box
         position="absolute"
         top={100}
@@ -78,7 +69,6 @@ export default function Login({ navigation }) {
           style={{ width: "90%", height: "90%" }}
         />
       </Box>
-
       <Box
         bg="#00796B"
         borderTopRadius="40"
@@ -148,7 +138,6 @@ export default function Login({ navigation }) {
     </Box>
   );
 }
-
 const styles = StyleSheet.create({
   button: {
     width: "100%",

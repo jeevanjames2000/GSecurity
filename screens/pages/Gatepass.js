@@ -21,6 +21,7 @@ import {
 import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const GatePass = () => {
   const toast = useToast();
   const filterOptions = [
@@ -70,10 +71,12 @@ const GatePass = () => {
     }, [])
   );
   const handleUpdate = async (id, updatedStatus) => {
+    const name = await AsyncStorage.getItem("userName");
     const formData = {
       pass_no: id,
       particulars: JSON.stringify(selectedPass.particulars),
       status: updatedStatus,
+      verified_by: name,
     };
     const response = await fetch(
       "http://172.17.58.151:9000/gatepass/updateParticulars",
