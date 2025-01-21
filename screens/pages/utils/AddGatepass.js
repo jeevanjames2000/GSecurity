@@ -74,8 +74,8 @@ export default function AddGatepass() {
         body: JSON.stringify(formData),
       }
     );
-    const responseData = await response.json();
     if (response.ok) {
+      await navigation.navigate("Gate-Pass");
       toast.show({
         render: () => {
           return (
@@ -271,7 +271,6 @@ export default function AddGatepass() {
                       }
                       onPress={addNewField}
                     />
-
                     {particulars.length > 1 && (
                       <IconButton
                         icon={

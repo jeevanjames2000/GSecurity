@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Box,
   Text,
@@ -22,22 +23,57 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 const GatePass = () => {
   const toast = useToast();
+  const filterOptions = [
+    { label: "All", value: "all" },
+    { label: "Pending", value: "pending" },
+    { label: "Approved", value: "approved" },
+    { label: "Rejected", value: "rejected" },
+  ];
   const navigation = useNavigation();
   const { isOpen, onOpen, onClose } = useDisclose();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
-  const [status, setStatus] = useState("");
-  const [particulars, setParticulars] = useState("");
-  const handleInputChange = (id, field, value) => {
-    setParticulars((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
+  const [filter, setFilter] = useState("all");
+  const [passes, setPasses] = useState([]);
+  const [filteredPasses, setFilteredPasses] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const cache = useMemo(() => ({}), []);
+  const fetchPasses = async () => {
+    if (isFetching) return;
+    setIsLoading(true);
+    setIsFetching(true);
+    try {
+      const response = await fetch(
+        "http://172.17.58.151:9000/gatepass/getAllGatePass"
+      );
+      const data = await response.json();
+      const parsedData = data.map((pass) => ({
+        ...pass,
+        particulars: Array.isArray(pass.particulars)
+          ? pass.particulars
+          : JSON.parse(pass.particulars),
+      }));
+      setPasses(parsedData);
+      setFilteredPasses(parsedData);
+    } catch (error) {
+      console.error("Error fetching passes:", error);
+    } finally {
+      setIsLoading(false);
+      setIsFetching(false);
+    }
   };
-  const handleApprove = async (id) => {
+  useFocusEffect(
+    useCallback(() => {
+      fetchPasses();
+    }, [])
+  );
+  const handleUpdate = async (id, updatedStatus) => {
     const formData = {
       pass_no: id,
-      particulars: JSON.stringify(particulars),
-      status: status,
+      particulars: JSON.stringify(selectedPass.particulars),
+      status: updatedStatus,
     };
     const response = await fetch(
       "http://172.17.58.151:9000/gatepass/updateParticulars",
@@ -51,17 +87,11 @@ const GatePass = () => {
     );
     const responseData = await response.json();
     if (response.ok) {
+      fetchPasses();
       toast.show({
         render: () => (
-          <Box
-            bg="green.300"
-            px="4"
-            py="2"
-            rounded="md"
-            shadow={2}
-            alignSelf="center"
-          >
-            GatePass updated successfully!
+          <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
+            {responseData.message}
           </Box>
         ),
         placement: "top-right",
@@ -71,14 +101,7 @@ const GatePass = () => {
         responseData.error || "An error occurred. Please try again.";
       toast.show({
         render: () => (
-          <Box
-            bg="red.300"
-            px="4"
-            py="2"
-            rounded="md"
-            shadow={2}
-            alignSelf="flex-end"
-          >
+          <Box bg="red.300" px="4" py="2" rounded="md" shadow={2}>
             {errorMessage}
           </Box>
         ),
@@ -86,48 +109,19 @@ const GatePass = () => {
       });
     }
   };
-  const handleCancel = (id) => {};
-  const filterOptions = [
-    { label: "All", value: "all" },
-    { label: "Pending", value: "pending" },
-    { label: "Approved", value: "approved" },
-    { label: "Rejected", value: "rejected" },
-  ];
-  const [filter, setFilter] = useState("all");
-  const [passes, setPasses] = useState([]);
-  const [filteredPasses, setFilteredPasses] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const cache = React.useRef({});
-  const fetchPasses = async () => {
-    setIsLoading(true);
-    setIsFetching(true);
-    try {
-      const response = await fetch(
-        "http://172.17.58.151:9000/gatepass/getAllGatePass"
-      );
-      const data = await response.json();
-      setPasses(data);
-      setFilteredPasses(data);
-    } catch (error) {
-      console.error("Error fetching passes:", error);
-    } finally {
-      setIsLoading(false);
-      setIsFetching(false);
-    }
+  const handleApprove = (id) => {
+    handleUpdate(id, "approved");
+    setModalVisible(false);
   };
-  useEffect(() => {
-    if (selectedPass) {
-      setParticulars(selectedPass.particulars);
-    }
-    fetchPasses();
-  }, []);
+  const handleReject = (id) => {
+    handleUpdate(id, "rejected");
+    setModalVisible(false);
+  };
   const applyFilters = (query, status) => {
     setIsLoading(true);
     const cacheKey = `${query.toLowerCase()}-${status}`;
-    if (cache.current[cacheKey]) {
-      setFilteredPasses(cache.current[cacheKey]);
+    if (cache[cacheKey]) {
+      setFilteredPasses(cache[cacheKey]);
       setIsLoading(false);
       return;
     }
@@ -139,12 +133,15 @@ const GatePass = () => {
       const matchesStatus = status === "all" ? true : pass.status === status;
       return matchesSearch && matchesStatus;
     });
-    cache.current[cacheKey] = updatedPasses;
+    cache[cacheKey] = updatedPasses;
     setFilteredPasses(updatedPasses);
-    setIsLoading(false);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
   };
   const handleSearchChange = (query) => {
     setSearchQuery(query);
+    setIsLoading(true);
     const cacheKey = `${query}-${filter}`;
     if (cache[cacheKey]) {
       setFilteredPasses(cache[cacheKey]);
@@ -152,10 +149,6 @@ const GatePass = () => {
     } else {
       applyFilters(query, filter, cacheKey);
     }
-  };
-  const handleView = (item) => {
-    setSelectedPass(item);
-    setModalVisible(true);
   };
   const handleSortChange = (value) => {
     setFilter(value);
@@ -168,6 +161,10 @@ const GatePass = () => {
       applyFilters(searchQuery, value, cacheKey);
     }
     onClose();
+  };
+  const handleView = (item) => {
+    setSelectedPass(item);
+    setModalVisible(true);
   };
   const Passes = ({ item }) => (
     <Box
@@ -324,7 +321,9 @@ const GatePass = () => {
           <FlatList
             data={filteredPasses}
             renderItem={({ item }) => <Passes item={item} />}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) =>
+              item?.id?.toString() || index.toString()
+            }
             contentContainerStyle={{ paddingBottom: 20 }}
             showsVerticalScrollIndicator={false}
           />
@@ -378,32 +377,59 @@ const GatePass = () => {
         </Actionsheet>
       </View>
       <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
-        <Modal.Content maxWidth="400px">
+        <Modal.Content width={"90%"}>
           <Modal.CloseButton />
           <Modal.Header>GatePass Details</Modal.Header>
           <Modal.Body>
             {selectedPass && (
               <VStack space={2} key={selectedPass.id}>
-                <Text fontWeight="bold">
-                  Pass Type: {selectedPass.pass_type}
+                <Text>
+                  <Text fontWeight="bold">Pass No: </Text>
+                  {selectedPass.pass_no}
                 </Text>
-                <Text>Vehicle Number: {selectedPass.vehicle_number}</Text>
-                <Text>Date: {selectedPass.created_time}</Text>
-                <Text>Status: {selectedPass.status}</Text>
+                <Text>
+                  <Text fontWeight="bold">Pass Type: </Text>
+                  {selectedPass.pass_type}
+                </Text>
+                <Text>
+                  <Text fontWeight="bold">Vehicle Number: </Text>
+                  {selectedPass.vehicle_number}
+                </Text>
+                <Text>
+                  <Text fontWeight="bold">Date: </Text>
+                  {new Date(selectedPass.created_time).toLocaleDateString()}
+                </Text>
+                <Text>
+                  <Text fontWeight="bold">Status: </Text>
+                  {selectedPass.status}
+                </Text>
                 <FormControl>
                   <FormControl.Label
-                    _text={{ fontSize: 16, fontWeight: "bold" }}
+                    _text={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "gray.600",
+                    }}
                   >
                     Particulars
                   </FormControl.Label>
-                  {JSON.parse(selectedPass.particulars).map((item, index) => (
-                    <HStack key={item.id} space={3} alignItems="center" mb={2}>
+                  {selectedPass.particulars.map((item, index) => (
+                    <HStack key={index} space={3} alignItems="center" mb={2}>
                       <Input
                         flex={2}
                         bg="#ffff"
                         value={item.particular}
                         p={3}
-                        onChangeText={(value) => setParticulars(value)}
+                        onChangeText={(value) => {
+                          const updatedParticulars = [
+                            ...selectedPass.particulars,
+                          ];
+                          updatedParticulars[index].particular = value;
+                          setSelectedPass({
+                            ...selectedPass,
+                            particulars: updatedParticulars,
+                          });
+                        }}
                       />
                       <Input
                         placeholder="Qty"
@@ -412,6 +438,16 @@ const GatePass = () => {
                         p={3}
                         keyboardType="numeric"
                         value={`${item.qty}`}
+                        onChangeText={(value) => {
+                          const updatedParticulars = [
+                            ...selectedPass.particulars,
+                          ];
+                          updatedParticulars[index].qty = value;
+                          setSelectedPass({
+                            ...selectedPass,
+                            particulars: updatedParticulars,
+                          });
+                        }}
                       />
                     </HStack>
                   ))}
@@ -424,7 +460,7 @@ const GatePass = () => {
               <>
                 <Button
                   onPress={() => {
-                    handleApprove(selectedPass.id);
+                    handleApprove(selectedPass.pass_no);
                     setModalVisible(false);
                   }}
                   colorScheme="green"
@@ -434,18 +470,16 @@ const GatePass = () => {
                 </Button>
                 <Button
                   onPress={() => {
-                    handleCancel(selectedPass.id);
-                    setModalVisible(false);
+                    handleReject(selectedPass.pass_no);
                   }}
                   colorScheme="red"
                 >
-                  Cancel
+                  Reject
                 </Button>
               </>
             ) : (
               <Button
                 onPress={() => {
-                  handleCancel(selectedPass.id);
                   setModalVisible(false);
                 }}
                 colorScheme="red"
