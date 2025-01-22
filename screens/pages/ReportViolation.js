@@ -13,29 +13,44 @@ import {
   View,
   Actionsheet,
   useDisclose,
-  Skeleton,
-  IconButton,
+  Badge,
 } from "native-base";
 import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { useSelector, useDispatch } from "react-redux";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { searchState } from "../../store/slices/violationSlice";
+const studentInfo = {
+  "Contact number": "+91 7845129630",
+  Department: "CSE, Engineering",
+  Campus: "Vishakapatnam",
+  Email: "abdefg@gitam.edu",
+};
 const ReportViolation = () => {
+  const studKeys = Object.keys(studentInfo);
+  const studValeus = Object.values(studentInfo);
   const navigation = useNavigation();
   const { isOpen, onOpen, onClose } = useDisclose();
   const [sortOption, setSortOption] = useState("all");
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [violations, setViolations] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredViolations, setFilteredViolations] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { violations, isLoading, error, searchStore } = useSelector(
+    (state) => state.violations
+  );
+  const [search, setSearch] = useState("");
+  const handleSearch = (query) => {
+    dispatch(searchState(query));
+    setSearch(query);
+  };
   const fetchViolations = async () => {
     if (isFetching) return;
     setIsFetching(true);
-    setIsLoading(true);
     try {
       const response = await fetch(
         "http://172.17.58.151:9000/auth/getViolations",
@@ -50,13 +65,11 @@ const ReportViolation = () => {
         throw new Error("Failed to fetch violations");
       }
       const data = await response.json();
-      setViolations(data);
       setFilteredViolations(data);
     } catch (error) {
       console.error("Error fetching violations:", error);
     } finally {
       setIsFetching(false);
-      setIsLoading(false);
     }
   };
   useFocusEffect(
@@ -64,114 +77,19 @@ const ReportViolation = () => {
       fetchViolations();
     }, [])
   );
-  const handleItemPress = (item) => {
-    setSelectedItem(item);
-    setIsModalVisible(true);
-  };
+
   const handleCloseModal = () => {
     setIsModalVisible(false);
     setSelectedItem(null);
   };
   const cache = useMemo(() => ({}), []);
-  const handleSearchChange = (query) => {
-    setSearchQuery(query);
-    setIsLoading(true);
-    const cacheKey = `${query}-${sortOption}`;
-    if (cache[cacheKey]) {
-      setFilteredViolations(cache[cacheKey]);
-      setIsLoading(false);
-    } else {
-      applyFilters(query, sortOption, cacheKey);
-    }
-  };
-  const applyFilters = (query, filter, cacheKey) => {
-    setIsLoading(true);
-    let updatedViolations = violations.filter((violation) => {
-      const matchesSearch = Object.values(violation).some((value) =>
-        value.toString().toLowerCase().includes(query.toLowerCase())
-      );
-      const matchesFilter =
-        filter === "all"
-          ? parseInt(violation.totalFines) > 0
-          : filter === "paid"
-          ? violation.status.toLowerCase() === "paid"
-          : filter === "unpaid"
-          ? violation.status.toLowerCase() === "unpaid"
-          : true;
-      return matchesSearch && matchesFilter;
-    });
-    if (filter === "all") {
-      updatedViolations.sort((a, b) => b.totalFines - a.totalFines);
-    } else if (filter === "paid" || filter === "unpaid") {
-      updatedViolations.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    cache[cacheKey] = updatedViolations;
-    setFilteredViolations(updatedViolations);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-  };
   const filterOptions = [
     { label: "All", value: "all" },
     { label: "Paid", value: "paid" },
     { label: "UnPaid", value: "unpaid" },
   ];
-  const Passes = ({ item }) => (
-    <Box
-      bg="white"
-      borderRadius="lg"
-      p={3}
-      mb={2}
-      shadow={2}
-      borderWidth={0.5}
-      borderColor={
-        item.status.toLowerCase() === "paid"
-          ? "green.400"
-          : item.status.toLowerCase() === "unpaid"
-          ? "red.400"
-          : "orange.400"
-      }
-    >
-      <TouchableOpacity onPress={() => handleItemPress(item)}>
-        <HStack justifyContent="space-between" alignItems="flex-start">
-          <VStack flex={1} space={2}>
-            <HStack justifyContent="space-between" alignItems="center">
-              <Text fontSize="lg" fontWeight="bold" color="gray.800">
-                Name:{" "}
-                <Text fontSize="md" fontWeight="medium" color="gray.600">
-                  {item.name}
-                </Text>
-              </Text>
-              <Text
-                fontSize={15}
-                fontWeight="bold"
-                color={
-                  item.status.toLowerCase() === "paid" ? "green.500" : "red.500"
-                }
-              >
-                ₹{item.totalFines}
-              </Text>
-            </HStack>
-            <Text fontSize="lg" fontWeight="bold" color="gray.800">
-              Vehicle:{" "}
-              <Text fontSize="md" fontWeight="medium" color="gray.600">
-                {item.vehicle_number}
-              </Text>
-            </Text>
-            <Text fontSize="lg" fontWeight="bold" color="gray.800">
-              Violation:{" "}
-              <Text fontSize="md" fontWeight="medium" color="gray.600">
-                {item.violation_type}
-              </Text>
-            </Text>
-          </VStack>
-        </HStack>
-      </TouchableOpacity>
-    </Box>
-  );
   const handleSortChange = (value) => {
     setSortOption(value);
-    setIsLoading(true);
     const cacheKey = `${searchQuery}-${value}`;
     if (cache[cacheKey]) {
       setFilteredViolations(cache[cacheKey]);
@@ -313,73 +231,134 @@ const ReportViolation = () => {
         >
           <Input
             flex={1}
-            placeholder="Search by ID / Vehicle number"
+            placeholder="ID / Registration / Vehicle number"
             variant="unstyled"
             fontSize="md"
-            value={searchQuery}
-            onChangeText={handleSearchChange}
+            value={search}
+            onChangeText={(value) => handleSearch(value)}
           />
-          {searchQuery ? (
-            <Pressable onPress={clearSearch}>
-              <IconButton
-                icon={<MaterialIcons name="cancel" size={24} color="gray" />}
-                onPress={clearSearch}
-              />
+          {searchStore ? (
+            <Pressable>
+              <Text>Clear</Text>
             </Pressable>
           ) : (
             <Pressable>
-              <Image
-                source={{
-                  uri: "http://172.17.58.151:9000/auth/getImage/search.png",
-                }}
-                alt="Search Icon"
-                size={8}
-              />
+              <AntDesign name="search1" size={28} color="#A69E91" />
             </Pressable>
           )}
         </HStack>
       </Box>
       <View style={{ flex: 1, position: "relative", top: 30 }} p={4}>
-        {isLoading ? (
-          <VStack space={2}>
-            {new Array(10).fill().map((_, index) => (
-              <HStack
-                key={index}
-                justifyContent="space-between"
-                alignItems="center"
-                p={3}
-                bg="white"
-                borderRadius={10}
-                borderWidth={0.5}
-                borderColor="gray.200"
+        {searchStore ? (
+          <Box
+            padding="6"
+            shadow="9"
+            bg={"#fff"}
+            borderRadius={"xl"}
+            minWidth={"sm"}
+            maxWidth={"sm"}
+          >
+            <HStack space={"lg"}>
+              <Image
+                source={{
+                  uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg",
+                }}
+                alt="Alternate Text"
+                size="lg"
+                borderRadius={"xl"}
+              />
+              <VStack space={"2"}>
+                <Text color={"#007367"} fontWeight={"bold"} fontSize="lg">
+                  Jacob West
+                </Text>
+                <Text fontWeight={"semibold"} fontSize="md">
+                  Employee
+                </Text>
+                <HStack
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  space={2}
+                >
+                  <Text fontWeight={"semibold"} fontSize="md">
+                    20250001
+                  </Text>
+                  <Badge colorScheme="success" _text={{ fontSize: "md" }}>
+                    Active
+                  </Badge>
+                </HStack>
+              </VStack>
+            </HStack>
+            <VStack space={1.5} marginTop={"6"}>
+              {[0, 1, 2, 3, 4].map((each) => (
+                <Box
+                  key={each}
+                  flexDirection={"row"}
+                  alignItems={"center"}
+                  justifyContent={"space-between"}
+                >
+                  <Text fontSize={"md"}>{studKeys[each]}</Text>
+                  <Text
+                    fontSize={"md"}
+                    color={
+                      studKeys[each] === "Role"
+                        ? "#007367"
+                        : studKeys[each] === "Name"
+                        ? "#000000"
+                        : "#706F6F"
+                    }
+                    paddingLeft={4}
+                  >
+                    {studValeus[each]}
+                  </Text>
+                </Box>
+              ))}
+            </VStack>
+            <HStack justifyContent={"space-evenly"} space={2} mt={4}>
+              <Button
+                variant="outline"
+                borderColor={"#37474F"}
+                borderRadius={"2xl"}
+                _text={{
+                  fontSize: "lg",
+                  fontWeight: "bold",
+                  color: "#37474F",
+                }}
               >
-                <VStack space={2} flex={1}>
-                  <Skeleton
-                    h={6}
-                    w="60%"
-                    startColor="gray.300"
-                    endColor="gray.100"
-                    borderRadius={5}
-                  />
-                  <Skeleton
-                    h={8}
-                    w="90%"
-                    startColor="gray.300"
-                    endColor="gray.100"
-                    borderRadius={5}
-                  />
-                </VStack>
-              </HStack>
-            ))}
-          </VStack>
+                Violations (3)
+              </Button>
+              <Button
+                variant="solid"
+                bg={"#007367"}
+                borderRadius={"2xl"}
+                _text={{ fontSize: "lg", fontWeight: "bold", color: "#fff" }}
+              >
+                Add Violation
+              </Button>
+            </HStack>
+          </Box>
         ) : (
-          <FlatList
-            data={filteredViolations}
-            renderItem={({ item }) => <Passes item={item} />}
-            keyExtractor={(item) => item.Id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
+          <Box flex={1} justifyContent="center" alignItems="center">
+            <Image
+              source={{
+                uri: "https://example.com/search-placeholder.png",
+              }}
+              alt="Search Illustration"
+              size="xl"
+              mb={4}
+            />
+            <Text
+              fontSize="lg"
+              fontWeight="bold"
+              color="gray.700"
+              textAlign="center"
+            >
+              Start Your Search
+            </Text>
+            <Text fontSize="md" color="gray.500" textAlign="center" mt={2}>
+              Enter keywords in the search bar above to find the information you
+              need.
+            </Text>
+          </Box>
         )}
         <TouchableOpacity
           style={{
