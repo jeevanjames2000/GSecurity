@@ -180,35 +180,9 @@ export default function Home() {
             >
               G-Security
             </Text>
-            <Pressable
-              position="absolute"
-              right={0}
-              onPress={() => navigation.navigate("Profile")}
-            >
-              <Avatar
-                borderColor={"blueGray.200"}
-                bg="green.500"
-                borderWidth={2}
-                alt="Profile icon"
-                size="md"
-                source={{
-                  uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg",
-                }}
-              >
-                P
-              </Avatar>
-            </Pressable>
           </VStack>
         </HStack>
         <HStack top={12} justifyContent={"center"}>
-          {/* <Text
-            fontSize={20}
-            color="orange.400"
-            fontWeight="bold"
-            textAlign="left"
-          >
-            Welcome!
-          </Text> */}
           <Text fontSize={18} color="white" fontWeight="thin" textAlign="left">
             Darlene Robertson
           </Text>
