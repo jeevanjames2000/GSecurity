@@ -1,18 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-export const fetchViolations = createAsyncThunk(
-  "violations/fetchViolations",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await fetch(
-        "http://172.17.58.151:9000/auth/getViolations"
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      return rejectWithValue("Error fetching violations data.");
-    }
-  }
-);
 export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
   async (searchStore, { rejectWithValue }) => {
@@ -41,37 +27,21 @@ export const fetchProfile = createAsyncThunk(
     }
   }
 );
-const violationSlice = createSlice({
-  name: "violations",
+const profileSlice = createSlice({
+  name: "profile",
   initialState: {
-    violations: [],
-    violationsCount: 0,
-    profile: [],
     searchStore: "",
+    profile: [],
     isLoading: false,
     error: null,
-    image: "",
   },
   reducers: {
-    searchState: (state, action) => {
+    profileSearchState: (state, action) => {
       state.searchStore = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchViolations.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(fetchViolations.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.violations = action.payload;
-        state.violationsCount = action.payload.length || 0;
-      })
-      .addCase(fetchViolations.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
       .addCase(fetchProfile.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -79,10 +49,6 @@ const violationSlice = createSlice({
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.isLoading = false;
         state.profile = action.payload;
-        const isStaff = action.payload.role === "staff";
-        state.image = isStaff
-          ? `https://gstaff.gitam.edu/img1.aspx?empid=${state.searchStore}`
-          : `https://doeresults.gitam.edu/photo/img.aspx?id=${state.searchStore}`;
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.isLoading = false;
@@ -90,5 +56,5 @@ const violationSlice = createSlice({
       });
   },
 });
-export const { searchState } = violationSlice.actions;
-export default violationSlice.reducer;
+export const { profileSearchState } = profileSlice.actions;
+export default profileSlice.reducer;
