@@ -10,6 +10,7 @@ import {
   Badge,
   Skeleton,
   KeyboardAvoidingView,
+  View,
 } from "native-base";
 import {
   Pressable,
@@ -99,7 +100,7 @@ export default function Home() {
     profile,
     violationsCount,
     image,
-  } = useSelector((state) => state.violations);
+  } = useSelector((state) => state.home);
   const [search, setSearch] = useState("");
   const handleSearch = () => {
     dispatch(searchState(search));
@@ -494,7 +495,9 @@ export default function Home() {
                   </HStack>
                 </Box>
               ) : (
-                <Text>No results found.</Text>
+                <View justifyContent="center" alignItems="center">
+                  <Text fontSize={18}>No results found.</Text>
+                </View>
               )
             ) : (
               <>

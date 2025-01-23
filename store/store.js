@@ -4,7 +4,7 @@ import profileReducer from "./slices/profileSlice";
 
 const store = configureStore({
   reducer: {
-    violations: violationsReducer,
+    home: violationsReducer,
     profile: profileReducer,
   },
 });

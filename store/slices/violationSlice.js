@@ -42,11 +42,12 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 const violationSlice = createSlice({
-  name: "violations",
+  name: "home",
   initialState: {
     violations: [],
     violationsCount: 0,
     profile: [],
+    prevProfile: "",
     searchStore: "",
     isLoading: false,
     profileLength: 0,
@@ -56,6 +57,7 @@ const violationSlice = createSlice({
   reducers: {
     searchState: (state, action) => {
       state.searchStore = action.payload;
+      state.prevProfile = action.payload;
     },
     profileStore: (state, action) => {
       state.profile = action.payload;
