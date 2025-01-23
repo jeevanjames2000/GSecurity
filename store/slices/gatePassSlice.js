@@ -17,6 +17,7 @@ export const fetchGatepassByID = createAsyncThunk(
         ...pass,
         particulars: pass.particulars,
       }));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       return parsedData;
     } catch (error) {
       return rejectWithValue(

@@ -70,14 +70,17 @@ const GatePass = () => {
     );
     const responseData = await response.json();
     if (response.ok) {
-      toast.show({
-        render: () => (
-          <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
-            {responseData.message}
-          </Box>
-        ),
-        placement: "top-right",
-      });
+      setTimeout(() => {
+        dispatch(fetchGatepassByID(search));
+        toast.show({
+          render: () => (
+            <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
+              {responseData.message}
+            </Box>
+          ),
+          placement: "top-right",
+        });
+      }, 500);
     } else {
       const errorMessage =
         responseData.error || "An error occurred. Please try again.";
@@ -179,34 +182,93 @@ const GatePass = () => {
           <View style={{ flex: 1, position: "relative", top: 30 }} p={4}>
             {isLoading ? (
               <VStack space={2}>
-                {new Array(10).fill().map((_, index) => (
-                  <HStack
-                    key={index}
-                    justifyContent="space-between"
-                    alignItems="center"
-                    p={3}
+                {new Array(1).fill().map((_, index) => (
+                  <VStack
+                    space={4}
+                    padding={4}
                     bg="white"
                     borderRadius={10}
-                    borderWidth={0.5}
-                    borderColor="gray.200"
+                    key={index}
+                    shadow={2}
                   >
-                    <VStack space={2} flex={1}>
+                    <Skeleton
+                      h={10}
+                      w="100%"
+                      startColor="gray.300"
+                      endColor="gray.100"
+                      borderRadius={5}
+                    />
+                    <VStack space={2}>
                       <Skeleton
-                        h={6}
-                        w="60%"
+                        h={5}
+                        w="80%"
                         startColor="gray.300"
                         endColor="gray.100"
                         borderRadius={5}
                       />
                       <Skeleton
-                        h={8}
-                        w="90%"
+                        h={5}
+                        w="40%"
+                        startColor="gray.300"
+                        endColor="gray.100"
+                        borderRadius={5}
+                      />
+                      <Skeleton
+                        h={5}
+                        w="50%"
                         startColor="gray.300"
                         endColor="gray.100"
                         borderRadius={5}
                       />
                     </VStack>
-                  </HStack>
+
+                    <VStack space={2} marginTop={1}>
+                      {[...Array(5)].map((_, index) => (
+                        <HStack
+                          key={index}
+                          justifyContent="space-between"
+                          alignItems="center"
+                          py={1}
+                        >
+                          <Skeleton
+                            h={5}
+                            w="30%"
+                            startColor="gray.300"
+                            endColor="gray.100"
+                            borderRadius={5}
+                          />
+                          <Skeleton
+                            h={5}
+                            w="60%"
+                            startColor="gray.300"
+                            endColor="gray.100"
+                            borderRadius={5}
+                          />
+                        </HStack>
+                      ))}
+                    </VStack>
+                    {}
+                    <HStack
+                      justifyContent="space-between"
+                      space={4}
+                      marginTop={3}
+                    >
+                      <Skeleton
+                        h={10}
+                        w="45%"
+                        startColor="gray.300"
+                        endColor="gray.100"
+                        borderRadius={10}
+                      />
+                      <Skeleton
+                        h={10}
+                        w="45%"
+                        startColor="gray.300"
+                        endColor="gray.100"
+                        borderRadius={10}
+                      />
+                    </HStack>
+                  </VStack>
                 ))}
               </VStack>
             ) : passesByID && passesByID.length > 0 ? (
