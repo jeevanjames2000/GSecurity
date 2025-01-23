@@ -41,7 +41,7 @@ const ReportViolation = () => {
   const [isFetching, setIsFetching] = useState(false);
   const dispatch = useDispatch();
   const { violations, isLoading, error, searchStore } = useSelector(
-    (state) => state.violations
+    (state) => state.home
   );
   const [search, setSearch] = useState("");
   const handleSearch = (query) => {
