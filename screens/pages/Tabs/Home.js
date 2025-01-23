@@ -103,6 +103,7 @@ export default function Home() {
   } = useSelector((state) => state.home);
   const [search, setSearch] = useState("");
   const handleSearch = () => {
+    dispatch(profileStore(null));
     dispatch(searchState(search));
     dispatch(fetchProfile(search));
     setSearch(search);
