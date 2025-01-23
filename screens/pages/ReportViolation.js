@@ -231,7 +231,7 @@ const ReportViolation = () => {
         >
           <Input
             flex={1}
-            placeholder="ID / Registration / Vehicle number"
+            placeholder="IDs / Registration / Vehicle number"
             variant="unstyled"
             fontSize="md"
             value={search}
