@@ -61,7 +61,7 @@ export default function AddGatepass() {
       receiver_name: name,
       receiver_mobile_number: mobile,
       vehicle_number: vehicle,
-      remarks: remarks,
+      note: remarks,
       particulars: particulars,
     };
     const response = await fetch(

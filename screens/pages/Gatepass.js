@@ -1,75 +1,55 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Text,
-  FlatList,
   VStack,
   HStack,
-  Modal,
-  Button,
   Pressable,
   Input,
-  Image,
   View,
-  Actionsheet,
-  useDisclose,
   Skeleton,
   FormControl,
   useToast,
+  Image,
+  Button,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "native-base";
-import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchGatepassByID,
+  gatepassSearchState,
+  passByIDState,
+} from "../../store/slices/gatePassSlice";
+import { Keyboard, TouchableWithoutFeedback } from "react-native";
 const GatePass = () => {
   const toast = useToast();
-  const filterOptions = [
-    { label: "All", value: "all" },
-    { label: "Pending", value: "pending" },
-    { label: "Approved", value: "approved" },
-    { label: "Rejected", value: "rejected" },
-  ];
   const navigation = useNavigation();
-  const { isOpen, onOpen, onClose } = useDisclose();
-  const [modalVisible, setModalVisible] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
-  const [filter, setFilter] = useState("all");
-  const [passes, setPasses] = useState([]);
-  const [filteredPasses, setFilteredPasses] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const cache = useMemo(() => ({}), []);
-  const fetchPasses = async () => {
-    if (isFetching) return;
-    setIsLoading(true);
-    setIsFetching(true);
-    try {
-      const response = await fetch(
-        "http://172.17.58.151:9000/gatepass/getAllGatePass"
-      );
-      const data = await response.json();
-      const parsedData = data.map((pass) => ({
-        ...pass,
-        particulars: Array.isArray(pass.particulars)
-          ? pass.particulars
-          : JSON.parse(pass.particulars),
-      }));
-      setPasses(parsedData);
-      setFilteredPasses(parsedData);
-    } catch (error) {
-      console.error("Error fetching passes:", error);
-    } finally {
-      setIsLoading(false);
-      setIsFetching(false);
-    }
-  };
-  useFocusEffect(
-    useCallback(() => {
-      fetchPasses();
-    }, [])
+  const dispatch = useDispatch();
+  const { isLoading, gatepassSearch, passesByID } = useSelector(
+    (state) => state.gatepass
   );
+  const [search, setSearch] = useState("");
+  const handleSearch = () => {
+    if (search.trim() === "") return;
+    dispatch(fetchGatepassByID(search));
+    dispatch(gatepassSearchState(search));
+    setSearch(search);
+  };
+  useEffect(() => {
+    if (passesByID && passesByID.length > 0) {
+      setSelectedPass({ ...passesByID[0] });
+    }
+  }, [passesByID]);
+  const handleClear = () => {
+    dispatch(gatepassSearchState(""));
+    dispatch(passByIDState(null));
+    setSearch("");
+  };
   const handleUpdate = async (id, updatedStatus) => {
     const name = await AsyncStorage.getItem("userName");
     const formData = {
@@ -90,7 +70,6 @@ const GatePass = () => {
     );
     const responseData = await response.json();
     if (response.ok) {
-      fetchPasses();
       toast.show({
         render: () => (
           <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
@@ -114,386 +93,465 @@ const GatePass = () => {
   };
   const handleApprove = (id) => {
     handleUpdate(id, "approved");
-    setModalVisible(false);
   };
   const handleReject = (id) => {
     handleUpdate(id, "rejected");
-    setModalVisible(false);
   };
-  const applyFilters = (query, status) => {
-    setIsLoading(true);
-    const cacheKey = `${query.toLowerCase()}-${status}`;
-    if (cache[cacheKey]) {
-      setFilteredPasses(cache[cacheKey]);
-      setIsLoading(false);
-      return;
-    }
-    const updatedPasses = passes.filter((pass) => {
-      const matchesSearch = Object.values(pass)
-        .join(" ")
-        .toLowerCase()
-        .includes(query.toLowerCase());
-      const matchesStatus = status === "all" ? true : pass.status === status;
-      return matchesSearch && matchesStatus;
-    });
-    cache[cacheKey] = updatedPasses;
-    setFilteredPasses(updatedPasses);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-  };
-  const handleSearchChange = (query) => {
-    setSearchQuery(query);
-    setIsLoading(true);
-    const cacheKey = `${query}-${filter}`;
-    if (cache[cacheKey]) {
-      setFilteredPasses(cache[cacheKey]);
-      setIsLoading(false);
-    } else {
-      applyFilters(query, filter, cacheKey);
-    }
-  };
-  const handleSortChange = (value) => {
-    setFilter(value);
-    setIsLoading(true);
-    const cacheKey = `${searchQuery}-${value}`;
-    if (cache[cacheKey]) {
-      setFilteredPasses(cache[cacheKey]);
-      setIsLoading(false);
-    } else {
-      applyFilters(searchQuery, value, cacheKey);
-    }
-    onClose();
-  };
-  const handleView = (item) => {
-    setSelectedPass(item);
-    setModalVisible(true);
-  };
-  const Passes = ({ item }) => (
-    <Box
-      bg="white"
-      borderRadius="lg"
-      p={3}
-      mb={2}
-      shadow={2}
-      borderLeftWidth={2}
-      borderColor={item.status === "pending" ? "orange.400" : "green.400"}
-    >
-      <TouchableOpacity onPress={() => handleView(item)}>
-        <HStack justifyContent="space-between" alignItems="center">
-          <VStack flex={1}>
-            <Text fontSize="lg" fontWeight="bold" color="gray.800">
-              Pass Type:{" "}
-              <Text fontSize="md" fontWeight="medium" color="gray.600">
-                {item.pass_type}
-              </Text>
-            </Text>
-            <Text fontSize="lg" fontWeight="bold" color="gray.800">
-              Vehicle Number:{" "}
-              <Text fontSize="md" fontWeight="medium" color="gray.600">
-                {item.vehicle_number}
-              </Text>
-            </Text>
-            <Text fontSize="lg" fontWeight="bold" color="gray.800">
-              Issued Date:{" "}
-              <Text fontSize="md" fontWeight="medium" color="gray.600">
-                {new Date(item.created_time).toLocaleDateString()}
-              </Text>
-            </Text>
-          </VStack>
-          <VStack
-            flexDirection={"row"}
-            gap={4}
-            alignItems="center"
-            justifyContent={"center"}
-            top={-25}
-          >
-            {item.status === "pending" ? (
-              <Ionicons name="time" size={26} color="orange" />
-            ) : item.status === "approved" ? (
-              <Ionicons name="checkmark-done-circle" size={26} color="green" />
-            ) : (
-              <Ionicons name="close-circle" size={26} color="red" />
-            )}
-          </VStack>
-        </HStack>
-      </TouchableOpacity>
-    </Box>
-  );
   return (
-    <Box flex={1} backgroundColor="#f5f5f5">
-      <Box backgroundColor="#007367" paddingY="4" paddingX="4">
-        <HStack
-          alignItems="center"
-          justifyContent="space-between"
-          position="relative"
-          top={10}
-          px={2}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={30}
-            color="white"
-            onPress={() => navigation.goBack()}
-          />
-          <Text
-            fontSize={30}
-            color="white"
-            fontWeight="bold"
-            textAlign="center"
-            flex={1}
-          >
-            Gate-Pass
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Create Pass")}>
-            <Image
-              source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/add (2).png",
-              }}
-              alt="Add Icon"
-              style={{
-                width: 30,
-                height: 30,
-              }}
-            />
-          </TouchableOpacity>
-        </HStack>
-        <HStack
-          backgroundColor="white"
-          borderRadius="20"
-          alignItems="center"
-          paddingX="4"
-          paddingY="4"
-          mt="4"
-          shadow="2"
-          top={50}
-        >
-          <Input
-            flex={1}
-            placeholder="Search by ID / Vehicle number"
-            variant="unstyled"
-            fontSize="md"
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-          />
-          <Pressable>
-            <Image
-              source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/search.png",
-              }}
-              alt="Search Icon"
-              size={8}
-            />
-          </Pressable>
-        </HStack>
-      </Box>
-      <View style={{ flex: 1, position: "relative", top: 30 }} p={4}>
-        {isLoading ? (
-          <VStack space={2}>
-            {new Array(10).fill().map((_, index) => (
-              <HStack
-                key={index}
-                justifyContent="space-between"
-                alignItems="center"
-                p={3}
-                bg="white"
-                borderRadius={10}
-                borderWidth={0.5}
-                borderColor="gray.200"
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <Box flex={1} backgroundColor="#f5f5f5">
+          <Box backgroundColor="#007367" paddingY="4" paddingX="4">
+            <HStack
+              alignItems="center"
+              justifyContent="space-between"
+              position="relative"
+              top={10}
+              px={2}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={30}
+                color="white"
+                onPress={() => navigation.goBack()}
+              />
+              <Text
+                fontSize={30}
+                color="white"
+                fontWeight="bold"
+                textAlign="center"
+                flex={1}
               >
-                <VStack space={2} flex={1}>
-                  <Skeleton
-                    h={6}
-                    w="60%"
-                    startColor="gray.300"
-                    endColor="gray.100"
-                    borderRadius={5}
-                  />
-                  <Skeleton
-                    h={8}
-                    w="90%"
-                    startColor="gray.300"
-                    endColor="gray.100"
-                    borderRadius={5}
-                  />
-                </VStack>
-              </HStack>
-            ))}
-          </VStack>
-        ) : (
-          <FlatList
-            data={filteredPasses}
-            renderItem={({ item }) => <Passes item={item} />}
-            keyExtractor={(item, index) =>
-              item?.id?.toString() || index.toString()
-            }
-            contentContainerStyle={{ paddingBottom: 20 }}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-        <TouchableOpacity
-          style={{
-            zIndex: 1000,
-            position: "absolute",
-            bottom: 48,
-            right: 15,
-            backgroundColor: "#007367",
-            borderRadius: 50,
-            paddingVertical: 8,
-            paddingHorizontal: 15,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-          onPress={onOpen}
-        >
-          <Ionicons name="filter-outline" size={22} color="white" />
-          <Text color="white" style={{ marginLeft: 5, fontSize: 16 }}>
-            Filter
-          </Text>
-        </TouchableOpacity>
-        <Actionsheet isOpen={isOpen} onClose={onClose}>
-          <Actionsheet.Content>
-            {filterOptions.map((option, index) => (
-              <Actionsheet.Item
-                key={index}
-                onPress={() => handleSortChange(option.value)}
-                borderBottomWidth={index !== filterOptions.length - 1 ? 1 : 0}
-                borderBottomColor="gray.300"
-                py={3}
-              >
-                <Text
-                  fontSize="md"
-                  fontWeight="bold"
-                  color={
-                    {
-                      Pending: "orange.400",
-                      Approved: "green.600",
-                      Rejected: "red.500",
-                    }[option.label] || "gray.700"
-                  }
-                >
-                  {option.label}
-                </Text>
-              </Actionsheet.Item>
-            ))}
-          </Actionsheet.Content>
-        </Actionsheet>
-      </View>
-      <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
-        <Modal.Content width={"90%"}>
-          <Modal.CloseButton />
-          <Modal.Header>GatePass Details</Modal.Header>
-          <Modal.Body>
-            {selectedPass && (
-              <VStack space={2} key={selectedPass.id}>
-                <Text>
-                  <Text fontWeight="bold">Pass No: </Text>
-                  {selectedPass.pass_no}
-                </Text>
-                <Text>
-                  <Text fontWeight="bold">Pass Type: </Text>
-                  {selectedPass.pass_type}
-                </Text>
-                <Text>
-                  <Text fontWeight="bold">Vehicle Number: </Text>
-                  {selectedPass.vehicle_number}
-                </Text>
-                <Text>
-                  <Text fontWeight="bold">Date: </Text>
-                  {new Date(selectedPass.created_time).toLocaleDateString()}
-                </Text>
-                <Text>
-                  <Text fontWeight="bold">Status: </Text>
-                  {selectedPass.status}
-                </Text>
-                <FormControl>
-                  <FormControl.Label
-                    _text={{
-                      fontSize: 16,
-                      fontWeight: "bold",
-                      color: "gray.600",
-                    }}
+                Gate-Pass
+              </Text>
+            </HStack>
+            <HStack
+              backgroundColor="white"
+              borderRadius="20"
+              alignItems="center"
+              paddingX="4"
+              paddingY="4"
+              mt="2"
+              shadow="2"
+              top={50}
+            >
+              <Input
+                flex={1}
+                placeholder="Search by Pass / Vehicle number"
+                variant="unstyled"
+                fontSize="md"
+                value={search}
+                onChangeText={(value) => setSearch(value)}
+              />
+              {gatepassSearch ? (
+                <>
+                  <HStack space={3}>
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={26}
+                      color="black"
+                      onPress={() => {
+                        handleClear();
+                      }}
+                    />
+                    <Ionicons
+                      name="search-outline"
+                      size={26}
+                      color="black"
+                      onPress={() => {
+                        handleSearch();
+                      }}
+                    />
+                  </HStack>
+                </>
+              ) : (
+                <Ionicons
+                  name="search-outline"
+                  size={26}
+                  color="black"
+                  onPress={() => {
+                    handleSearch();
+                  }}
+                />
+              )}
+            </HStack>
+          </Box>
+          <View style={{ flex: 1, position: "relative", top: 30 }} p={4}>
+            {isLoading ? (
+              <VStack space={2}>
+                {new Array(10).fill().map((_, index) => (
+                  <HStack
+                    key={index}
+                    justifyContent="space-between"
+                    alignItems="center"
+                    p={3}
+                    bg="white"
+                    borderRadius={10}
+                    borderWidth={0.5}
+                    borderColor="gray.200"
                   >
-                    Particulars
-                  </FormControl.Label>
-                  {selectedPass.particulars.map((item, index) => (
-                    <HStack key={index} space={3} alignItems="center" mb={2}>
-                      <Input
-                        flex={2}
-                        bg="#ffff"
-                        value={item.particular}
-                        p={3}
-                        onChangeText={(value) => {
-                          const updatedParticulars = [
-                            ...selectedPass.particulars,
-                          ];
-                          updatedParticulars[index].particular = value;
-                          setSelectedPass({
-                            ...selectedPass,
-                            particulars: updatedParticulars,
-                          });
-                        }}
+                    <VStack space={2} flex={1}>
+                      <Skeleton
+                        h={6}
+                        w="60%"
+                        startColor="gray.300"
+                        endColor="gray.100"
+                        borderRadius={5}
                       />
-                      <Input
-                        placeholder="Qty"
-                        flex={1}
-                        bg="#ffff"
-                        p={3}
-                        keyboardType="numeric"
-                        value={`${item.qty}`}
-                        onChangeText={(value) => {
-                          const updatedParticulars = [
-                            ...selectedPass.particulars,
-                          ];
-                          updatedParticulars[index].qty = value;
-                          setSelectedPass({
-                            ...selectedPass,
-                            particulars: updatedParticulars,
-                          });
-                        }}
+                      <Skeleton
+                        h={8}
+                        w="90%"
+                        startColor="gray.300"
+                        endColor="gray.100"
+                        borderRadius={5}
                       />
-                    </HStack>
-                  ))}
-                </FormControl>
+                    </VStack>
+                  </HStack>
+                ))}
               </VStack>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            {selectedPass?.status === "pending" ? (
-              <>
-                <Button
-                  onPress={() => {
-                    handleApprove(selectedPass.pass_no);
-                    setModalVisible(false);
-                  }}
-                  colorScheme="green"
-                  mr={2}
+            ) : passesByID && passesByID.length > 0 ? (
+              <ScrollView bg="white" borderRadius="xl">
+                <VStack
+                  space={4}
+                  padding={4}
+                  bg="white"
+                  borderRadius="xl"
+                  shadow="3"
                 >
-                  Approve
-                </Button>
-                <Button
-                  onPress={() => {
-                    handleReject(selectedPass.pass_no);
-                  }}
-                  colorScheme="red"
+                  {passesByID.map((gatePass, index) => (
+                    <View key={index} mb={5} pt={0}>
+                      <Text
+                        textAlign={"center"}
+                        fontWeight={"bold"}
+                        color={"black"}
+                        fontSize={18}
+                        pb={2}
+                      >
+                        GatePass Details
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          backgroundColor: "#007367",
+                          padding: 10,
+                          borderRadius: 15,
+                        }}
+                      >
+                        <View ml={3}>
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "bold",
+                              color: "#ddd",
+                            }}
+                          >
+                            Pass No
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "bold",
+                              color: "white",
+                            }}
+                          >
+                            #{gatePass.pass_no || "null"}
+                          </Text>
+                        </View>
+                        <View mr={3}>
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "bold",
+                              color: "#ddd",
+                            }}
+                          >
+                            Type
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "bold",
+                              color: "white",
+                            }}
+                          >
+                            {gatePass.pass_type || "null"}
+                          </Text>
+                        </View>
+                      </View>
+                      <View mt={4}>
+                        <HStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={3}
+                        >
+                          <Text fontSize={18} fontWeight="bold">
+                            Vehicle number:
+                          </Text>
+                          <Text fontSize={16} textAlign="right" flex={1}>
+                            {gatePass.vehicle_number || "null"}
+                          </Text>
+                        </HStack>
+                        <HStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={3}
+                        >
+                          <Text fontSize={18} fontWeight="bold">
+                            Reciever name:
+                          </Text>
+                          <Text fontSize={16} textAlign="right" flex={1}>
+                            {gatePass.receiver_name || "null"}
+                          </Text>
+                        </HStack>
+                        <HStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={3}
+                        >
+                          <Text fontSize={18} fontWeight="bold">
+                            Created on:
+                          </Text>
+                          <Text fontSize={16} textAlign="right" flex={1}>
+                            {new Date(
+                              gatePass.created_time
+                            ).toLocaleDateString() || "null"}
+                          </Text>
+                        </HStack>
+                        <HStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={3}
+                        >
+                          <Text fontSize={18} fontWeight="bold">
+                            Issued to:
+                          </Text>
+                          <Text fontSize={16} textAlign="right" flex={1}>
+                            {gatePass.receiver_emp_id || "null"}
+                          </Text>
+                        </HStack>
+                        <HStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={3}
+                        >
+                          <Text fontSize={18} fontWeight="bold">
+                            Issued by:
+                          </Text>
+                          <Text fontSize={16} textAlign="right" flex={1}>
+                            {gatePass.issued_by || "null"}
+                          </Text>
+                        </HStack>
+                        <HStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={3}
+                        >
+                          <Text fontSize={18} fontWeight="bold">
+                            Status:
+                          </Text>
+                          <Text
+                            fontSize={16}
+                            fontWeight={"bold"}
+                            textAlign="right"
+                            flex={1}
+                            style={{
+                              color:
+                                gatePass.status === "approved"
+                                  ? "green"
+                                  : gatePass.status === "pending"
+                                  ? "orange"
+                                  : "red",
+                            }}
+                          >
+                            {gatePass.status === "approved"
+                              ? "Approved"
+                              : gatePass.status === "rejected"
+                              ? "Rejected"
+                              : "Pending"}
+                          </Text>
+                        </HStack>
+                        <HStack
+                          flexDirection={"column"}
+                          justifyContent="space-between"
+                          mb={3}
+                          space={2}
+                        >
+                          <Text
+                            fontSize={18}
+                            fontWeight="bold"
+                            textAlign={"left"}
+                          >
+                            Note:
+                          </Text>
+                          <Input fontSize={14} value={gatePass.note} readOnly />
+                        </HStack>
+                      </View>
+                      <FormControl
+                        mt={1}
+                        borderWidth={1}
+                        borderColor={"#ddd"}
+                        borderRadius={10}
+                        p={3}
+                        backgroundColor={"#F8FAFC"}
+                      >
+                        <FormControl.Label
+                          _text={{
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            color: "gray.600",
+                          }}
+                        >
+                          Particulars
+                        </FormControl.Label>
+                        {selectedPass &&
+                          selectedPass.particulars &&
+                          selectedPass.particulars.map((particular, idx) => (
+                            <HStack
+                              key={idx}
+                              space={3}
+                              alignItems="center"
+                              mb={2}
+                            >
+                              <Input
+                                flex={2}
+                                bg="#ffff"
+                                fontSize={16}
+                                value={particular.particular}
+                                p={3}
+                                onChangeText={(value) => {
+                                  const updatedParticulars =
+                                    selectedPass.particulars.map(
+                                      (item, index) =>
+                                        index === idx
+                                          ? { ...item, particular: value }
+                                          : item
+                                    );
+                                  setSelectedPass((prev) => ({
+                                    ...prev,
+                                    particulars: updatedParticulars,
+                                  }));
+                                }}
+                              />
+                              <Input
+                                placeholder="Qty"
+                                flex={1}
+                                bg="#ffff"
+                                p={3}
+                                fontSize={16}
+                                keyboardType="numeric"
+                                value={`${particular.qty}`}
+                                onChangeText={(value) => {
+                                  const updatedParticulars =
+                                    selectedPass.particulars.map(
+                                      (item, index) =>
+                                        index === idx
+                                          ? { ...item, qty: value }
+                                          : item
+                                    );
+                                  setSelectedPass((prev) => ({
+                                    ...prev,
+                                    particulars: updatedParticulars,
+                                  }));
+                                }}
+                              />
+                            </HStack>
+                          ))}
+                      </FormControl>
+
+                      {selectedPass?.status === "pending" ? (
+                        <HStack space={2} mt={4} justifyContent="space-between">
+                          <Button
+                            onPress={() => handleReject(gatePass.pass_no)}
+                            variant="outline"
+                            colorScheme="red"
+                            padding={2}
+                            px={12}
+                            borderRadius={5}
+                            borderColor="red.400"
+                            style={{ flex: 1 }}
+                          >
+                            Reject
+                          </Button>
+                          <Pressable
+                            onPress={() => handleApprove(gatePass.pass_no)}
+                            style={{
+                              backgroundColor: "#007367",
+                              padding: 10,
+                              paddingHorizontal: 50,
+                              borderRadius: 5,
+                              flex: 1,
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Text color="white" fontWeight="bold">
+                              Approve
+                            </Text>
+                          </Pressable>
+                        </HStack>
+                      ) : (
+                        <HStack space={2} mt={4} justifyContent="flex-end">
+                          <Button
+                            onPress={() => handleClear()}
+                            variant="outline"
+                            colorScheme="red"
+                            padding={2}
+                            px={8}
+                            borderRadius={5}
+                            borderColor="red.400"
+                          >
+                            Close
+                          </Button>
+                        </HStack>
+                      )}
+                    </View>
+                  ))}
+                </VStack>
+              </ScrollView>
+            ) : search.trim() ? (
+              <View flex={1} justifyContent="center" alignItems="center">
+                <Text
+                  fontSize={18}
+                  fontWeight="bold"
+                  color="gray.500"
+                  textAlign="center"
                 >
-                  Reject
-                </Button>
-              </>
+                  No Results Found
+                </Text>
+              </View>
             ) : (
-              <Button
-                onPress={() => {
-                  setModalVisible(false);
-                }}
-                colorScheme="red"
-              >
-                Cancel
-              </Button>
+              <View flex={1} justifyContent="center" alignItems="center">
+                <Image
+                  source={{
+                    uri: "http://172.17.58.151:9000/auth/getImage/amico.png",
+                  }}
+                  alt="Profile Image"
+                  size="xl"
+                  borderRadius="xl"
+                />
+                <Text mt={5}>Search for results</Text>
+              </View>
             )}
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-    </Box>
+          </View>
+          <TouchableWithoutFeedback
+            onPress={() => navigation.navigate("Create Pass")}
+          >
+            <Image
+              source={require("../../assets/Frame 213.png")}
+              alt="Profile Image"
+              size={20}
+              color="#007367"
+              position="absolute"
+              right={5}
+              zIndex={1000}
+              bottom={12}
+            />
+          </TouchableWithoutFeedback>
+        </Box>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 export default GatePass;
