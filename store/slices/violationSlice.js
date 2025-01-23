@@ -16,7 +16,6 @@ export const fetchViolations = createAsyncThunk(
 export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
   async (searchStore, { rejectWithValue }) => {
-    console.log("searchStore: ", typeof searchStore);
     try {
       const response = await fetch(
         "https://studentmobileapi.gitam.edu/Logingym",
@@ -35,6 +34,7 @@ export const fetchProfile = createAsyncThunk(
         throw new Error("Failed to fetch profile data.");
       }
       const data = await response.json();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       return data;
     } catch (error) {
       return rejectWithValue(error.message || "Error fetching profile data.");
@@ -49,12 +49,17 @@ const violationSlice = createSlice({
     profile: [],
     searchStore: "",
     isLoading: false,
+    profileLength: 0,
     error: null,
     image: "",
   },
   reducers: {
     searchState: (state, action) => {
       state.searchStore = action.payload;
+    },
+    profileStore: (state, action) => {
+      state.profile = action.payload;
+      state.profileLength = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -83,6 +88,7 @@ const violationSlice = createSlice({
         state.image = isStaff
           ? `https://gstaff.gitam.edu/img1.aspx?empid=${state.searchStore}`
           : `https://doeresults.gitam.edu/photo/img.aspx?id=${state.searchStore}`;
+        state.profileLength = action.payload.stdprofile?.length || 0;
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.isLoading = false;
@@ -90,5 +96,5 @@ const violationSlice = createSlice({
       });
   },
 });
-export const { searchState } = violationSlice.actions;
+export const { searchState, profileStore } = violationSlice.actions;
 export default violationSlice.reducer;
