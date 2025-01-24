@@ -14,10 +14,10 @@ export default function ViolationsCard() {
     profile,
     violationsCount,
     image,
-  } = useSelector((state) => state.home);
+  } = useSelector((state) => state.violations);
   const handleShowViolations = () => {
     dispatch(showViolationsPage(true));
-    navigation.navigate("Violation");
+    navigation.navigate("AddViolations");
   };
   return (
     <Box
@@ -50,8 +50,7 @@ export default function ViolationsCard() {
             space={2}
           >
             <Text fontWeight={"semibold"} fontSize="md">
-              {profile?.stdprofile?.[0]?.regdno ||
-                "Registration number not available"}
+              {profile?.stdprofile?.[0]?.regdno || " not available"}
             </Text>
             <Badge colorScheme="success" _text={{ fontSize: "md" }}>
               {profile?.stdprofile?.[0]?.status === "A" ? "Active" : "Inactive"}

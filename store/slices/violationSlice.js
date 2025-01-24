@@ -15,7 +15,7 @@ export const fetchViolations = createAsyncThunk(
 );
 export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
-  async (searchStore, { rejectWithValue }) => {
+  async (ViolationsearchStore, { rejectWithValue }) => {
     try {
       const response = await fetch(
         "https://studentmobileapi.gitam.edu/Logingym",
@@ -25,7 +25,7 @@ export const fetchProfile = createAsyncThunk(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            UserName: searchStore,
+            UserName: ViolationsearchStore,
             Password: "Ganesh@2024",
           }),
         }
@@ -42,13 +42,13 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 const violationSlice = createSlice({
-  name: "home",
+  name: "violations",
   initialState: {
     violations: [],
     violationsCount: 0,
     profile: [],
     prevProfile: "",
-    searchStore: "",
+    ViolationsearchStore: "",
     showViolations: false,
     isLoading: false,
     profileLength: 0,
@@ -57,8 +57,8 @@ const violationSlice = createSlice({
     refresh: false,
   },
   reducers: {
-    searchState: (state, action) => {
-      state.searchStore = action.payload;
+    ViolationSearchState: (state, action) => {
+      state.ViolationsearchStore = action.payload;
       state.prevProfile = action.payload;
     },
     profileStore: (state, action) => {
@@ -96,8 +96,8 @@ const violationSlice = createSlice({
         state.profile = action.payload;
         const isStaff = action.payload.role === "staff";
         state.image = isStaff
-          ? `https://gstaff.gitam.edu/img1.aspx?empid=${state.searchStore}`
-          : `https://doeresults.gitam.edu/photo/img.aspx?id=${state.searchStore}`;
+          ? `https://gstaff.gitam.edu/img1.aspx?empid=${state.ViolationsearchStore}`
+          : `https://doeresults.gitam.edu/photo/img.aspx?id=${state.ViolationsearchStore}`;
         state.profileLength = action.payload.stdprofile?.length || 0;
       })
       .addCase(fetchProfile.rejected, (state, action) => {
@@ -106,6 +106,10 @@ const violationSlice = createSlice({
       });
   },
 });
-export const { searchState, profileStore, showViolationsPage, setRefresh } =
-  violationSlice.actions;
+export const {
+  ViolationSearchState,
+  profileStore,
+  showViolationsPage,
+  setRefresh,
+} = violationSlice.actions;
 export default violationSlice.reducer;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -6,11 +6,8 @@ import {
   Image,
   HStack,
   Input,
-  VStack,
-  Badge,
-  Skeleton,
-  KeyboardAvoidingView,
-  View,
+  VStack, KeyboardAvoidingView,
+  View
 } from "native-base";
 import {
   Pressable,
@@ -21,15 +18,16 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  fetchProfile,
+  fetchCardById,
   searchState,
-  profileStore,
-  showViolationsPage,
-} from "../../../store/slices/violationSlice";
+  clearState,
+} from "../../../store/slices/homeSlice";
+import { ViolationSearchState } from "../../../store/slices/violationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import GatepassCard from "../SearchCards/gatepassCard";
 import SkeletonCard from "../SearchCards/skeletonCard";
 import ViolationsCard from "../SearchCards/violationCard";
+import { fetchProfile } from "../../../store/slices/violationSlice";
 const featuredData = [
   {
     name: "Violation",
@@ -97,30 +95,25 @@ const emergencyData = [
 export default function Home() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {
-    violations,
-    isLoading,
-    searchStore,
-    profile,
-    violationsCount,
-    image,
-  } = useSelector((state) => state.home);
+  const { cardData, cardType, searchStore, profile } = useSelector(
+    (state) => state.home
+  );
+  const { isLoading } = useSelector((state) => state.violations);
+  useEffect(() => {
+    if (cardType === "Violations") {
+      dispatch(fetchProfile(searchStore));
+    }
+  }, [cardType, dispatch]);
   const [search, setSearch] = useState("");
   const handleSearch = () => {
-    dispatch(profileStore(null));
+    dispatch(ViolationSearchState(search));
     dispatch(searchState(search));
-    dispatch(fetchProfile(search));
+    dispatch(fetchCardById(search));
     setSearch(search);
   };
   const handleClear = () => {
-    dispatch(searchState());
-    dispatch(profileStore(null));
+    dispatch(clearState());
     setSearch();
-  };
-
-  const handleShowViolations = () => {
-    dispatch(showViolationsPage(true));
-    navigation.navigate("Violation");
   };
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleEmergencyRoute = (item) => {
@@ -255,7 +248,6 @@ export default function Home() {
                         handleClear();
                       }}
                     />
-
                     <Ionicons
                       name="search-outline"
                       size={26}
@@ -284,8 +276,10 @@ export default function Home() {
             {searchStore ? (
               isLoading ? (
                 <SkeletonCard />
-              ) : profile?.stdprofile?.length > 0 ? (
-                <GatepassCard />
+              ) : cardType === "Violations" ? (
+                <ViolationsCard data={cardData} />
+              ) : cardType === "GatePass" ? (
+                <GatepassCard data={cardData} />
               ) : (
                 <View justifyContent="center" alignItems="center">
                   <Text fontSize={18}>No results found.</Text>

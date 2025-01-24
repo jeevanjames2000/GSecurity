@@ -47,6 +47,7 @@ const ViolationsTabs = () => {
     image,
     refresh,
   } = useSelector((state) => state.home);
+  console.log("violations: ", violations);
   const handleSearch = () => {
     dispatch(searchState(search));
     dispatch(fetchProfile(search));
@@ -63,6 +64,7 @@ const ViolationsTabs = () => {
   };
   const handleTotalViolations = () => {
     dispatch(showViolationsPage(!showViolations));
+    navigation.navigate("AddViolations");
   };
   const [filterViolationStatus, setFilterViolationStatus] = useState("all");
   const filteredViloationData = violations?.filter((item) => {

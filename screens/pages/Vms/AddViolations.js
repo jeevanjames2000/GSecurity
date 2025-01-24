@@ -40,7 +40,7 @@ import {
 } from "../../../store/slices/violationSlice";
 import { useDispatch, useSelector } from "react-redux";
 export default function AddViolations() {
-  const { refresh } = useSelector((state) => state.home);
+  const { refresh } = useSelector((state) => state.violations);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const toast = useToast();
