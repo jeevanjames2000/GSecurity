@@ -246,16 +246,15 @@ export default function Home() {
                         handleClear();
                       }}
                     />
-                    <Pressable>
-                      <Ionicons
-                        name="search-outline"
-                        size={26}
-                        color="black"
-                        onPress={() => {
-                          handleSearch();
-                        }}
-                      />
-                    </Pressable>
+
+                    <Ionicons
+                      name="search-outline"
+                      size={26}
+                      color="black"
+                      onPress={() => {
+                        handleSearch();
+                      }}
+                    />
                   </HStack>
                 </>
               ) : (
