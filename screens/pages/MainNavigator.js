@@ -16,6 +16,7 @@ import Leaves_Permission from "./Leaves_Permission";
 import QrCamera from "./Tabs/Camera";
 import MaterialPass from "./MaterialPass";
 import AddGatepass from "./utils/AddGatepass";
+import ViolationsTabs from "./utils/ViolationsTabs";
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigator() {
@@ -106,6 +107,11 @@ export default function MainNavigator() {
       <Stack.Screen
         name="Visitors"
         component={VisitorsList}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ViolationTabs"
+        component={ViolationsTabs}
         options={{ headerShown: false }}
       />
       <Stack.Screen

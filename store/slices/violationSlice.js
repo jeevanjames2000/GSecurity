@@ -49,10 +49,12 @@ const violationSlice = createSlice({
     profile: [],
     prevProfile: "",
     searchStore: "",
+    showViolations: false,
     isLoading: false,
     profileLength: 0,
     error: null,
     image: "",
+    refresh: false,
   },
   reducers: {
     searchState: (state, action) => {
@@ -62,6 +64,12 @@ const violationSlice = createSlice({
     profileStore: (state, action) => {
       state.profile = action.payload;
       state.profileLength = action.payload;
+    },
+    showViolationsPage: (state, action) => {
+      state.showViolations = action.payload;
+    },
+    setRefresh: (state, action) => {
+      state.refresh = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -98,5 +106,6 @@ const violationSlice = createSlice({
       });
   },
 });
-export const { searchState, profileStore } = violationSlice.actions;
+export const { searchState, profileStore, showViolationsPage, setRefresh } =
+  violationSlice.actions;
 export default violationSlice.reducer;

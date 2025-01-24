@@ -24,8 +24,12 @@ import {
   fetchProfile,
   searchState,
   profileStore,
+  showViolationsPage,
 } from "../../../store/slices/violationSlice";
 import { Ionicons } from "@expo/vector-icons";
+import GatepassCard from "../SearchCards/gatepassCard";
+import SkeletonCard from "../SearchCards/skeletonCard";
+import ViolationsCard from "../SearchCards/violationCard";
 const featuredData = [
   {
     name: "Violation",
@@ -112,6 +116,11 @@ export default function Home() {
     dispatch(searchState());
     dispatch(profileStore(null));
     setSearch();
+  };
+
+  const handleShowViolations = () => {
+    dispatch(showViolationsPage(true));
+    navigation.navigate("Violation");
   };
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleEmergencyRoute = (item) => {
@@ -271,229 +280,12 @@ export default function Home() {
               )}
             </HStack>
           </Box>
-          <Box paddingX="4" paddingY="4" top={10}>
+          <Box paddingX="4" paddingY="2" top={10}>
             {searchStore ? (
               isLoading ? (
-                <VStack
-                  space={4}
-                  padding={4}
-                  bg="white"
-                  borderRadius={10}
-                  shadow={2}
-                >
-                  <HStack space={4} alignItems="center">
-                    <Skeleton
-                      h={20}
-                      w="30%"
-                      startColor="gray.300"
-                      endColor="gray.100"
-                      borderRadius={5}
-                    />
-                    <VStack space={2} flex={1}>
-                      <Skeleton
-                        h={5}
-                        w="80%"
-                        startColor="gray.300"
-                        endColor="gray.100"
-                        borderRadius={5}
-                      />
-                      <Skeleton
-                        h={5}
-                        w="40%"
-                        startColor="gray.300"
-                        endColor="gray.100"
-                        borderRadius={5}
-                      />
-                      <Skeleton
-                        h={5}
-                        w="50%"
-                        startColor="gray.300"
-                        endColor="gray.100"
-                        borderRadius={5}
-                      />
-                    </VStack>
-                  </HStack>
-                  <VStack space={2} marginTop={3}>
-                    {[...Array(5)].map((_, index) => (
-                      <HStack
-                        key={index}
-                        justifyContent="space-between"
-                        alignItems="center"
-                        py={1}
-                      >
-                        <Skeleton
-                          h={5}
-                          w="30%"
-                          startColor="gray.300"
-                          endColor="gray.100"
-                          borderRadius={5}
-                        />
-                        <Skeleton
-                          h={5}
-                          w="60%"
-                          startColor="gray.300"
-                          endColor="gray.100"
-                          borderRadius={5}
-                        />
-                      </HStack>
-                    ))}
-                  </VStack>
-                  {}
-                  <HStack
-                    justifyContent="space-between"
-                    space={4}
-                    marginTop={3}
-                  >
-                    <Skeleton
-                      h={10}
-                      w="45%"
-                      startColor="gray.300"
-                      endColor="gray.100"
-                      borderRadius={10}
-                    />
-                    <Skeleton
-                      h={10}
-                      w="45%"
-                      startColor="gray.300"
-                      endColor="gray.100"
-                      borderRadius={10}
-                    />
-                  </HStack>
-                </VStack>
+                <SkeletonCard />
               ) : profile?.stdprofile?.length > 0 ? (
-                <Box
-                  padding="6"
-                  shadow="9"
-                  bg={"#fff"}
-                  borderRadius={"xl"}
-                  minWidth={"sm"}
-                  maxWidth={"sm"}
-                >
-                  <HStack space={"lg"}>
-                    <Image
-                      source={{
-                        uri: image,
-                      }}
-                      alt="Profile Image"
-                      size="lg"
-                      borderRadius="xl"
-                    />
-                    <VStack space={"2"}>
-                      <Text color={"#007367"} fontWeight={"bold"} fontSize="lg">
-                        {profile?.stdprofile?.[0]?.name || "Name not available"}
-                      </Text>
-                      <Text fontWeight={"semibold"} fontSize="md">
-                        {profile?.role || "Role not available"}
-                      </Text>
-                      <HStack
-                        justifyContent={"space-between"}
-                        alignItems={"center"}
-                        space={2}
-                      >
-                        <Text fontWeight={"semibold"} fontSize="md">
-                          {profile?.stdprofile?.[0]?.regdno ||
-                            "Registration number not available"}
-                        </Text>
-                        <Badge colorScheme="success" _text={{ fontSize: "md" }}>
-                          {profile?.stdprofile?.[0]?.status === "A"
-                            ? "Active"
-                            : "Inactive"}
-                        </Badge>
-                      </HStack>
-                    </VStack>
-                  </HStack>
-                  <VStack space={1.5} marginTop={"6"}>
-                    {[
-                      { key: "Name", value: profile?.stdprofile?.[0]?.name },
-                      { key: "Role", value: profile?.role },
-                      { key: "Batch", value: profile?.stdprofile?.[0]?.batch },
-                      {
-                        key: "Email",
-                        value: profile?.stdprofile?.[0]?.emailid,
-                      },
-                      {
-                        key: "Mobile",
-                        value: profile?.stdprofile?.[0]?.mobile,
-                      },
-                    ].map((item, index) => (
-                      <Box
-                        key={index}
-                        flexDirection={"row"}
-                        alignItems={"center"}
-                        justifyContent={"space-between"}
-                      >
-                        <Text fontSize={"md"}>{item.key}</Text>
-                        <Text
-                          fontSize={"md"}
-                          color={
-                            item.key === "Role"
-                              ? "#007367"
-                              : item.key === "Name"
-                              ? "#000000"
-                              : "#706F6F"
-                          }
-                          paddingLeft={4}
-                        >
-                          {item.value || "Not available"}
-                        </Text>
-                      </Box>
-                    ))}
-                  </VStack>
-                  <HStack
-                    justifyContent="space-between"
-                    space={4}
-                    mt={4}
-                    alignItems="center"
-                    width="100%"
-                  >
-                    <Pressable
-                      onPress={() => navigation.navigate("Violation")}
-                      style={{
-                        borderWidth: 1,
-                        borderColor: "#37474F",
-                        borderRadius: 20,
-                        paddingVertical: 10,
-                        paddingHorizontal: 15,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flex: 1,
-                        marginRight: 8,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                          fontWeight: "bold",
-                          color: "#37474F",
-                        }}
-                      >
-                        Violations {violationsCount}
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => navigation.navigate("AddViolations")}
-                      style={{
-                        backgroundColor: "#007367",
-                        borderRadius: 20,
-                        paddingVertical: 10,
-                        paddingHorizontal: 15,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flex: 1,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 20,
-                          fontWeight: "bold",
-                          color: "#fff",
-                        }}
-                      >
-                        Add Violation
-                      </Text>
-                    </Pressable>
-                  </HStack>
-                </Box>
+                <GatepassCard />
               ) : (
                 <View justifyContent="center" alignItems="center">
                   <Text fontSize={18}>No results found.</Text>

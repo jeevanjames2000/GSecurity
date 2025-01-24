@@ -30,7 +30,18 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Feather from "react-native-vector-icons/Feather";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import {
+  searchState,
+  profileStore,
+  fetchProfile,
+  fetchViolations,
+  showViolationsPage,
+  setRefresh,
+} from "../../../store/slices/violationSlice";
+import { useDispatch, useSelector } from "react-redux";
 export default function AddViolations() {
+  const { refresh } = useSelector((state) => state.home);
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const toast = useToast();
   const [isActionSheetOpen, setActionSheetOpen] = useState(false);
@@ -153,6 +164,9 @@ export default function AddViolations() {
     setSelectedValues(values);
     setFine(fines);
   };
+  const handleRefeshViolationpage = () => {
+    dispatch(setRefresh(!refresh));
+  };
   const [comments, setComments] = useState("");
   const handleUploadImage = async () => {
     setIsLoading(true);
@@ -183,6 +197,7 @@ export default function AddViolations() {
       const result = await response.json();
       if (response.status === 200) {
         setTimeout(() => {
+          handleRefeshViolationpage();
           toast.show({
             render: () => {
               return (

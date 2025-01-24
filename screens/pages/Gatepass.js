@@ -24,7 +24,11 @@ import {
   gatepassSearchState,
   passByIDState,
 } from "../../store/slices/gatePassSlice";
-import { Keyboard, TouchableWithoutFeedback } from "react-native";
+import {
+  Keyboard,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native";
 const GatePass = () => {
   const toast = useToast();
   const navigation = useNavigation();
@@ -597,20 +601,24 @@ const GatePass = () => {
               </View>
             )}
           </View>
-          <TouchableWithoutFeedback
+
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              right: 25,
+              zIndex: 1000,
+              bottom: 12,
+              backgroundColor: "#007367",
+              borderRadius: 50,
+              paddingVertical: 10,
+              paddingHorizontal: 10,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
             onPress={() => navigation.navigate("Create Pass")}
           >
-            <Image
-              source={require("../../assets/Frame 213.png")}
-              alt="Profile Image"
-              size={20}
-              color="#007367"
-              position="absolute"
-              right={5}
-              zIndex={1000}
-              bottom={12}
-            />
-          </TouchableWithoutFeedback>
+            <Ionicons name="add-circle-outline" size={30} color="white" />
+          </TouchableOpacity>
         </Box>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
