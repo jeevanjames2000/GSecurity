@@ -129,11 +129,15 @@ export default function Main() {
         component={Profile}
         options={{
           headerStyle: {
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "#007367",
           },
           headerTitle: "Profile",
-          headerTintColor: "#000",
+          headerTintColor: "#fff",
           headerTitleAlign: "center",
+
+          headerTitleStyle: {
+            fontSize: 30,
+          },
         }}
       />
       {}
