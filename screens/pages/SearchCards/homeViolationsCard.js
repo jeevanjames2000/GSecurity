@@ -4,10 +4,20 @@ import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { showViolationsPage } from "../../../store/slices/violationSlice";
-export default function ViolationsCard({ data, profile, image }) {
+export default function HomeViolationsCard(cardData) {
+  const { data } = cardData;
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {
+    violations,
+    isLoading,
+    searchStore,
+    profile,
+    violationsCount,
+    image,
+  } = useSelector((state) => state.violations);
   const handleShowViolations = () => {
+    dispatch(showViolationsPage(true));
     navigation.navigate("AddViolations");
   };
   return (
@@ -114,7 +124,7 @@ export default function ViolationsCard({ data, profile, image }) {
               color: "#37474F",
             }}
           >
-            Violations {data?.length || 0}
+            Violations {violationsCount}
           </Text>
         </Pressable>
         <Pressable

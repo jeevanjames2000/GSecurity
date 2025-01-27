@@ -59,7 +59,6 @@ const violationSlice = createSlice({
   reducers: {
     ViolationSearchState: (state, action) => {
       state.ViolationsearchStore = action.payload;
-      state.prevProfile = action.payload;
     },
     profileStore: (state, action) => {
       state.profile = action.payload;
@@ -98,7 +97,6 @@ const violationSlice = createSlice({
         state.image = isStaff
           ? `https://gstaff.gitam.edu/img1.aspx?empid=${state.ViolationsearchStore}`
           : `https://doeresults.gitam.edu/photo/img.aspx?id=${state.ViolationsearchStore}`;
-        state.profileLength = action.payload.stdprofile?.length || 0;
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.isLoading = false;

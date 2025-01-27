@@ -6,8 +6,9 @@ import {
   Image,
   HStack,
   Input,
-  VStack, KeyboardAvoidingView,
-  View
+  VStack,
+  KeyboardAvoidingView,
+  View,
 } from "native-base";
 import {
   Pressable,
@@ -18,16 +19,16 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  fetchCardById,
   searchState,
   clearState,
+  fetchProfile,
+  fetchDataBySearchQuery,
 } from "../../../store/slices/homeSlice";
 import { ViolationSearchState } from "../../../store/slices/violationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import GatepassCard from "../SearchCards/gatepassCard";
 import SkeletonCard from "../SearchCards/skeletonCard";
 import ViolationsCard from "../SearchCards/violationCard";
-import { fetchProfile } from "../../../store/slices/violationSlice";
 const featuredData = [
   {
     name: "Violation",
@@ -95,25 +96,22 @@ const emergencyData = [
 export default function Home() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { cardData, cardType, searchStore, profile } = useSelector(
-    (state) => state.home
-  );
-  const { isLoading } = useSelector((state) => state.violations);
-  useEffect(() => {
-    if (cardType === "Violations") {
-      dispatch(fetchProfile(searchStore));
-    }
-  }, [cardType, dispatch]);
+  const { isLoading, cardData, cardType, searchStore, profile, image } =
+    useSelector((state) => state.home);
+  console.log("cardData, cardType, profile ", cardData, cardType, profile);
   const [search, setSearch] = useState("");
+  const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const handleSearch = () => {
-    dispatch(ViolationSearchState(search));
+    setIsSearchTriggered(true);
     dispatch(searchState(search));
-    dispatch(fetchCardById(search));
-    setSearch(search);
+    dispatch(fetchProfile(search));
+    dispatch(fetchDataBySearchQuery(search));
+    dispatch(ViolationSearchState(search));
   };
   const handleClear = () => {
+    setSearch("");
+    setIsSearchTriggered(false);
     dispatch(clearState());
-    setSearch();
   };
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleEmergencyRoute = (item) => {
@@ -237,7 +235,7 @@ export default function Home() {
                 value={search}
                 onChangeText={(value) => setSearch(value)}
               />
-              {searchStore ? (
+              {search ? (
                 <>
                   <HStack space={3}>
                     <Ionicons
@@ -273,13 +271,23 @@ export default function Home() {
             </HStack>
           </Box>
           <Box paddingX="4" paddingY="2" top={10}>
-            {searchStore ? (
+            {isSearchTriggered ? (
               isLoading ? (
                 <SkeletonCard />
-              ) : cardType === "Violations" ? (
-                <ViolationsCard data={cardData} />
-              ) : cardType === "GatePass" ? (
-                <GatepassCard data={cardData} />
+              ) : cardData ? (
+                cardType === "Violations" ? (
+                  <ViolationsCard
+                    data={cardData}
+                    profile={profile}
+                    image={image}
+                  />
+                ) : cardType === "GatePass" ? (
+                  <GatepassCard data={cardData} />
+                ) : (
+                  <View justifyContent="center" alignItems="center">
+                    <Text fontSize={18}>No results found.</Text>
+                  </View>
+                )
               ) : (
                 <View justifyContent="center" alignItems="center">
                   <Text fontSize={18}>No results found.</Text>

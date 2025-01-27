@@ -5,7 +5,8 @@ import {
   gatepassSearchState,
   passByIDState,
 } from "../../../store/slices/gatePassSlice";
-export default function GatepassCard() {
+export default function GatepassCard(cardData) {
+  const { data } = cardData;
   const dispatch = useDispatch();
   const { passesByID } = useSelector((state) => state.gatepass);
 
@@ -17,7 +18,7 @@ export default function GatepassCard() {
 
   return (
     <VStack space={4} padding={4} bg="white" borderRadius="xl" shadow="3">
-      {passesByID.map((gatePass, index) => (
+      {data.map((gatePass, index) => (
         <View key={index} mb={5} pt={0}>
           <Text
             textAlign={"center"}

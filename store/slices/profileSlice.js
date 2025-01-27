@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
   async (searchStore, { rejectWithValue }) => {
-    console.log("searchStore: ", typeof searchStore);
     try {
       const response = await fetch(
         "https://studentmobileapi.gitam.edu/Logingym",
@@ -21,6 +20,8 @@ export const fetchProfile = createAsyncThunk(
         throw new Error("Failed to fetch profile data.");
       }
       const data = await response.json();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       return data;
     } catch (error) {
       return rejectWithValue(error.message || "Error fetching profile data.");

@@ -1,29 +1,51 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchViolations } from "./violationSlice";
-import { fetchGatepassByID } from "./gatePassSlice";
-export const fetchCardById = createAsyncThunk(
-  "home/fetchCardById",
-  async (searchQuery, { dispatch, rejectWithValue }) => {
+export const fetchProfile = createAsyncThunk(
+  "home/fetchProfile",
+  async (searchStore, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        "https://studentmobileapi.gitam.edu/Logingym",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            UserName: searchStore,
+            Password: "Ganesh@2024",
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile data.");
+      }
+      const data = await response.json();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return { source: "profile", data };
+    } catch (error) {
+      return rejectWithValue(error.message || "Error fetching profile data.");
+    }
+  }
+);
+export const fetchDataBySearchQuery = createAsyncThunk(
+  "home/fetchDataBySearchQuery",
+  async (searchQuery, { rejectWithValue }) => {
     try {
       const queryParams = new URLSearchParams();
       if (searchQuery) queryParams.append("searchQuery", searchQuery);
       const response = await fetch(
-        `http://172.17.58.151:9000/api/global/getCardsByID?${queryParams.toString()}`
+        `http://172.17.58.151:9000/global/getCardsByID?${queryParams.toString()}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch data by search query.");
       }
       const sdata = await response.json();
       const { data, source } = sdata;
-      if (source === "Violations") {
-        const result = await dispatch(fetchViolations(searchQuery)).unwrap();
-        return { source, data: result };
+      if (!source || !data) {
+        throw new Error("Invalid API response.");
       }
-      if (source === "GatePass") {
-        const result = await dispatch(fetchGatepassByID(searchQuery)).unwrap();
-        return { source, data: result };
-      }
-      throw new Error("Invalid source or unsupported operation.");
+      //   await new Promise((resolve) => setTimeout(resolve, 2000));
+      return { source, data };
     } catch (error) {
       return rejectWithValue(
         error.message || "Error fetching data by search query."
@@ -35,29 +57,25 @@ const homeSlice = createSlice({
   name: "home",
   initialState: {
     searchStore: "",
-    profile: [],
+    profile: null,
     cardData: [],
+    cardType: "profile",
     isLoading: false,
     error: null,
     image: "",
-    refresh: false,
-    cardType: "",
   },
   reducers: {
     searchState: (state, action) => {
       state.searchStore = action.payload;
-    },
-    setRefresh: (state, action) => {
-      state.refresh = action.payload;
     },
     setCardType: (state, action) => {
       state.cardType = action.payload;
     },
     clearState: (state) => {
       state.searchStore = "";
-      state.profile = [];
+      state.profile = null;
       state.cardData = [];
-      state.cardType = "";
+      state.cardType = "profile";
       state.isLoading = false;
       state.error = null;
       state.image = "";
@@ -65,21 +83,39 @@ const homeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCardById.pending, (state) => {
+      .addCase(fetchProfile.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchCardById.fulfilled, (state, action) => {
+      .addCase(fetchProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.profile = action.payload.data;
+        const isStaff = action.payload.data.role === "staff";
+        state.image = isStaff
+          ? `https://gstaff.gitam.edu/img1.aspx?empid=${state.searchStore}`
+          : `https://doeresults.gitam.edu/photo/img.aspx?id=${state.searchStore}`;
+        state.cardType = "Violations";
+      })
+      .addCase(fetchProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchDataBySearchQuery.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.cardData = [];
+      })
+      .addCase(fetchDataBySearchQuery.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cardData = action.payload.data;
         state.cardType = action.payload.source;
       })
-      .addCase(fetchCardById.rejected, (state, action) => {
+      .addCase(fetchDataBySearchQuery.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+        state.cardType = "Violations";
       });
   },
 });
-export const { searchState, setRefresh, clearState, setCardType } =
-  homeSlice.actions;
+export const { searchState, clearState, setCardType } = homeSlice.actions;
 export default homeSlice.reducer;
