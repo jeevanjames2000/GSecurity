@@ -50,6 +50,8 @@ export const fetchDataBySearchQuery = createAsyncThunk(
       "Failed to fetch data by search query."
     );
     const { data, source } = sdata;
+    console.log("data, source: ", data, source);
+
     if (!source || !data) {
       throw new Error("Invalid API response.");
     }

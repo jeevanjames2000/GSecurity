@@ -9,8 +9,11 @@ import {
 } from "../store/slices/homeSlice";
 const useSearch = () => {
   const dispatch = useDispatch();
-  const { isLoading, cardData, cardType } = useSelector((state) => state.home);
-  const [search, setSearch] = useState("");
+  const { isLoading, cardData, cardType, profile } = useSelector(
+    (state) => state.home
+  );
+  console.log("cardData: ", cardData, profile);
+  const [search, setSearch] = useState("2023000256");
   const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const handleSearch = async () => {
     dispatch(clearState());
@@ -18,6 +21,7 @@ const useSearch = () => {
     dispatch(searchState(search));
     const searchPrefix = search.toLowerCase().charAt(0);
     if (searchPrefix === "v" || searchPrefix === "g") {
+      console.log("called");
       await dispatch(fetchDataBySearchQuery(search));
     } else {
       await dispatch(fetchProfile(search));

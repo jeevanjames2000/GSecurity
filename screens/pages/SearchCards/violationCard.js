@@ -4,10 +4,12 @@ import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { wrap } from "lodash";
+import { MaterialIcons } from "@expo/vector-icons";
 export default function ViolationsCard() {
   const { isLoading, cardData, image, noProfile, profile } = useSelector(
     (state) => state.home
   );
+
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const handleShowViolations = () => {
@@ -20,32 +22,115 @@ export default function ViolationsCard() {
       </View>
     );
   }
+
+  const CustomButton = ({
+    onPress,
+    iconName,
+    text,
+    bgColor,
+    textColor,
+    borderColor,
+  }) => (
+    <Pressable
+      onPress={onPress}
+      style={{
+        backgroundColor: bgColor,
+        borderWidth: borderColor ? 0.5 : 0,
+        borderColor: borderColor,
+        borderRadius: 20,
+        paddingVertical: 10,
+        alignItems: "center",
+        textAlign: "center",
+        justifyContent: "center",
+        flex: 1,
+        flexDirection: "row",
+
+        elevation: 3,
+      }}
+      _pressed={{ opacity: 0.8 }}
+    >
+      <MaterialIcons name={iconName} size={20} color={textColor} />
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: "600",
+          color: textColor,
+          textAlign: "center",
+        }}
+      >
+        {text}
+      </Text>
+    </Pressable>
+  );
+
+  // Violations Stack
+  const ViolationsStack = ({
+    cardData,
+    handleShowViolations,
+    handleAddViolation,
+  }) => (
+    <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
+      <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
+        Violations ({cardData?.length || 0})
+      </Text>
+      <HStack justifyContent="space-between" space={4}>
+        {/* <CustomButton
+          text={`Violations`}
+          bgColor="#fff"
+          textColor="#37474F"
+          borderColor="#37474F"
+        /> */}
+        <CustomButton text="Add" bgColor="#007367" textColor="#fff" />
+      </HStack>
+    </Box>
+  );
+
+  // Leaves & Permissions Stack
+  const LeavesPermissionsStack = ({ handleCheckIn, handleCheckOut }) => (
+    <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
+      <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
+        Leaves & Permissions ({cardData?.length || 0})
+      </Text>
+      <HStack justifyContent="space-between" space={4}>
+        <CustomButton
+          text="Check In"
+          bgColor="#fff"
+          textColor="#37474F"
+          borderColor="#37474F"
+        />
+        <CustomButton
+          // onPress={handleCheckOut}
+          text="Check Out"
+          bgColor="#007367"
+          textColor="#fff"
+        />
+      </HStack>
+    </Box>
+  );
   return (
-    <Box padding="6" shadow="9" bg={"#fff"} borderRadius={"xl"}>
-      <HStack space={"lg"}>
+    <Box padding="6" shadow="9" bg="#fff" borderRadius="xl">
+      <HStack space="lg">
         <Image
-          source={{
-            uri: image,
-          }}
+          source={{ uri: image }}
           alt="Profile Image"
           size="lg"
           borderRadius="xl"
         />
-        <VStack space={"2"}>
-          <Text color={"#007367"} fontWeight={"bold"} fontSize="lg">
+        <VStack space="2">
+          <Text color="#007367" fontWeight="bold" fontSize="lg">
             {profile?.stdprofile?.[0]?.name || "Name not available"}
           </Text>
-          <Text fontWeight={"semibold"} fontSize="md">
+          <Text fontWeight="semibold" fontSize="md">
             {profile?.role || "Role not available"}
           </Text>
           <HStack
-            justifyContent={"space-between"}
-            alignItems={"center"}
+            justifyContent="space-between"
+            alignItems="center"
             space={2}
-            flexWrap={wrap}
+            flexWrap="wrap"
           >
-            <Text fontWeight={"semibold"} fontSize="md">
-              {profile?.stdprofile?.[0]?.regdno || " not available"}
+            <Text fontWeight="semibold" fontSize="md">
+              {profile?.stdprofile?.[0]?.regdno || "Not available"}
             </Text>
             <Badge
               colorScheme={
@@ -59,28 +144,23 @@ export default function ViolationsCard() {
           </HStack>
         </VStack>
       </HStack>
-      <VStack space={1.5} marginTop={"6"}>
+      <VStack space={1.5} marginTop="6">
         {[
-          { key: "Role", value: profile?.role },
           { key: "Batch", value: profile?.stdprofile?.[0]?.batch },
-          {
-            key: "Email",
-            value: profile?.stdprofile?.[0]?.emailid,
-          },
-          {
-            key: "Mobile",
-            value: profile?.stdprofile?.[0]?.mobile,
-          },
+          { key: "Department", value: profile?.stdprofile?.[0]?.branch_code },
+          { key: "Campus", value: profile?.stdprofile?.[0]?.campus },
+          { key: "Email", value: profile?.stdprofile?.[0]?.emailid },
+          { key: "Mobile", value: profile?.stdprofile?.[0]?.mobile },
         ].map((item, index) => (
           <Box
             key={index}
-            flexDirection={"row"}
-            alignItems={"center"}
-            justifyContent={"space-between"}
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="space-between"
           >
-            <Text fontSize={"md"}>{item.key}</Text>
+            <Text fontSize="md">{item.key}</Text>
             <Text
-              fontSize={"md"}
+              fontSize="md"
               color={
                 item.key === "Role"
                   ? "#007367"
@@ -95,60 +175,14 @@ export default function ViolationsCard() {
           </Box>
         ))}
       </VStack>
-      <HStack
-        justifyContent="space-between"
-        space={4}
-        mt={4}
-        alignItems="center"
-        width="100%"
-      >
-        <Pressable
-          onPress={handleShowViolations}
-          style={{
-            borderWidth: 1,
-            borderColor: "#37474F",
-            borderRadius: 20,
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            alignItems: "center",
-            justifyContent: "center",
-            flex: 1,
-            marginRight: 8,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              color: "#37474F",
-            }}
-          >
-            Violations {cardData?.length || 0}
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={handleShowViolations}
-          style={{
-            backgroundColor: "#007367",
-            borderRadius: 20,
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            alignItems: "center",
-            justifyContent: "center",
-            flex: 1,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              color: "#fff",
-            }}
-          >
-            Add Violation
-          </Text>
-        </Pressable>
-      </HStack>
+
+      {/* Violations and Leaves & Permissions Stacks */}
+      <ViolationsStack
+        cardData={cardData}
+        handleShowViolations={handleShowViolations}
+      />
+      {profile.role === "student" &&
+        profile?.stdprofile[0]?.hostler === "Y" && <LeavesPermissionsStack />}
     </Box>
   );
 }
