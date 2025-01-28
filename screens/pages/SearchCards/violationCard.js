@@ -1,24 +1,27 @@
 import React from "react";
-import { Box, Text, Image, HStack, VStack, Badge } from "native-base";
+import { Box, Text, Image, HStack, VStack, Badge, View } from "native-base";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector, useDispatch } from "react-redux";
-import { showViolationsPage } from "../../../store/slices/violationSlice";
-export default function ViolationsCard({ data, profile, image }) {
+import { useDispatch, useSelector } from "react-redux";
+import { wrap } from "lodash";
+export default function ViolationsCard() {
+  const { isLoading, cardData, image, noProfile, profile } = useSelector(
+    (state) => state.home
+  );
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const handleShowViolations = () => {
     navigation.navigate("AddViolations");
   };
+  if (noProfile) {
+    return (
+      <View justifyContent="center" alignItems="center">
+        <Text fontSize={18}>No results found.</Text>
+      </View>
+    );
+  }
   return (
-    <Box
-      padding="6"
-      shadow="9"
-      bg={"#fff"}
-      borderRadius={"xl"}
-      minWidth={"sm"}
-      maxWidth={"sm"}
-    >
+    <Box padding="6" shadow="9" bg={"#fff"} borderRadius={"xl"}>
       <HStack space={"lg"}>
         <Image
           source={{
@@ -39,11 +42,18 @@ export default function ViolationsCard({ data, profile, image }) {
             justifyContent={"space-between"}
             alignItems={"center"}
             space={2}
+            flexWrap={wrap}
           >
             <Text fontWeight={"semibold"} fontSize="md">
               {profile?.stdprofile?.[0]?.regdno || " not available"}
             </Text>
-            <Badge colorScheme="success" _text={{ fontSize: "md" }}>
+            <Badge
+              colorScheme={
+                profile?.stdprofile?.[0]?.status === "A" ? "success" : "error"
+              }
+              _text={{ fontSize: "md" }}
+              borderRadius={5}
+            >
               {profile?.stdprofile?.[0]?.status === "A" ? "Active" : "Inactive"}
             </Badge>
           </HStack>
@@ -51,7 +61,6 @@ export default function ViolationsCard({ data, profile, image }) {
       </HStack>
       <VStack space={1.5} marginTop={"6"}>
         {[
-          { key: "Name", value: profile?.stdprofile?.[0]?.name },
           { key: "Role", value: profile?.role },
           { key: "Batch", value: profile?.stdprofile?.[0]?.batch },
           {
@@ -81,7 +90,7 @@ export default function ViolationsCard({ data, profile, image }) {
               }
               paddingLeft={4}
             >
-              {item.value || "Not available"}
+              {item?.value || "Not available"}
             </Text>
           </Box>
         ))}
@@ -114,7 +123,7 @@ export default function ViolationsCard({ data, profile, image }) {
               color: "#37474F",
             }}
           >
-            Violations {data?.length || 0}
+            Violations {cardData?.length || 0}
           </Text>
         </Pressable>
         <Pressable

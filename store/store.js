@@ -11,6 +11,12 @@ const store = configureStore({
     gatepass: gatePassReducer,
     home: homeSlice,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    }),
+  devTools: process.env.NODE_ENV !== "production",
 });
 
 export default store;

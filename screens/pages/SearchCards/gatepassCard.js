@@ -9,15 +9,13 @@ export default function GatepassCard(cardData) {
   const { data } = cardData;
   const dispatch = useDispatch();
   const { passesByID } = useSelector((state) => state.gatepass);
-
   const handleClear = () => {
     dispatch(gatepassSearchState(""));
     dispatch(passByIDState(null));
     setSearch("");
   };
-
   return (
-    <VStack space={4} padding={4} bg="white" borderRadius="xl" shadow="3">
+    <VStack padding="6" shadow="9" bg={"#fff"} borderRadius={"xl"}>
       {data.map((gatePass, index) => (
         <View key={index} mb={5} pt={0}>
           <Text
@@ -158,7 +156,6 @@ export default function GatepassCard(cardData) {
               <Input fontSize={14} value={gatePass.note} readOnly />
             </HStack>
           </View>
-
           <HStack space={2} mt={4} justifyContent="flex-end">
             <Button
               onPress={() => handleClear()}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Text,
@@ -29,6 +29,7 @@ import { Ionicons } from "@expo/vector-icons";
 import GatepassCard from "../SearchCards/gatepassCard";
 import SkeletonCard from "../SearchCards/skeletonCard";
 import ViolationsCard from "../SearchCards/violationCard";
+import VisitorDetailsCard from "../SearchCards/visitorsCard";
 const featuredData = [
   {
     name: "Violation",
@@ -96,9 +97,7 @@ const emergencyData = [
 export default function Home() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { isLoading, cardData, cardType, searchStore, profile, image } =
-    useSelector((state) => state.home);
-  console.log("cardData, cardType, profile ", cardData, cardType, profile);
+  const { isLoading, cardData, cardType } = useSelector((state) => state.home);
   const [search, setSearch] = useState("");
   const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const handleSearch = () => {
@@ -274,24 +273,19 @@ export default function Home() {
             {isSearchTriggered ? (
               isLoading ? (
                 <SkeletonCard />
-              ) : cardData ? (
-                cardType === "Violations" ? (
-                  <ViolationsCard
-                    data={cardData}
-                    profile={profile}
-                    image={image}
-                  />
+              ) : (
+                cardData &&
+                (cardType === "Violations" ? (
+                  <ViolationsCard />
                 ) : cardType === "GatePass" ? (
                   <GatepassCard data={cardData} />
+                ) : cardType === "VisitorManagement" ? (
+                  <VisitorDetailsCard data={cardData} />
                 ) : (
                   <View justifyContent="center" alignItems="center">
-                    <Text fontSize={18}>No results found.</Text>
+                    {}
                   </View>
-                )
-              ) : (
-                <View justifyContent="center" alignItems="center">
-                  <Text fontSize={18}>No results found.</Text>
-                </View>
+                ))
               )
             ) : (
               <>

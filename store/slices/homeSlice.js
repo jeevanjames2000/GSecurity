@@ -20,8 +20,7 @@ export const fetchProfile = createAsyncThunk(
         throw new Error("Failed to fetch profile data.");
       }
       const data = await response.json();
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      return { source: "profile", data };
+      return { source: "Violations", data };
     } catch (error) {
       return rejectWithValue(error.message || "Error fetching profile data.");
     }
@@ -44,7 +43,6 @@ export const fetchDataBySearchQuery = createAsyncThunk(
       if (!source || !data) {
         throw new Error("Invalid API response.");
       }
-      //   await new Promise((resolve) => setTimeout(resolve, 2000));
       return { source, data };
     } catch (error) {
       return rejectWithValue(
@@ -59,10 +57,11 @@ const homeSlice = createSlice({
     searchStore: "",
     profile: null,
     cardData: [],
-    cardType: "profile",
+    cardType: "Violations",
     isLoading: false,
     error: null,
     image: "",
+    noProfile: false,
   },
   reducers: {
     searchState: (state, action) => {
@@ -75,7 +74,7 @@ const homeSlice = createSlice({
       state.searchStore = "";
       state.profile = null;
       state.cardData = [];
-      state.cardType = "profile";
+      state.cardType = "";
       state.isLoading = false;
       state.error = null;
       state.image = "";
@@ -85,7 +84,11 @@ const homeSlice = createSlice({
     builder
       .addCase(fetchProfile.pending, (state) => {
         state.isLoading = true;
+        state.noProfile = false;
         state.error = null;
+        state.profile = null;
+        state.image = "";
+        state.cardType = "Violations";
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -95,25 +98,33 @@ const homeSlice = createSlice({
           ? `https://gstaff.gitam.edu/img1.aspx?empid=${state.searchStore}`
           : `https://doeresults.gitam.edu/photo/img.aspx?id=${state.searchStore}`;
         state.cardType = "Violations";
+        state.noProfile = false;
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.isLoading = false;
+        state.noProfile = true;
         state.error = action.payload;
+        state.profile = null;
+        state.cardData = [];
+        state.image = "";
+        state.cardType = "Violations";
       })
       .addCase(fetchDataBySearchQuery.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.noProfile = false;
         state.cardData = [];
       })
       .addCase(fetchDataBySearchQuery.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.noProfile = false;
         state.cardData = action.payload.data;
         state.cardType = action.payload.source;
       })
       .addCase(fetchDataBySearchQuery.rejected, (state, action) => {
         state.isLoading = false;
+        state.noProfile = true;
         state.error = action.payload;
-        state.cardType = "Violations";
       });
   },
 });

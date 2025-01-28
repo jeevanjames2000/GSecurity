@@ -1,158 +1,194 @@
 import {
-  Badge,
   Box,
   HStack,
-  Image,
-  Pressable,
   VStack,
   Text,
   Center,
+  View,
+  Input,
+  Button,
 } from "native-base";
-
+import { useState } from "react";
+import { useSelector } from "react-redux";
 export default function VisitorDetailsCard() {
-  const visitorData = [
-    { key: "Visitor Name", value: "Alice Brown" },
-    { key: "Contact", value: "+1 123 456 7890" },
-    { key: "Visit Purpose", value: "Meeting with Faculty" },
-    { key: "Check-In Time", value: "9:30 AM" },
-    { key: "Check-Out Time", value: "Pending" },
-    { key: "Status", value: "In Progress" },
-    { key: "To Meet", value: "Dr. John Smith (Faculty)" }, // Added
-  ];
-
-  const requestData = [
-    { key: "Requested By", value: "Jane Doe (Admin)" }, // Added
-    { key: "Requester Contact", value: "+1 987 654 3210" }, // Added
-  ];
-
+  const { isLoading, cardData, image, noProfile, profile } = useSelector(
+    (state) => state.home
+  );
+  const [isOtpSubmitted, setIsOtpSubmitted] = useState(false);
+  const [otp, setOtp] = useState("");
+  if (noProfile) {
+    return (
+      <View justifyContent="center" alignItems="center">
+        <Text fontSize={18}>No results found.</Text>
+      </View>
+    );
+  }
   return (
-    <Center>
-      <Box
-        padding="6"
-        shadow="9"
-        bg={"#fff"}
-        borderRadius={"xl"}
-        minWidth={"sm"}
-        maxWidth={"sm"}
-        mt="1"
-        mb="1"
-      >
-        {/* Visitor Profile Section */}
-        <HStack space={"lg"} alignItems={"center"}>
-          <Image
-            source={{
-              uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg", // Replace with visitor image URL
-            }}
-            alt="Visitor Image"
-            size="lg"
-            borderRadius="xl"
-          />
-          <VStack space={"2"}>
-            <Text color={"#007367"} fontWeight={"bold"} fontSize="lg">
-              Alice Brown
-            </Text>
-            <Text fontWeight={"semibold"} fontSize="md">
-              Visitor
-            </Text>
-            <HStack alignItems={"center"} space={2}>
-              <Badge colorScheme="info" _text={{ fontSize: "md" }}>
-                Active Visitor
-              </Badge>
-            </HStack>
-          </VStack>
-        </HStack>
-
-        {/* Visitor Details */}
-        <VStack space={1.5} marginTop={"6"}>
-          {visitorData.map((item, index) => (
-            <Box
-              key={index}
-              flexDirection={"row"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-            >
-              <Text fontSize={"md"}>{item.key}</Text>
-              <Text fontSize={"md"} color="#706F6F" paddingLeft={4}>
-                {item.value || "Not available"}
-              </Text>
-            </Box>
-          ))}
-        </VStack>
-
-        {/* Divider */}
-        <Box height="1" backgroundColor="#f0f0f0" my="6" />
-
-        {/* Request Details */}
-        <VStack space={1.5}>
-          {requestData.map((item, index) => (
-            <Box
-              key={index}
-              flexDirection={"row"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-            >
-              <Text fontSize={"md"}>{item.key}</Text>
-              <Text fontSize={"md"} color="#706F6F" paddingLeft={4}>
-                {item.value || "Not available"}
-              </Text>
-            </Box>
-          ))}
-        </VStack>
-
-        {/* Buttons Section */}
-        <HStack
-          justifyContent="space-between"
-          space={4}
-          mt={4}
-          alignItems="center"
-          width="100%"
+    <Box padding="6" shadow="9" bg={"#fff"} borderRadius={"xl"}>
+      <HStack alignItems={"center"} justifyContent={"center"} mb={2}>
+        <Text
+          fontSize={22}
+          fontWeight="bold"
+          color={"#007367"}
+          textAlign={"center"}
         >
-          <Pressable
-            style={{
-              borderWidth: 1,
-              borderColor: "#37474F",
-              borderRadius: 20,
-              paddingVertical: 10,
-              paddingHorizontal: 15,
-              alignItems: "center",
-              justifyContent: "center",
-              flex: 1,
-              marginRight: 8,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: "bold",
-                color: "#37474F",
-              }}
-            >
-              Mark Exit
+          Visitor Details
+        </Text>
+      </HStack>
+      <VStack space={2}>
+        <VStack space={3} borderBottomWidth={1} borderColor="#DADADA" pb={3}>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Name
             </Text>
-          </Pressable>
-          <Pressable
-            style={{
-              backgroundColor: "#007367",
-              borderRadius: 20,
-              paddingVertical: 10,
-              paddingHorizontal: 15,
-              alignItems: "center",
-              justifyContent: "center",
-              flex: 1,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                color: "#fff",
-              }}
-            >
-              Cancel Visit
+            <Text color="gray.800">
+              {cardData[0]?.visitor_name || "Name not available"}
             </Text>
-          </Pressable>
-        </HStack>
-      </Box>
-    </Center>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Phone Number
+            </Text>
+            <Text color="gray.800">
+              {cardData[0]?.contact_no || "Phone not available"}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Vehicle Type
+            </Text>
+            <Text color="gray.800">
+              {cardData[0]?.vehicle_type || "Vehicle type not available"}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Vehicle Number
+            </Text>
+            <Text color="gray.800">
+              {cardData[0]?.vehicle_no || "Vehicle number not available"}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Visit Time
+            </Text>
+            <Text color="gray.800">
+              {new Date(cardData[0]?.from_time).toLocaleTimeString() || "N/A"}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Out Time
+            </Text>
+            <Text color="gray.800">
+              {new Date(cardData[0]?.to_time).toLocaleTimeString() || "N/A"}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Visit Department
+            </Text>
+            <Text color="gray.800">
+              {cardData[0]?.visiting_location || "Department not available"}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Status
+            </Text>
+            <Text
+              color={
+                cardData[0]?.status === "pending"
+                  ? "#DB9669"
+                  : cardData[0]?.status === "rejected"
+                  ? "#FF6060"
+                  : "#007367"
+              }
+            >
+              {cardData[0]?.status || "N/A"}
+            </Text>
+          </HStack>
+          <VStack space={2} justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Purpose:
+            </Text>
+            <Text
+              color="gray.800"
+              borderWidth={1}
+              borderColor={"#DADADA"}
+              borderRadius={"lg"}
+              padding={"2"}
+            >
+              {cardData[0]?.purpose || "Purpose not available"}
+            </Text>
+          </VStack>
+        </VStack>
+        {}
+        <Text fontWeight="bold" color="#007367" fontSize="lg" mt={2}>
+          Invitor Details
+        </Text>
+        <VStack space={3} borderBottomWidth={1} borderColor="#DADADA" pb={3}>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Name
+            </Text>
+            <Text color="gray.800">
+              {cardData[0]?.whomToMeet || "Invitor name not available"}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <Text fontWeight="bold" color="gray.600">
+              Visitor ID
+            </Text>
+            <Text color="gray.800">
+              {cardData[0]?.visitor_id || "Visitor ID not available"}
+            </Text>
+          </HStack>
+        </VStack>
+        {}
+        {cardData[0]?.status === "pending" && !isOtpSubmitted && (
+          <Center mt={4}>
+            <Input
+              placeholder="Enter OTP"
+              value={otp}
+              onChangeText={(text) => setOtp(text)}
+              keyboardType="numeric"
+              maxLength={6}
+              p={"4"}
+              fontSize={"md"}
+              color={"#9D9D9C"}
+              borderRadius={"xl"}
+              borderColor={"#9D9D9C"}
+              borderWidth={1}
+              borderStyle={"solid"}
+              w="70%"
+              InputRightElement={
+                <Button
+                  colorScheme="teal"
+                  borderRadius={"full"}
+                  mx={4}
+                  px={4}
+                  onPress={() => {
+                    if (otp === "123456") {
+                      setIsOtpSubmitted(true);
+                    } else {
+                      alert("Invalid OTP. Please try again.");
+                    }
+                  }}
+                >
+                  Allow
+                </Button>
+              }
+            />
+          </Center>
+        )}
+        {isOtpSubmitted && (
+          <VStack space={4} mt={4}>
+            <Button colorScheme="teal">Download Visitor Pass</Button>
+          </VStack>
+        )}
+      </VStack>
+    </Box>
   );
 }
