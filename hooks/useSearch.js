@@ -1,0 +1,43 @@
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import {
+  clearState,
+  searchState,
+  fetchDataBySearchQuery,
+  fetchProfile,
+  ViolationSearchState,
+} from "../store/slices/homeSlice";
+const useSearch = () => {
+  const dispatch = useDispatch();
+  const { isLoading, cardData, cardType } = useSelector((state) => state.home);
+  const [search, setSearch] = useState("");
+  const [isSearchTriggered, setIsSearchTriggered] = useState(false);
+  const handleSearch = async () => {
+    dispatch(clearState());
+    setIsSearchTriggered(true);
+    dispatch(searchState(search));
+    const searchPrefix = search.toLowerCase().charAt(0);
+    if (searchPrefix === "v" || searchPrefix === "g") {
+      await dispatch(fetchDataBySearchQuery(search));
+    } else {
+      await dispatch(fetchProfile(search));
+    }
+    dispatch(ViolationSearchState(search));
+  };
+  const handleClear = () => {
+    setSearch("");
+    setIsSearchTriggered(false);
+    dispatch(clearState());
+  };
+  return {
+    search,
+    setSearch,
+    isSearchTriggered,
+    handleSearch,
+    handleClear,
+    isLoading,
+    cardData,
+    cardType,
+  };
+};
+export default useSearch;

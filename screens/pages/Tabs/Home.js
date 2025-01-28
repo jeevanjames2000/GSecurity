@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Text,
@@ -9,6 +9,7 @@ import {
   VStack,
   KeyboardAvoidingView,
   View,
+  ScrollView,
 } from "native-base";
 import {
   Pressable,
@@ -17,19 +18,12 @@ import {
   Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  searchState,
-  clearState,
-  fetchProfile,
-  fetchDataBySearchQuery,
-} from "../../../store/slices/homeSlice";
-import { ViolationSearchState } from "../../../store/slices/violationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import GatepassCard from "../SearchCards/gatepassCard";
 import SkeletonCard from "../SearchCards/skeletonCard";
 import ViolationsCard from "../SearchCards/violationCard";
 import VisitorDetailsCard from "../SearchCards/visitorsCard";
+import useSearch from "../../../hooks/useSearch";
 const featuredData = [
   {
     name: "Violation",
@@ -96,36 +90,38 @@ const emergencyData = [
 ];
 export default function Home() {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const { isLoading, cardData, cardType } = useSelector((state) => state.home);
-  const [search, setSearch] = useState("");
-  const [isSearchTriggered, setIsSearchTriggered] = useState(false);
-  const handleSearch = () => {
-    dispatch(clearState());
-    setIsSearchTriggered(true);
-    dispatch(searchState(search));
-    if (
-      search.toLowerCase().startsWith("v") ||
-      search.toLowerCase().startsWith("g")
-    ) {
-      dispatch(fetchDataBySearchQuery(search));
-    } else {
-      dispatch(fetchProfile(search));
-    }
-    dispatch(ViolationSearchState(search));
-  };
-
-  const handleClear = () => {
-    setSearch("");
-    setIsSearchTriggered(false);
-    dispatch(clearState());
-  };
+  const {
+    search,
+    setSearch,
+    isSearchTriggered,
+    handleSearch,
+    handleClear,
+    isLoading,
+    cardData,
+    cardType,
+  } = useSearch();
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleEmergencyRoute = (item) => {
     const phoneNumber = `tel:${item.phone}`;
     Linking.openURL(phoneNumber).catch((err) =>
       console.error("Error opening dialer:", err)
     );
+  };
+  const renderCard = (cardType, cardData) => {
+    switch (cardType) {
+      case "Violations":
+        return <ViolationsCard />;
+      case "GatePass":
+        return <GatepassCard data={cardData} />;
+      case "VisitorManagement":
+        return <VisitorDetailsCard data={cardData} />;
+      default:
+        return (
+          <View justifyContent="center" alignItems="center">
+            <Text fontSize={18}>No results found.</Text>
+          </View>
+        );
+    }
   };
   const FeaturedCard = ({ item }) => (
     <Pressable
@@ -192,6 +188,39 @@ export default function Home() {
       </Text>
     </Pressable>
   );
+
+  const FeaturedAndEmergencyCards = ({ featuredData, emergencyData }) => (
+    <>
+      <FlatList
+        data={featuredData}
+        renderItem={({ item }) => <FeaturedCard item={item} />}
+        keyExtractor={(item) => item.name}
+        numColumns={3}
+        scrollEnabled={false}
+        contentContainerStyle={{ paddingBottom: 16 }}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+      />
+      <Box
+        paddingX="3"
+        paddingY="4"
+        top={2}
+        backgroundColor="#95E1D975"
+        borderRadius={10}
+      >
+        <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
+          Emergency
+        </Text>
+        <HStack justifyContent="space-between" flexWrap="wrap">
+          {emergencyData.map((item, index) => (
+            <EmergencyCard key={index} item={item} />
+          ))}
+        </HStack>
+      </Box>
+    </>
+  );
+
+  const SearchResults = ({ isLoading, cardType, cardData }) =>
+    isLoading ? <SkeletonCard /> : renderCard(cardType, cardData);
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -214,7 +243,7 @@ export default function Home() {
                 </Text>
               </VStack>
             </HStack>
-            <HStack top={12} justifyContent={"center"}>
+            <HStack top={12} justifyContent="center">
               <Text
                 fontSize={18}
                 color="white"
@@ -243,87 +272,46 @@ export default function Home() {
                 onChangeText={(value) => setSearch(value)}
               />
               {search ? (
-                <>
-                  <HStack space={3}>
-                    <Ionicons
-                      name="close-circle-outline"
-                      size={26}
-                      color="black"
-                      onPress={() => {
-                        handleClear();
-                      }}
-                    />
-                    <Ionicons
-                      name="search-outline"
-                      size={26}
-                      color="black"
-                      onPress={() => {
-                        handleSearch();
-                      }}
-                    />
-                  </HStack>
-                </>
-              ) : (
-                <Pressable>
+                <HStack space={3}>
+                  <Ionicons
+                    name="close-circle-outline"
+                    size={26}
+                    color="black"
+                    onPress={handleClear}
+                  />
                   <Ionicons
                     name="search-outline"
                     size={26}
                     color="black"
-                    onPress={() => {
-                      handleSearch();
-                    }}
+                    onPress={handleSearch}
                   />
+                </HStack>
+              ) : (
+                <Pressable onPress={handleSearch}>
+                  <Ionicons name="search-outline" size={26} color="black" />
                 </Pressable>
               )}
             </HStack>
           </Box>
-          <Box paddingX="4" paddingY="2" top={10}>
-            {isSearchTriggered ? (
-              isLoading ? (
-                <SkeletonCard />
-              ) : (
-                cardData &&
-                (cardType === "Violations" ? (
-                  <ViolationsCard />
-                ) : cardType === "GatePass" ? (
-                  <GatepassCard data={cardData} />
-                ) : cardType === "VisitorManagement" ? (
-                  <VisitorDetailsCard data={cardData} />
-                ) : (
-                  <View justifyContent="center" alignItems="center">
-                    <Text fontSize={18}>No results found.</Text>
-                  </View>
-                ))
-              )
-            ) : (
-              <>
-                <FlatList
-                  data={featuredData}
-                  renderItem={({ item }) => <FeaturedCard item={item} />}
-                  keyExtractor={(item) => item.name}
-                  numColumns={3}
-                  contentContainerStyle={{ paddingBottom: 16 }}
-                  columnWrapperStyle={{ justifyContent: "space-between" }}
+          <ScrollView
+            style={{ flex: 1, zIndex: -1 }}
+            contentContainerStyle={{ paddingBottom: 38 }}
+          >
+            <Box paddingX="4" paddingY="2" top={10}>
+              {isSearchTriggered && search.length > 0 ? (
+                <SearchResults
+                  isLoading={isLoading}
+                  cardType={cardType}
+                  cardData={cardData}
                 />
-                <Box
-                  paddingX="3"
-                  paddingY="4"
-                  top={10}
-                  backgroundColor="#95E1D975"
-                  borderRadius={10}
-                >
-                  <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
-                    Emergency
-                  </Text>
-                  <HStack justifyContent="space-between" flexWrap="wrap">
-                    {emergencyData.map((item, index) => (
-                      <EmergencyCard key={index} item={item} />
-                    ))}
-                  </HStack>
-                </Box>
-              </>
-            )}
-          </Box>
+              ) : (
+                <FeaturedAndEmergencyCards
+                  featuredData={featuredData}
+                  emergencyData={emergencyData}
+                />
+              )}
+            </Box>
+          </ScrollView>
         </Box>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

@@ -4,15 +4,19 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   gatepassSearchState,
   passByIDState,
+  clearState,
 } from "../../../store/slices/gatePassSlice";
+import { useNavigation } from "@react-navigation/native";
+import { Pressable } from "react-native";
 export default function GatepassCard(cardData) {
+  const navigation = useNavigation();
+
   const { data } = cardData;
   const dispatch = useDispatch();
-  const { passesByID } = useSelector((state) => state.gatepass);
   const handleClear = () => {
+    dispatch(clearState());
     dispatch(gatepassSearchState(""));
     dispatch(passByIDState(null));
-    setSearch("");
   };
   return (
     <VStack padding="6" shadow="9" bg={"#fff"} borderRadius={"xl"}>
@@ -156,18 +160,57 @@ export default function GatepassCard(cardData) {
               <Input fontSize={14} value={gatePass.note} readOnly />
             </HStack>
           </View>
-          <HStack space={2} mt={4} justifyContent="flex-end">
-            <Button
-              onPress={() => handleClear()}
-              variant="outline"
-              colorScheme="orange"
-              padding={2}
-              px={8}
-              borderRadius={5}
-              borderColor="orange.400"
+          <HStack
+            justifyContent="space-between"
+            space={4}
+            mt={4}
+            alignItems="center"
+            width="100%"
+          >
+            <Pressable
+              style={{
+                borderWidth: 1,
+                borderColor: "#37474F",
+                borderRadius: 20,
+                paddingVertical: 10,
+                paddingHorizontal: 15,
+                alignItems: "center",
+                justifyContent: "center",
+                flex: 1,
+                marginRight: 8,
+              }}
             >
-              View
-            </Button>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  color: "#37474F",
+                }}
+              >
+                Allow
+              </Text>
+            </Pressable>
+            <Pressable
+              style={{
+                backgroundColor: "#007367",
+                borderRadius: 20,
+                paddingVertical: 10,
+                paddingHorizontal: 15,
+                alignItems: "center",
+                justifyContent: "center",
+                flex: 1,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  color: "#fff",
+                }}
+              >
+                Add
+              </Text>
+            </Pressable>
           </HStack>
         </View>
       ))}

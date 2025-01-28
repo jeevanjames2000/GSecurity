@@ -45,6 +45,9 @@ const gatepassSlice = createSlice({
       state.passesCount = action.payload;
       state.passesByID = action.payload;
     },
+    clearState: (state) => {
+      Object.assign(state, initialState);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -62,5 +65,6 @@ const gatepassSlice = createSlice({
       });
   },
 });
-export const { gatepassSearchState, passByIDState } = gatepassSlice.actions;
+export const { gatepassSearchState, passByIDState, clearState } =
+  gatepassSlice.actions;
 export default gatepassSlice.reducer;
