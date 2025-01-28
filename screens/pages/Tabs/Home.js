@@ -101,12 +101,20 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const handleSearch = () => {
+    dispatch(clearState());
     setIsSearchTriggered(true);
     dispatch(searchState(search));
-    dispatch(fetchProfile(search));
-    dispatch(fetchDataBySearchQuery(search));
+    if (
+      search.toLowerCase().startsWith("v") ||
+      search.toLowerCase().startsWith("g")
+    ) {
+      dispatch(fetchDataBySearchQuery(search));
+    } else {
+      dispatch(fetchProfile(search));
+    }
     dispatch(ViolationSearchState(search));
   };
+
   const handleClear = () => {
     setSearch("");
     setIsSearchTriggered(false);
@@ -283,7 +291,7 @@ export default function Home() {
                   <VisitorDetailsCard data={cardData} />
                 ) : (
                   <View justifyContent="center" alignItems="center">
-                    {}
+                    <Text fontSize={18}>No results found.</Text>
                   </View>
                 ))
               )
