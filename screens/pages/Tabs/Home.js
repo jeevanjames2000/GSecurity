@@ -100,7 +100,6 @@ export default function Home() {
     cardData,
     cardType,
   } = useSearch();
-
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleEmergencyRoute = (item) => {
     const phoneNumber = `tel:${item.phone}`;

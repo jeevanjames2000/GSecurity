@@ -181,8 +181,9 @@ export default function ViolationsCard() {
         cardData={cardData}
         handleShowViolations={handleShowViolations}
       />
-      {profile.role === "student" &&
-        profile?.stdprofile[0]?.hostler === "Y" && <LeavesPermissionsStack />}
+      {(profile.role === "student" &&
+        profile?.stdprofile[0]?.hostler === "Y") ||
+        ("" && <LeavesPermissionsStack />)}
     </Box>
   );
 }
