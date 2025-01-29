@@ -91,53 +91,78 @@ export default function GatepassCard({ data }) {
             </View>
             <View mt={4}>
               <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={18} fontWeight="bold">
-                  Vehicle number:
+                <Text fontSize={"md"} fontWeight={"bold"}>
+                  Vehicle number
                 </Text>
-                <Text fontSize={16} textAlign="right" flex={1}>
+                <Text
+                  fontSize={"md"}
+                  color="gray.800"
+                  textAlign="right"
+                  flex={1}
+                >
                   {selectedGatePass.vehicle_number || "null"}
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={18} fontWeight="bold">
+                <Text fontSize={"md"} fontWeight="bold">
                   Reciever name:
                 </Text>
-                <Text fontSize={16} textAlign="right" flex={1}>
+                <Text
+                  fontSize={"md"}
+                  color="gray.800"
+                  textAlign="right"
+                  flex={1}
+                >
                   {selectedGatePass.receiver_name || "null"}
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={18} fontWeight="bold">
+                <Text fontSize={"md"} fontWeight={"bold"}>
                   Created on:
                 </Text>
-                <Text fontSize={16} textAlign="right" flex={1}>
+                <Text
+                  fontSize={"md"}
+                  color="gray.800"
+                  textAlign="right"
+                  flex={1}
+                >
                   {new Date(
                     selectedGatePass.created_time
                   ).toLocaleDateString() || "null"}
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={18} fontWeight="bold">
+                <Text fontSize={"md"} fontWeight="bold">
                   Issued to:
                 </Text>
-                <Text fontSize={16} textAlign="right" flex={1}>
+                <Text
+                  fontSize={"md"}
+                  color="gray.800"
+                  textAlign="right"
+                  flex={1}
+                >
                   {selectedGatePass.receiver_emp_id || "null"}
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={18} fontWeight="bold">
+                <Text fontSize={"md"} fontWeight="bold">
                   Issued by:
                 </Text>
-                <Text fontSize={16} textAlign="right" flex={1}>
+                <Text
+                  fontSize={"md"}
+                  color="gray.800"
+                  textAlign="right"
+                  flex={1}
+                >
                   {selectedGatePass.issued_by || "null"}
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={18} fontWeight="bold">
+                <Text fontSize={"md"} fontWeight="bold">
                   Status:
                 </Text>
                 <Text
-                  fontSize={16}
+                  fontSize={"md"}
                   fontWeight={"bold"}
                   textAlign="right"
                   flex={1}
@@ -163,10 +188,14 @@ export default function GatepassCard({ data }) {
                 mb={3}
                 space={2}
               >
-                <Text fontSize={18} fontWeight="bold" textAlign={"left"}>
+                <Text fontSize={"md"} fontWeight="bold" textAlign={"left"}>
                   Note:
                 </Text>
-                <Input fontSize={14} value={selectedGatePass.note} />
+                <Input
+                  fontSize={"md"}
+                  color="gray.800"
+                  value={selectedGatePass.note}
+                />
               </HStack>
             </View>
           </View>

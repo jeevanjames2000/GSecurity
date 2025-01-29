@@ -158,7 +158,9 @@ export default function ViolationsCard() {
             alignItems="center"
             justifyContent="space-between"
           >
-            <Text fontSize="md">{item.key}</Text>
+            <Text fontSize="md" fontWeight={"bold"}>
+              {item.key}
+            </Text>
             <Text
               fontSize="md"
               color={

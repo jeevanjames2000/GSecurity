@@ -27,7 +27,7 @@ export default function VisitorDetailsCard() {
     <Box padding="6" shadow="9" bg={"#fff"} borderRadius={"xl"}>
       <HStack alignItems={"center"} justifyContent={"center"} mb={2}>
         <Text
-          fontSize={22}
+          fontSize={18}
           fontWeight="bold"
           color={"#007367"}
           textAlign={"center"}
@@ -38,66 +38,67 @@ export default function VisitorDetailsCard() {
       <VStack space={2}>
         <VStack space={3} borderBottomWidth={1} borderColor="#DADADA" pb={3}>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontSize={"md"} fontWeight={"bold"}>
               Name
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {cardData[0]?.visitor_name || "Name not available"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Phone Number
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {cardData[0]?.contact_no || "Phone not available"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Vehicle Type
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {cardData[0]?.vehicle_type || "Vehicle type not available"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Vehicle Number
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {cardData[0]?.vehicle_no || "Vehicle number not available"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Visit Time
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {new Date(cardData[0]?.from_time).toLocaleTimeString() || "N/A"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Out Time
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {new Date(cardData[0]?.to_time).toLocaleTimeString() || "N/A"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Visit Department
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {cardData[0]?.visiting_location || "Department not available"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Status
             </Text>
             <Text
+              fontSize={"md"}
               color={
                 cardData[0]?.status === "pending"
                   ? "#DB9669"
@@ -110,7 +111,7 @@ export default function VisitorDetailsCard() {
             </Text>
           </HStack>
           <VStack space={2} justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Purpose:
             </Text>
             <Text
@@ -119,6 +120,7 @@ export default function VisitorDetailsCard() {
               borderColor={"#DADADA"}
               borderRadius={"lg"}
               padding={"2"}
+              fontSize={"md"}
             >
               {cardData[0]?.purpose || "Purpose not available"}
             </Text>
@@ -130,18 +132,18 @@ export default function VisitorDetailsCard() {
         </Text>
         <VStack space={3} borderBottomWidth={1} borderColor="#DADADA" pb={3}>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Name
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {cardData[0]?.whomToMeet || "Invitor name not available"}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
-            <Text fontWeight="bold" color="gray.600">
+            <Text fontWeight="bold" fontSize={"md"}>
               Visitor ID
             </Text>
-            <Text color="gray.800">
+            <Text fontSize={"md"} color="gray.800">
               {cardData[0]?.visitor_id || "Visitor ID not available"}
             </Text>
           </HStack>
