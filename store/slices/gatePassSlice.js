@@ -12,7 +12,6 @@ export const fetchGatepassByID = createAsyncThunk(
         throw new Error("Failed to fetch gate pass by search query.");
       }
       const data = await response.json();
-      console.log("passdata: ", data);
       const parsedData = data.map((pass) => ({
         ...pass,
         particulars: pass.particulars,

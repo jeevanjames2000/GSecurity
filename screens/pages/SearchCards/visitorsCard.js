@@ -18,8 +18,21 @@ export default function VisitorDetailsCard() {
   const [otp, setOtp] = useState("");
   if (noProfile) {
     return (
-      <View justifyContent="center" alignItems="center">
-        <Text fontSize={18}>No results found.</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+          }}
+          alt="No Results icon"
+          style={{ width: 200, height: 200 }}
+          resizeMode="contain"
+        />
       </View>
     );
   }

@@ -2,27 +2,36 @@ import React from "react";
 import { Box, Text, Image, HStack, VStack, Badge, View } from "native-base";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
-import { wrap } from "lodash";
+import { useSelector } from "react-redux";
 import { MaterialIcons } from "@expo/vector-icons";
 export default function ViolationsCard() {
-  const { isLoading, cardData, image, noProfile, profile } = useSelector(
+  const { cardData, image, noProfile, profile } = useSelector(
     (state) => state.home
   );
-
   const navigation = useNavigation();
-  const dispatch = useDispatch();
   const handleShowViolations = () => {
     navigation.navigate("AddViolations");
   };
   if (noProfile) {
     return (
-      <View justifyContent="center" alignItems="center">
-        <Text fontSize={18}>No results found.</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+          }}
+          alt="No Results icon"
+          style={{ width: 200, height: 200 }}
+          resizeMode="contain"
+        />
       </View>
     );
   }
-
   const CustomButton = ({
     onPress,
     iconName,
@@ -44,7 +53,6 @@ export default function ViolationsCard() {
         justifyContent: "center",
         flex: 1,
         flexDirection: "row",
-
         elevation: 3,
       }}
       _pressed={{ opacity: 0.8 }}
@@ -62,8 +70,6 @@ export default function ViolationsCard() {
       </Text>
     </Pressable>
   );
-
-  // Violations Stack
   const ViolationsStack = ({
     cardData,
     handleShowViolations,
@@ -80,12 +86,15 @@ export default function ViolationsCard() {
           textColor="#37474F"
           borderColor="#37474F"
         /> */}
-        <CustomButton text="Add" bgColor="#007367" textColor="#fff" />
+        <CustomButton
+          text="Add"
+          bgColor="#007367"
+          textColor="#fff"
+          onPress={() => navigation.navigate("AddViolations")}
+        />
       </HStack>
     </Box>
   );
-
-  // Leaves & Permissions Stack
   const LeavesPermissionsStack = ({ handleCheckIn, handleCheckOut }) => (
     <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
       <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
@@ -98,12 +107,7 @@ export default function ViolationsCard() {
           textColor="#37474F"
           borderColor="#37474F"
         />
-        <CustomButton
-          // onPress={handleCheckOut}
-          text="Check Out"
-          bgColor="#007367"
-          textColor="#fff"
-        />
+        <CustomButton text="Check Out" bgColor="#007367" textColor="#fff" />
       </HStack>
     </Box>
   );
@@ -116,8 +120,14 @@ export default function ViolationsCard() {
           size="lg"
           borderRadius="xl"
         />
-        <VStack space="2">
-          <Text color="#007367" fontWeight="bold" fontSize="lg">
+        <VStack space="2" flex={1}>
+          <Text
+            color="#007367"
+            fontWeight="bold"
+            fontSize="lg"
+            flexWrap="wrap"
+            flex={1}
+          >
             {profile?.stdprofile?.[0]?.name || "Name not available"}
           </Text>
           <Text fontWeight="semibold" fontSize="md">
@@ -177,13 +187,12 @@ export default function ViolationsCard() {
           </Box>
         ))}
       </VStack>
-
-      {/* Violations and Leaves & Permissions Stacks */}
+      {}
       <ViolationsStack
         cardData={cardData}
         handleShowViolations={handleShowViolations}
       />
-      {(profile.role === "student" &&
+      {(profile?.role === "student" &&
         profile?.stdprofile[0]?.hostler === "Y") ||
         ("" && <LeavesPermissionsStack />)}
     </Box>

@@ -9,11 +9,10 @@ import {
 } from "../store/slices/homeSlice";
 const useSearch = () => {
   const dispatch = useDispatch();
-  const { isLoading, cardData, cardType, profile } = useSelector(
+  const { isLoading, cardData, cardType, searchStore } = useSelector(
     (state) => state.home
   );
-  console.log("cardData: ", cardData, profile);
-  const [search, setSearch] = useState("2023000256");
+  const [search, setSearch] = useState("");
   const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const handleSearch = async () => {
     dispatch(clearState());
@@ -21,12 +20,14 @@ const useSearch = () => {
     dispatch(searchState(search));
     const searchPrefix = search.toLowerCase().charAt(0);
     if (searchPrefix === "v" || searchPrefix === "g") {
-      console.log("called");
       await dispatch(fetchDataBySearchQuery(search));
     } else {
       await dispatch(fetchProfile(search));
     }
-    dispatch(ViolationSearchState(search));
+    dispatch(fetchDataBySearchQuery(search));
+  };
+  const handleRefresh = () => {
+    dispatch(fetchDataBySearchQuery(searchStore));
   };
   const handleClear = () => {
     setSearch("");
@@ -39,6 +40,7 @@ const useSearch = () => {
     isSearchTriggered,
     handleSearch,
     handleClear,
+    handleRefresh,
     isLoading,
     cardData,
     cardType,

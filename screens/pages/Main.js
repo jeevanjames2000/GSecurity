@@ -1,15 +1,14 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import Camera from "./Tabs/Camera";
+import { View, Text, TouchableOpacity, BackHandler, Alert } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Profile from "./Tabs/Profile";
 import MainNavigator from "./MainNavigator";
 import { Image } from "native-base";
 import QrCamera from "./Tabs/Camera";
 const Tab = createBottomTabNavigator();
-export default function Main() {
+export default function Main({ route }) {
   const navigation = useNavigation();
   const icons = {
     MainNavigator: {
@@ -22,6 +21,7 @@ export default function Main() {
       uri: "http://172.17.58.151:9000/auth/getImage/user1.png",
     },
   };
+
   return (
     <Tab.Navigator
       initialRouteName="MainNavigator"

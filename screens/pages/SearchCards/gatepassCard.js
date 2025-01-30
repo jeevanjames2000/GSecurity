@@ -1,32 +1,85 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   VStack,
   HStack,
   Input,
   View,
-  Button,
   FormControl,
+  useToast,
+  Box,
 } from "native-base";
 import { Pressable } from "react-native";
-export default function GatepassCard({ data }) {
-  const [selectedGatePass, setSelectedGatePass] = useState(null);
-  const [particulars, setParticulars] = useState([]);
-  useEffect(() => {
-    if (data) {
-      setSelectedGatePass(data.gatePass);
-      setParticulars(data.particulars);
-    }
-  }, [data]);
+import useSearch from "../../../hooks/useSearch";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
+const GatepassCard = React.memo(() => {
+  const { cardData } = useSelector((state) => ({
+    cardData: state.home.cardData,
+  }));
+  const { handleRefresh } = useSearch();
+  const [selectedGatePass] = useState(cardData?.gatePass || null);
+  const [particulars, setParticulars] = useState(cardData?.particulars || []);
+  const toast = useToast();
   const handleParticularChange = (idx, field, value) => {
     const updatedParticulars = particulars.map((item, index) =>
       index === idx ? { ...item, [field]: value } : item
     );
     setParticulars(updatedParticulars);
   };
+  const handleUpdate = async (id, updatedStatus) => {
+    const name = await AsyncStorage.getItem("userName");
+    const formData = {
+      pass_no: id,
+      particulars: JSON.stringify(particulars),
+      status: updatedStatus,
+      verified_by: name,
+    };
+    const response = await fetch(
+      "http://172.17.58.151:9000/gatepass/updateParticulars",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+    const responseData = await response.json();
+    if (response.ok) {
+      handleRefresh();
+      setTimeout(() => {
+        toast.show({
+          render: () => (
+            <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
+              {responseData.message}
+            </Box>
+          ),
+          placement: "top-right",
+        });
+      }, 500);
+    } else {
+      const errorMessage =
+        responseData.error || "An error occurred. Please try again.";
+      toast.show({
+        render: () => (
+          <Box bg="red.300" px="4" py="2" rounded="md" shadow={2}>
+            {errorMessage}
+          </Box>
+        ),
+        placement: "top-right",
+      });
+    }
+  };
+  const handleApprove = (id) => {
+    handleUpdate(id, "approved");
+  };
+  const handleReject = (id) => {
+    handleUpdate(id, "rejected");
+  };
   return (
     <VStack padding="6" pt={2} shadow="9" bg={"#fff"} borderRadius={"xl"}>
-      {selectedGatePass && particulars.length > 0 ? (
+      {selectedGatePass && particulars.length > 0 && (
         <>
           <View mb={2}>
             <Text
@@ -103,15 +156,20 @@ export default function GatepassCard({ data }) {
                   {selectedGatePass.vehicle_number || "null"}
                 </Text>
               </HStack>
-              <HStack justifyContent="space-between" alignItems="center" mb={3}>
+              <HStack
+                justifyContent="space-between"
+                alignItems="flex-start"
+                mb={3}
+              >
                 <Text fontSize={"md"} fontWeight="bold">
-                  Reciever name:
+                  Receiver name:
                 </Text>
                 <Text
                   fontSize={"md"}
                   color="gray.800"
                   textAlign="right"
                   flex={1}
+                  flexWrap="wrap"
                 >
                   {selectedGatePass.receiver_name || "null"}
                 </Text>
@@ -182,24 +240,21 @@ export default function GatepassCard({ data }) {
                     : "Pending"}
                 </Text>
               </HStack>
-              <HStack
-                flexDirection={"column"}
-                justifyContent="space-between"
-                mb={3}
-                space={2}
-              >
-                <Text fontSize={"md"} fontWeight="bold" textAlign={"left"}>
+              <HStack justifyContent="space-between" alignItems="center" mb={3}>
+                <Text fontSize={"md"} fontWeight="bold">
                   Note:
                 </Text>
-                <Input
+                <Text
                   fontSize={"md"}
                   color="gray.800"
-                  value={selectedGatePass.note}
-                />
+                  textAlign="right"
+                  flex={1}
+                >
+                  {selectedGatePass.note || "null"}
+                </Text>
               </HStack>
             </View>
           </View>
-
           <FormControl
             mt={1}
             borderWidth={1}
@@ -244,65 +299,65 @@ export default function GatepassCard({ data }) {
               </HStack>
             ))}
           </FormControl>
-          {}
-          <HStack
-            justifyContent="space-between"
-            space={4}
-            mt={4}
-            alignItems="center"
-            width="100%"
-          >
-            <Pressable
-              style={{
-                borderWidth: 1,
-                borderColor: "#37474F",
-                borderRadius: 20,
-                paddingVertical: 8,
-                paddingHorizontal: 15,
-                alignItems: "center",
-                justifyContent: "center",
-                flex: 1,
-                marginRight: 8,
-              }}
+          {selectedGatePass.status === "pending" && (
+            <HStack
+              justifyContent="space-between"
+              space={4}
+              mt={4}
+              alignItems="center"
+              width="100%"
             >
-              <Text
+              <Pressable
+                onPress={() => handleReject(selectedGatePass.pass_no)}
                 style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  color: "#37474F",
+                  borderWidth: 1,
+                  borderColor: "#37474F",
+                  borderRadius: 20,
+                  paddingVertical: 8,
+                  paddingHorizontal: 15,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flex: 1,
+                  marginRight: 8,
                 }}
               >
-                Reject
-              </Text>
-            </Pressable>
-            <Pressable
-              style={{
-                backgroundColor: "#007367",
-                borderRadius: 20,
-                paddingVertical: 8,
-                paddingHorizontal: 15,
-                alignItems: "center",
-                justifyContent: "center",
-                flex: 1,
-              }}
-            >
-              <Text
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: "#37474F",
+                  }}
+                >
+                  Reject
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => handleApprove(selectedGatePass.pass_no)}
                 style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  color: "#fff",
+                  backgroundColor: "#007367",
+                  borderRadius: 20,
+                  paddingVertical: 8,
+                  paddingHorizontal: 15,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flex: 1,
                 }}
               >
-                Approve
-              </Text>
-            </Pressable>
-          </HStack>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: "#fff",
+                  }}
+                >
+                  Approve
+                </Text>
+              </Pressable>
+            </HStack>
+          )}
         </>
-      ) : (
-        <View justifyContent="center" alignItems="center">
-          <Text fontSize={18}>No results found.</Text>
-        </View>
       )}
     </VStack>
   );
-}
+});
+export default GatepassCard;

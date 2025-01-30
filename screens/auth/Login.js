@@ -1,5 +1,14 @@
-import React, { useRef, useState } from "react";
-import { Text, Box, Image, VStack, Input, Spinner, View } from "native-base";
+import React, { useCallback, useRef, useState } from "react";
+import {
+  Text,
+  Box,
+  Image,
+  VStack,
+  Input,
+  Spinner,
+  View,
+  useToast,
+} from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Keyboard,
@@ -9,60 +18,107 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 export default function Login({ navigation }) {
-  const [username, setUsername] = useState("sample");
-  const [password, setPassword] = useState("123@123");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const OTP_LENGTH = 4;
+  const toast = useToast();
+  const INITIAL_OTP = Array(OTP_LENGTH).fill("");
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState(INITIAL_OTP);
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const otpRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
-  const handleSendOtp = () => {
-    if (mobileNumber.length === 10) {
-      setOtpSent(true);
-      setError("");
-    } else {
-      setError("Please enter a valid mobile number.");
-    }
-  };
-  const handleChangeOtp = (text, index) => {
-    const newOtp = [...otp];
-    newOtp[index] = text;
-    setOtp(newOtp);
-    if (text.length === 1 && index < 3) {
-      otpRefs[index + 1].current.focus();
-    }
-  };
-  const handleLogin = async () => {
-    if (!username || !password) {
-      setError("Please enter both username and password.");
+  const otpRefs = Array(OTP_LENGTH)
+    .fill(0)
+    .map(() => useRef(null));
+  const handleSendOtp = useCallback(async () => {
+    if (mobile.length !== 10) {
+      setError("Please enter a valid 10-digit mobile number.");
       return;
     }
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://172.17.58.151:9000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      const response = await fetch(
+        "http://172.17.58.151:9000/auth/generateAndStoreOtp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mobile }),
+        }
+      );
       const data = await response.json();
       if (response.ok) {
-        await AsyncStorage.setItem("token", data.token);
-        await AsyncStorage.setItem("userName", username);
-        navigation.navigate("Main");
-      } else {
-        setError(data.message || "Invalid credentials.");
+        setIsLoading(false);
+        setOtpSent(true);
+        setError("");
+        setTimeout(() => setOtpSent(false), 3000);
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      setError("Something went wrong. Please try again.");
+      setError("Error Generating OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [mobile]);
+  const handleChangeOtp = useCallback(
+    (text, index) => {
+      const newOtp = [...otp];
+      newOtp[index] = text;
+      setOtp(newOtp);
+      if (text.length === 1 && index < OTP_LENGTH - 1) {
+        otpRefs[index + 1].current.focus();
+      }
+    },
+    [otp, otpRefs]
+  );
+  const handleLogin = useCallback(async () => {
+    Keyboard.dismiss();
+    if (mobile.length !== 10 || otp.includes("")) {
+      setError("Please enter a valid mobile number and OTP.");
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        "http://172.17.58.151:9000/auth/loginWithOtp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mobile, otp: parseInt(otp.join(""), 10) }),
+        }
+      );
+      const data = await response.json();
+      const { user } = data;
+      if (response.ok) {
+        toast.show({
+          render: () => (
+            <Box
+              bg="#F4F6FF"
+              px="6"
+              py="2"
+              rounded="md"
+              shadow={2}
+              position={"absolute"}
+              right={3}
+            >
+              <Text>Welcome back {user?.username}</Text>
+            </Box>
+          ),
+          placement: "top-right",
+        });
+        await AsyncStorage.setItem("mobile", mobile);
+        navigation.replace("Main");
+      } else {
+        setError(data.error || "Invalid credentials. Please try again.");
+      }
+    } catch (error) {
+      setError("Network error. Please check your connection.");
+    } finally {
+      setOtp(INITIAL_OTP);
+      setIsLoading(false);
+    }
+  }, [mobile, otp, navigation]);
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+    <KeyboardAvoidingView style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <Box flex={1} bg="white" justifyContent="center" alignItems="center">
           <Box
@@ -76,13 +132,13 @@ export default function Login({ navigation }) {
                 uri: "http://172.17.58.151:9000/auth/getImage/GitamLogo.jpg",
               }}
               alt="Search Icon"
-              size="xl"
+              style={{ height: 200, width: 200 }}
               resizeMode="contain"
             />
           </Box>
           <Box
             position="absolute"
-            top={100}
+            top={150}
             width="100%"
             height="50%"
             justifyContent="center"
@@ -122,8 +178,8 @@ export default function Login({ navigation }) {
                 variant="filled"
                 bg="white"
                 p={3}
-                value={mobileNumber}
-                onChangeText={setMobileNumber}
+                value={mobile}
+                onChangeText={setMobile}
                 borderRadius="md"
                 width="100%"
                 fontSize={16}
@@ -138,10 +194,6 @@ export default function Login({ navigation }) {
                   </TouchableOpacity>
                 }
               />
-              {otpSent && (
-                <Text color="white">OTP sent to your mobile number.</Text>
-              )}
-
               <Box
                 flexDirection="row"
                 justifyContent="space-between"
@@ -153,7 +205,6 @@ export default function Login({ navigation }) {
                     value={digit}
                     onChangeText={(text) => handleChangeOtp(text, index)}
                     ref={otpRefs[index]}
-                    // placeholder="0"
                     keyboardType="numeric"
                     maxLength={1}
                     textAlign="center"
@@ -164,7 +215,9 @@ export default function Login({ navigation }) {
                   />
                 ))}
               </Box>
-
+              {otpSent && (
+                <Text color="white">OTP sent to your mobile number.</Text>
+              )}
               {error && <Text color="red.500">{error}</Text>}
               {isLoading ? (
                 <Spinner size="lg" color="white" />

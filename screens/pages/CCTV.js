@@ -1,40 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet } from "react-native";
-import {
-  VStack,
-  Input,
-  Button,
-  Box,
-  FormControl,
-  Text,
-  Select,
-  CheckIcon,
-  HStack,
-  ScrollView,
-} from "native-base";
+import { Box, Text, HStack } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 const CCTV = () => {
   const navigation = useNavigation();
-  const [visitorName, setVisitorName] = useState("");
-  const [contactNo, setContactNo] = useState("");
-  const [otp, setOtp] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [visitingDept, setVisitingDept] = useState("");
-  const [whomToMeet, setWhomToMeet] = useState("");
-  const handleSendOtp = () => {
-    console.log("OTP sent to:", contactNo);
-  };
-  const handleSubmit = () => {
-    console.log({
-      visitorName,
-      contactNo,
-      otp,
-      purpose,
-      visitingDept,
-      whomToMeet,
-    });
-  };
+
   return (
     <Box flex={1} backgroundColor="#f5f5f5">
       {}

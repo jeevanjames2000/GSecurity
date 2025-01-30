@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Box,
   Text,
@@ -10,14 +10,17 @@ import {
   KeyboardAvoidingView,
   View,
   ScrollView,
+  useToast,
 } from "native-base";
 import {
   Pressable,
   Linking,
   TouchableWithoutFeedback,
   Keyboard,
+  BackHandler,
+  Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import GatepassCard from "../SearchCards/gatepassCard";
 import SkeletonCard from "../SearchCards/skeletonCard";
@@ -26,36 +29,18 @@ import VisitorDetailsCard from "../SearchCards/visitorsCard";
 import useSearch from "../../../hooks/useSearch";
 const featuredData = [
   {
-    name: "Violation",
-    img: {
-      uri: "http://172.17.58.151:9000/auth/getImage/violationnew.png",
-    },
-  },
-  {
-    name: "Visitors",
-    img: {
-      uri: "http://172.17.58.151:9000/auth/getImage/visitornew.png",
-    },
-  },
-  {
-    name: "Gate-Pass",
-    img: {
-      uri: "http://172.17.58.151:9000/auth/getImage/gatepassnew.png",
-    },
-  },
-  {
     name: "CCTV",
     img: { uri: "http://172.17.58.151:9000/auth/getImage/cctvnew.png" },
   },
   {
-    name: "Material-Pass",
+    name: "Alert",
     img: {
-      uri: "http://172.17.58.151:9000/auth/getImage/materialpassnew.png",
+      uri: "http://172.17.58.151:9000/auth/getImage/Group 9.png",
     },
   },
   {
-    name: "Leaves",
-    img: { uri: "http://172.17.58.151:9000/auth/getImage/leavesnew.png" },
+    name: "Communication",
+    img: { uri: "http://172.17.58.151:9000/auth/getImage/aggressive (1).png" },
   },
 ];
 const emergencyData = [
@@ -90,6 +75,7 @@ const emergencyData = [
 ];
 export default function Home() {
   const navigation = useNavigation();
+
   const {
     search,
     setSearch,
@@ -100,6 +86,25 @@ export default function Home() {
     cardData,
     cardType,
   } = useSearch();
+  const toast = useToast();
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert("Exit App", "Are you sure you want to exit?", [
+          { text: "Cancel", style: "cancel" },
+          { text: "OK", onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, [])
+  );
+
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleEmergencyRoute = (item) => {
     const phoneNumber = `tel:${item.phone}`;
@@ -117,15 +122,46 @@ export default function Home() {
         return <VisitorDetailsCard data={cardData} />;
       default:
         return (
-          <View justifyContent="center" alignItems="center">
-            <Text fontSize={18}>No results found.</Text>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              // top: 100,
+            }}
+          >
+            <Image
+              source={{
+                uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+              }}
+              alt="No Results icon"
+              style={{ width: 200, height: 200 }}
+              resizeMode="contain"
+            />
           </View>
         );
     }
   };
   const FeaturedCard = ({ item }) => (
     <Pressable
-      onPress={() => handleRoute(item)}
+      onPress={() =>
+        toast.show({
+          render: () => (
+            <Box
+              bg="#F4F6FF"
+              px="6"
+              py="2"
+              rounded="md"
+              shadow={2}
+              position={"absolute"}
+              right={3}
+            >
+              <Text>Coming soon</Text>
+            </Box>
+          ),
+          placement: "top-right",
+        })
+      }
       flex={1}
       margin="8"
       marginBottom="8"
@@ -188,7 +224,6 @@ export default function Home() {
       </Text>
     </Pressable>
   );
-
   const FeaturedAndEmergencyCards = ({ featuredData, emergencyData }) => (
     <>
       <FlatList
@@ -203,9 +238,9 @@ export default function Home() {
       <Box
         paddingX="3"
         paddingY="4"
-        top={2}
         backgroundColor="#95E1D975"
         borderRadius={10}
+        marginTop={10}
       >
         <Text fontSize="lg" fontWeight="bold" color="black" mb="4">
           Emergency
@@ -218,14 +253,13 @@ export default function Home() {
       </Box>
     </>
   );
-
   const SearchResults = ({ isLoading, cardType, cardData }) =>
     isLoading ? <SkeletonCard /> : renderCard(cardType, cardData);
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <Box flex={1} backgroundColor="#f5f5f5">
-          <Box backgroundColor="#007367" paddingY="4" paddingX="4">
+          <Box backgroundColor="#007367" paddingY="4" paddingX="4" zIndex={1}>
             <HStack
               alignItems="center"
               justifyContent="center"
@@ -293,25 +327,33 @@ export default function Home() {
               )}
             </HStack>
           </Box>
-          <ScrollView
-            style={{ flex: 1, zIndex: -1 }}
-            contentContainerStyle={{ paddingBottom: 38 }}
-          >
-            <Box paddingX="4" paddingY="2" top={10}>
-              {isSearchTriggered && search.length > 0 ? (
+          {}
+          {isSearchTriggered && search.length > 0 ? (
+            <ScrollView
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingBottom: 38,
+                zIndex: -1,
+              }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <Box paddingX="4" paddingY="4" marginTop={10} minHeight="100%">
                 <SearchResults
                   isLoading={isLoading}
                   cardType={cardType}
                   cardData={cardData}
                 />
-              ) : (
-                <FeaturedAndEmergencyCards
-                  featuredData={featuredData}
-                  emergencyData={emergencyData}
-                />
-              )}
+              </Box>
+            </ScrollView>
+          ) : (
+            <Box paddingX="4" paddingY="4" marginTop={10}>
+              <FeaturedAndEmergencyCards
+                featuredData={featuredData}
+                emergencyData={emergencyData}
+              />
             </Box>
-          </ScrollView>
+          )}
         </Box>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

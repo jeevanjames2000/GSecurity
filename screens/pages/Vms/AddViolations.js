@@ -41,6 +41,9 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 export default function AddViolations() {
   const { refresh } = useSelector((state) => state.violations);
+  const { cardData, image, noProfile, profile } = useSelector(
+    (state) => state.home
+  );
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const toast = useToast();
@@ -50,7 +53,7 @@ export default function AddViolations() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   const [vehicleNumber, setVehicleNumber] = useState("");
-  const [name, setName] = useState("");
+  const [name, setName] = useState(profile?.stdprofile?.[0]?.name);
   const handlePickImages = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -186,6 +189,7 @@ export default function AddViolations() {
       formData.append("violationType[]", violation);
     });
     formData.append("comments", comments);
+    formData.append("regdNo_empId", profile?.stdprofile?.[0]?.regdno);
     try {
       const response = await fetch(
         "http://172.17.58.151:9000/auth/reportViolation",
