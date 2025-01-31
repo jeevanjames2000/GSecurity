@@ -160,30 +160,30 @@ const GatepassCard = React.memo(() => {
             <VStack mt={4} space={2}>
               {[
                 {
-                  label: "Vehicle number:",
+                  label: "Vehicle number",
                   value: selectedGatePass.vehicle_number || "null",
                 },
                 {
-                  label: "Receiver name:",
+                  label: "Receiver name",
                   value: selectedGatePass.receiver_name || "null",
                   align: "flex-start",
                 },
                 {
-                  label: "Created on:",
+                  label: "Created on",
                   value:
                     new Date(
                       selectedGatePass.created_time
                     ).toLocaleDateString() || "null",
                 },
                 {
-                  label: "Issued to:",
+                  label: "Issued to",
                   value: selectedGatePass.receiver_emp_id || "null",
                 },
                 {
-                  label: "Issued by:",
+                  label: "Issued by",
                   value: selectedGatePass.issued_by || "null",
                 },
-                { label: "Note:", value: selectedGatePass.note || "null" },
+                { label: "Note", value: selectedGatePass.note || "null" },
               ].map(({ label, value, align }, index) => (
                 <HStack
                   key={index}
@@ -208,7 +208,7 @@ const GatepassCard = React.memo(() => {
 
               <HStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="md" fontWeight="bold">
-                  Status:
+                  Status
                 </Text>
                 <Text
                   fontSize="md"
@@ -247,7 +247,7 @@ const GatepassCard = React.memo(() => {
                 color: "gray.600",
               }}
             >
-              Particulars:
+              Particulars
             </FormControl.Label>
             {particulars.map((particular, idx) => (
               <HStack key={idx} space={3} alignItems="center" mb={2}>

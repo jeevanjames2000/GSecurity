@@ -295,7 +295,7 @@ export default function Home() {
         >
           <Input
             flex={1}
-            placeholder="ID / Registration / Vehicle number"
+            placeholder="Enter Id"
             variant="unstyled"
             fontSize="md"
             value={search}

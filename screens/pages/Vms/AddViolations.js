@@ -295,8 +295,8 @@ export default function AddViolations() {
           padding={4}
         >
           <TouchableOpacity
-            onPress={onPickImages}
             style={{ alignItems: "center" }}
+            onPress={onPickImages}
           >
             <MaterialCommunityIcons
               name="camera-plus-outline"
