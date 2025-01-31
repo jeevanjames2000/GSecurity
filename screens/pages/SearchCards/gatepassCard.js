@@ -78,14 +78,14 @@ const GatepassCard = React.memo(() => {
     handleUpdate(id, "rejected");
   };
   return (
-    <VStack padding="6" pt={2} shadow="9" bg={"#fff"} borderRadius={"xl"}>
+    <VStack padding="6" pt={2} shadow="6" bg={"#fff"} borderRadius={"xl"}>
       {selectedGatePass && particulars.length > 0 && (
         <>
           <View mb={2}>
             <Text
               textAlign={"center"}
               fontWeight={"bold"}
-              color={"black"}
+              color="#007367"
               fontSize={18}
               pb={2}
             >
@@ -142,96 +142,71 @@ const GatepassCard = React.memo(() => {
                 </Text>
               </View>
             </View>
-            <View mt={4}>
-              <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={"md"} fontWeight={"bold"}>
-                  Vehicle number
-                </Text>
-                <Text
-                  fontSize={"md"}
-                  color="gray.800"
-                  textAlign="right"
-                  flex={1}
+            <VStack mt={4} space={2}>
+              {[
+                {
+                  label: "Vehicle number:",
+                  value: selectedGatePass.vehicle_number || "null",
+                },
+                {
+                  label: "Receiver name:",
+                  value: selectedGatePass.receiver_name || "null",
+                  align: "flex-start",
+                },
+                {
+                  label: "Created on:",
+                  value:
+                    new Date(
+                      selectedGatePass.created_time
+                    ).toLocaleDateString() || "null",
+                },
+                {
+                  label: "Issued to:",
+                  value: selectedGatePass.receiver_emp_id || "null",
+                },
+                {
+                  label: "Issued by:",
+                  value: selectedGatePass.issued_by || "null",
+                },
+                { label: "Note:", value: selectedGatePass.note || "null" },
+              ].map(({ label, value, align }, index) => (
+                <HStack
+                  key={index}
+                  justifyContent="space-between"
+                  alignItems={align || "center"}
                 >
-                  {selectedGatePass.vehicle_number || "null"}
-                </Text>
-              </HStack>
-              <HStack
-                justifyContent="space-between"
-                alignItems="flex-start"
-                mb={3}
-              >
-                <Text fontSize={"md"} fontWeight="bold">
-                  Receiver name:
-                </Text>
-                <Text
-                  fontSize={"md"}
-                  color="gray.800"
-                  textAlign="right"
-                  flex={1}
-                  flexWrap="wrap"
-                >
-                  {selectedGatePass.receiver_name || "null"}
-                </Text>
-              </HStack>
-              <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={"md"} fontWeight={"bold"}>
-                  Created on:
-                </Text>
-                <Text
-                  fontSize={"md"}
-                  color="gray.800"
-                  textAlign="right"
-                  flex={1}
-                >
-                  {new Date(
-                    selectedGatePass.created_time
-                  ).toLocaleDateString() || "null"}
-                </Text>
-              </HStack>
-              <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={"md"} fontWeight="bold">
-                  Issued to:
-                </Text>
-                <Text
-                  fontSize={"md"}
-                  color="gray.800"
-                  textAlign="right"
-                  flex={1}
-                >
-                  {selectedGatePass.receiver_emp_id || "null"}
-                </Text>
-              </HStack>
-              <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={"md"} fontWeight="bold">
-                  Issued by:
-                </Text>
-                <Text
-                  fontSize={"md"}
-                  color="gray.800"
-                  textAlign="right"
-                  flex={1}
-                >
-                  {selectedGatePass.issued_by || "null"}
-                </Text>
-              </HStack>
-              <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={"md"} fontWeight="bold">
+                  <Text fontSize="md" fontWeight="bold">
+                    {label}
+                  </Text>
+                  <Text
+                    fontSize="md"
+                    color="gray.800"
+                    textAlign="right"
+                    flex={1}
+                    width="70%"
+                    flexWrap="wrap"
+                  >
+                    {value}
+                  </Text>
+                </HStack>
+              ))}
+
+              <HStack justifyContent="space-between" alignItems="center">
+                <Text fontSize="md" fontWeight="bold">
                   Status:
                 </Text>
                 <Text
-                  fontSize={"md"}
-                  fontWeight={"bold"}
+                  fontSize="md"
+                  fontWeight="bold"
                   textAlign="right"
                   flex={1}
-                  style={{
-                    color:
-                      selectedGatePass.status === "approved"
-                        ? "green"
-                        : selectedGatePass.status === "pending"
-                        ? "orange"
-                        : "red",
-                  }}
+                  color={
+                    selectedGatePass.status === "approved"
+                      ? "#007367"
+                      : selectedGatePass.status === "pending"
+                      ? "#DB9669"
+                      : "#FF6060"
+                  }
                 >
                   {selectedGatePass.status === "approved"
                     ? "Approved"
@@ -240,20 +215,7 @@ const GatepassCard = React.memo(() => {
                     : "Pending"}
                 </Text>
               </HStack>
-              <HStack justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontSize={"md"} fontWeight="bold">
-                  Note:
-                </Text>
-                <Text
-                  fontSize={"md"}
-                  color="gray.800"
-                  textAlign="right"
-                  flex={1}
-                >
-                  {selectedGatePass.note || "null"}
-                </Text>
-              </HStack>
-            </View>
+            </VStack>
           </View>
           <FormControl
             mt={1}
@@ -270,7 +232,7 @@ const GatepassCard = React.memo(() => {
                 color: "gray.600",
               }}
             >
-              Particulars
+              Particulars:
             </FormControl.Label>
             {particulars.map((particular, idx) => (
               <HStack key={idx} space={3} alignItems="center" mb={2}>

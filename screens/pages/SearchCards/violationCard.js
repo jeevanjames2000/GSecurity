@@ -80,12 +80,6 @@ export default function ViolationsCard() {
         Violations ({cardData?.length || 0})
       </Text>
       <HStack justifyContent="space-between" space={4}>
-        {/* <CustomButton
-          text={`Violations`}
-          bgColor="#fff"
-          textColor="#37474F"
-          borderColor="#37474F"
-        /> */}
         <CustomButton
           text="Add"
           bgColor="#007367"

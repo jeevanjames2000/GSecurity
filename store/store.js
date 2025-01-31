@@ -3,6 +3,7 @@ import violationsReducer from "./slices/violationSlice";
 import profileReducer from "./slices/profileSlice";
 import gatePassReducer from "./slices/gatePassSlice";
 import homeSlice from "./slices/homeSlice";
+import authSlice from "./slices/authSlice";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     profile: profileReducer,
     gatepass: gatePassReducer,
     home: homeSlice,
+    auth: authSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

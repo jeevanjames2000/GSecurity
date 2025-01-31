@@ -17,11 +17,14 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { fetchProfile, loginSearchState } from "../../store/slices/authSlice";
 export default function Login({ navigation }) {
   const OTP_LENGTH = 4;
   const toast = useToast();
+  const dispatch = useDispatch();
   const INITIAL_OTP = Array(OTP_LENGTH).fill("");
-  const [mobile, setMobile] = useState("");
+  const [mobile, setMobile] = useState("6302816551");
   const [otp, setOtp] = useState(INITIAL_OTP);
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState(null);
@@ -88,11 +91,14 @@ export default function Login({ navigation }) {
       );
       const data = await response.json();
       const { user } = data;
+
       if (response.ok) {
+        dispatch(loginSearchState(user?.regdNo));
+        dispatch(fetchProfile(user?.regdNo));
         toast.show({
           render: () => (
             <Box
-              bg="#F4F6FF"
+              bg="green.300"
               px="6"
               py="2"
               rounded="md"
@@ -100,7 +106,7 @@ export default function Login({ navigation }) {
               position={"absolute"}
               right={3}
             >
-              <Text>Welcome back {user?.username}</Text>
+              <Text>Welcome back! {user?.username}</Text>
             </Box>
           ),
           placement: "top-right",

@@ -1,34 +1,25 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import {
-  Box,
-  Button,
-  Center,
-  HStack,
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-  VStack,
-} from "native-base";
+import { Box, HStack, Image, Pressable, Text, VStack } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-
-const studentInfo = {
-  Name: "Jacob West",
-  Role: "Student",
-  Vehicle: "AP 39 CE 4585",
-  Department: "CSE, Engineering",
-  Email: "jacob@gmail.com",
-  Phone: "+1 202 555 0147",
-};
+import { useSelector } from "react-redux";
 
 export default function Profile() {
   const navigation = useNavigation();
-
+  const { profile, image } = useSelector((state) => state.auth);
+  const studentInfo = profile?.stdprofile?.[0]
+    ? {
+        Name: profile.stdprofile[0].name || "N/A",
+        Role: profile.role || "N/A",
+        Department: profile.stdprofile[0].branch_code || "N/A",
+        Email: profile.stdprofile[0].emailid || "N/A",
+        Phone: profile.stdprofile[0].mobile || "N/A",
+        Campus: profile.stdprofile[0].campus || "N/A",
+      }
+    : null;
   const studKeys = Object.keys(studentInfo);
   const studValeus = Object.values(studentInfo);
 
@@ -48,11 +39,11 @@ export default function Profile() {
           alignItems={"center"}
           paddingBottom={10}
           flex={1}
+          position={"fixed"}
+          top={10}
         >
           <Image
-            source={{
-              uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg",
-            }}
+            source={{ uri: image }}
             alt="Alternate Text"
             size="2xl"
             borderColor={"#007367"}
@@ -61,15 +52,26 @@ export default function Profile() {
             borderStyle={"solid"}
           />
 
-          <VStack space={1}>
+          <VStack space={1} alignItems="flex-start">
             {[0, 1, 2, 3, 4, 5].map((each) => (
-              <Box key={each} flexDirection={"row"} alignItems={"center"}>
-                <Text fontSize={"lg"} width={"2/5"} paddingLeft={6}>
-                  {studKeys[each]}
+              <Box
+                key={each}
+                flexDirection="row"
+                alignItems="flex-start"
+                flexWrap="wrap"
+                width="100%"
+              >
+                <Text
+                  fontSize="lg"
+                  width="40%"
+                  paddingLeft={6}
+                  fontWeight="bold"
+                >
+                  {studKeys[each]}:
                 </Text>
                 <Text
-                  fontSize={"lg"}
-                  width={"3/5"}
+                  fontSize="lg"
+                  width="60%"
                   color={
                     studKeys[each] === "Role"
                       ? "#007367"
@@ -77,7 +79,8 @@ export default function Profile() {
                       ? "#000000"
                       : "#706F6F"
                   }
-                  paddingLeft={4}
+                  paddingLeft={2}
+                  flexShrink={1}
                 >
                   {studValeus[each]}
                 </Text>

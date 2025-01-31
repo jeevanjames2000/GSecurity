@@ -9,9 +9,10 @@ import {
 } from "../store/slices/homeSlice";
 const useSearch = () => {
   const dispatch = useDispatch();
-  const { isLoading, cardData, cardType, searchStore } = useSelector(
+  const { isLoading, cardData, cardType, searchStore, profile } = useSelector(
     (state) => state.home
   );
+
   const [search, setSearch] = useState("");
   const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const handleSearch = async () => {
@@ -44,6 +45,7 @@ const useSearch = () => {
     isLoading,
     cardData,
     cardType,
+    profile,
   };
 };
 export default useSearch;

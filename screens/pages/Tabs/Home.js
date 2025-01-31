@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import {
   Box,
   Text,
-  FlatList,
   Image,
   HStack,
   Input,
@@ -27,6 +26,7 @@ import SkeletonCard from "../SearchCards/skeletonCard";
 import ViolationsCard from "../SearchCards/violationCard";
 import VisitorDetailsCard from "../SearchCards/visitorsCard";
 import useSearch from "../../../hooks/useSearch";
+import { useSelector } from "react-redux";
 const featuredData = [
   {
     name: "CCTV",
@@ -75,7 +75,6 @@ const emergencyData = [
 ];
 export default function Home() {
   const navigation = useNavigation();
-
   const {
     search,
     setSearch,
@@ -86,8 +85,9 @@ export default function Home() {
     cardData,
     cardType,
   } = useSearch();
-  const toast = useToast();
+  const { profile } = useSelector((state) => state.auth);
 
+  const toast = useToast();
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -97,14 +97,11 @@ export default function Home() {
         ]);
         return true;
       };
-
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
-
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     }, [])
   );
-
   const handleRoute = (item) => navigation.navigate({ name: item.name });
   const handleEmergencyRoute = (item) => {
     const phoneNumber = `tel:${item.phone}`;
@@ -127,7 +124,6 @@ export default function Home() {
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              // top: 100,
             }}
           >
             <Image
@@ -148,7 +144,7 @@ export default function Home() {
         toast.show({
           render: () => (
             <Box
-              bg="#F4F6FF"
+              bg="green.300"
               px="6"
               py="2"
               rounded="md"
@@ -156,7 +152,7 @@ export default function Home() {
               position={"absolute"}
               right={3}
             >
-              <Text>Coming soon</Text>
+              <Text>Coming soon...</Text>
             </Box>
           ),
           placement: "top-right",
@@ -226,15 +222,13 @@ export default function Home() {
   );
   const FeaturedAndEmergencyCards = ({ featuredData, emergencyData }) => (
     <>
-      <FlatList
-        data={featuredData}
-        renderItem={({ item }) => <FeaturedCard item={item} />}
-        keyExtractor={(item) => item.name}
-        numColumns={3}
-        scrollEnabled={false}
-        contentContainerStyle={{ paddingBottom: 16 }}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-      />
+      <VStack space={4}>
+        <HStack justifyContent="space-between" flexWrap="wrap">
+          {featuredData.map((item, index) => (
+            <FeaturedCard key={index} item={item} />
+          ))}
+        </HStack>
+      </VStack>
       <Box
         paddingX="3"
         paddingY="4"
@@ -253,8 +247,15 @@ export default function Home() {
       </Box>
     </>
   );
-  const SearchResults = ({ isLoading, cardType, cardData }) =>
-    isLoading ? <SkeletonCard /> : renderCard(cardType, cardData);
+  const SearchResults = ({ isLoading, cardType, cardData }) => {
+    if (isLoading) return <SkeletonCard />;
+    return (
+      <View>
+        {renderCard(cardType, cardData)}
+        <Box height={"100%"} backgroundColor="transparent" />
+      </View>
+    );
+  };
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -284,7 +285,7 @@ export default function Home() {
                 fontWeight="thin"
                 textAlign="left"
               >
-                Darlene Robertson
+                {profile.stdprofile[0].name || "N/A"}
               </Text>
             </HStack>
             <HStack
@@ -327,15 +328,14 @@ export default function Home() {
               )}
             </HStack>
           </Box>
-          {}
           {isSearchTriggered && search.length > 0 ? (
             <ScrollView
               contentContainerStyle={{
                 flexGrow: 1,
                 paddingBottom: 38,
-                zIndex: -1,
               }}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
               showsVerticalScrollIndicator={false}
             >
               <Box paddingX="4" paddingY="4" marginTop={10} minHeight="100%">
