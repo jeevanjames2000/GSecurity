@@ -9,7 +9,7 @@ import {
   useToast,
   Box,
 } from "native-base";
-import { Pressable } from "react-native";
+import { Alert, Pressable } from "react-native";
 import useSearch from "../../../hooks/useSearch";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
@@ -75,7 +75,22 @@ const GatepassCard = React.memo(() => {
     handleUpdate(id, "approved");
   };
   const handleReject = (id) => {
-    handleUpdate(id, "rejected");
+    Alert.alert(
+      "Confirm Reject",
+      "Are you sure you want to reject this pass?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Reject",
+          onPress: () => handleUpdate(id, "rejected"),
+        },
+      ],
+      { cancelable: false }
+    );
   };
   return (
     <VStack padding="6" pt={2} shadow="6" bg={"#fff"} borderRadius={"xl"}>

@@ -30,20 +30,15 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Feather from "react-native-vector-icons/Feather";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import {
-  searchState,
-  profileStore,
-  fetchProfile,
-  fetchViolations,
-  showViolationsPage,
-  setRefresh,
-} from "../../../store/slices/violationSlice";
+import { setRefresh } from "../../../store/slices/violationSlice";
+import { fetchDataBySearchQuery } from "../../../store/slices/homeSlice";
 import { useDispatch, useSelector } from "react-redux";
 export default function AddViolations() {
   const { refresh } = useSelector((state) => state.violations);
-  const { cardData, image, noProfile, profile } = useSelector(
+  const { cardData, cardType, searchStore, profile } = useSelector(
     (state) => state.home
   );
+
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const toast = useToast();
@@ -168,6 +163,7 @@ export default function AddViolations() {
     setFine(fines);
   };
   const handleRefeshViolationpage = () => {
+    dispatch(fetchDataBySearchQuery(searchStore));
     dispatch(setRefresh(!refresh));
   };
   const [comments, setComments] = useState("");

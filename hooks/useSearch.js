@@ -5,7 +5,6 @@ import {
   searchState,
   fetchDataBySearchQuery,
   fetchProfile,
-  ViolationSearchState,
 } from "../store/slices/homeSlice";
 const useSearch = () => {
   const dispatch = useDispatch();

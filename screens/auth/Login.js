@@ -24,7 +24,7 @@ export default function Login({ navigation }) {
   const toast = useToast();
   const dispatch = useDispatch();
   const INITIAL_OTP = Array(OTP_LENGTH).fill("");
-  const [mobile, setMobile] = useState("6302816551");
+  const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState(INITIAL_OTP);
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState(null);

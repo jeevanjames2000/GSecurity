@@ -31,7 +31,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     searchStore: "",
-    profile: [],
+    profile: null,
     isLoading: false,
     image: "",
     error: null,

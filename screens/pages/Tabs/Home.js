@@ -122,6 +122,7 @@ export default function Home() {
           <View
             style={{
               flex: 1,
+              height: "auto",
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -251,111 +252,103 @@ export default function Home() {
     if (isLoading) return <SkeletonCard />;
     return (
       <View>
-        {renderCard(cardType, cardData)}
-        <Box height={"100%"} backgroundColor="transparent" />
+        <Box backgroundColor="transparent">
+          {renderCard(cardType, cardData)}
+        </Box>
       </View>
     );
   };
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <Box flex={1} backgroundColor="#f5f5f5">
-          <Box backgroundColor="#007367" paddingY="4" paddingX="4" zIndex={1}>
-            <HStack
-              alignItems="center"
-              justifyContent="center"
-              position="relative"
-              top={10}
+    <Box flex={1} backgroundColor="#f5f5f5" onPress={Keyboard.dismiss}>
+      <Box backgroundColor="#007367" paddingY="4" paddingX="4" zIndex={1}>
+        <HStack
+          alignItems="center"
+          justifyContent="center"
+          position="relative"
+          top={10}
+        >
+          <VStack alignItems="center" flex={1}>
+            <Text
+              fontSize={30}
+              color="white"
+              fontWeight="bold"
+              textAlign="center"
             >
-              <VStack alignItems="center" flex={1}>
-                <Text
-                  fontSize={30}
-                  color="white"
-                  fontWeight="bold"
-                  textAlign="center"
-                >
-                  G-Security
-                </Text>
-              </VStack>
-            </HStack>
-            <HStack top={12} justifyContent="center">
-              <Text
-                fontSize={18}
-                color="white"
-                fontWeight="thin"
-                textAlign="left"
-              >
-                {profile.stdprofile[0].name || "N/A"}
-              </Text>
-            </HStack>
-            <HStack
-              backgroundColor="white"
-              borderRadius="20"
-              alignItems="center"
-              paddingX="4"
-              paddingY="4"
-              mt="4"
-              shadow="2"
-              top={50}
-            >
-              <Input
-                flex={1}
-                placeholder="ID / Registration / Vehicle number"
-                variant="unstyled"
-                fontSize="md"
-                value={search}
-                onChangeText={(value) => setSearch(value)}
+              G-Security
+            </Text>
+          </VStack>
+        </HStack>
+        <HStack top={12} justifyContent="center">
+          <Text fontSize={18} color="white" fontWeight="thin" textAlign="left">
+            {profile?.stdprofile?.[0]?.name || "N/A"}
+          </Text>
+        </HStack>
+        <HStack
+          backgroundColor="white"
+          borderRadius="20"
+          alignItems="center"
+          paddingX="4"
+          paddingY="4"
+          mt="4"
+          shadow="2"
+          top={50}
+        >
+          <Input
+            flex={1}
+            placeholder="ID / Registration / Vehicle number"
+            variant="unstyled"
+            fontSize="md"
+            value={search}
+            onChangeText={(value) => setSearch(value)}
+          />
+          {search ? (
+            <HStack space={3}>
+              <Ionicons
+                name="close-circle-outline"
+                size={26}
+                color="black"
+                onPress={handleClear}
               />
-              {search ? (
-                <HStack space={3}>
-                  <Ionicons
-                    name="close-circle-outline"
-                    size={26}
-                    color="black"
-                    onPress={handleClear}
-                  />
-                  <Ionicons
-                    name="search-outline"
-                    size={26}
-                    color="black"
-                    onPress={handleSearch}
-                  />
-                </HStack>
-              ) : (
-                <Pressable onPress={handleSearch}>
-                  <Ionicons name="search-outline" size={26} color="black" />
-                </Pressable>
-              )}
+              <Ionicons
+                name="search-outline"
+                size={26}
+                color="black"
+                onPress={handleSearch}
+              />
             </HStack>
-          </Box>
-          {isSearchTriggered && search.length > 0 ? (
-            <ScrollView
-              contentContainerStyle={{
-                flexGrow: 1,
-                paddingBottom: 38,
-              }}
-              keyboardShouldPersistTaps="handled"
-              keyboardDismissMode="on-drag"
-              showsVerticalScrollIndicator={false}
-            >
-              <Box paddingX="4" paddingY="4" marginTop={10} minHeight="100%">
-                <SearchResults
-                  isLoading={isLoading}
-                  cardType={cardType}
-                  cardData={cardData}
-                />
-              </Box>
-            </ScrollView>
           ) : (
-            <Box paddingX="4" paddingY="4" marginTop={10}>
-              <FeaturedAndEmergencyCards
-                featuredData={featuredData}
-                emergencyData={emergencyData}
-              />
-            </Box>
+            <Pressable onPress={handleSearch}>
+              <Ionicons name="search-outline" size={26} color="black" />
+            </Pressable>
           )}
+        </HStack>
+      </Box>
+      {isSearchTriggered && search.length > 0 ? (
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: 38,
+          }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
+        >
+          <Box paddingX="4" paddingY="4" marginTop={10} minHeight="100%">
+            <SearchResults
+              isLoading={isLoading}
+              cardType={cardType}
+              cardData={cardData}
+            />
+          </Box>
+        </ScrollView>
+      ) : (
+        <Box paddingX="4" paddingY="4" marginTop={10}>
+          <FeaturedAndEmergencyCards
+            featuredData={featuredData}
+            emergencyData={emergencyData}
+          />
         </Box>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      )}
+    </Box>
   );
 }

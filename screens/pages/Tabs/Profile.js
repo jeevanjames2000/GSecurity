@@ -10,18 +10,19 @@ import { useSelector } from "react-redux";
 export default function Profile() {
   const navigation = useNavigation();
   const { profile, image } = useSelector((state) => state.auth);
-  const studentInfo = profile?.stdprofile?.[0]
-    ? {
-        Name: profile.stdprofile[0].name || "N/A",
-        Role: profile.role || "N/A",
-        Department: profile.stdprofile[0].branch_code || "N/A",
-        Email: profile.stdprofile[0].emailid || "N/A",
-        Phone: profile.stdprofile[0].mobile || "N/A",
-        Campus: profile.stdprofile[0].campus || "N/A",
-      }
-    : null;
-  const studKeys = Object.keys(studentInfo);
-  const studValeus = Object.values(studentInfo);
+  const studentInfo =
+    profile && profile.stdprofile && profile.stdprofile[0]
+      ? {
+          Name: profile.stdprofile[0].name || "N/A",
+          Role: profile.role || "N/A",
+          Department: profile.stdprofile[0].branch_code || "N/A",
+          Email: profile.stdprofile[0].emailid || "N/A",
+          Phone: profile.stdprofile[0].mobile || "N/A",
+          Campus: profile.stdprofile[0].campus || "N/A",
+        }
+      : null;
+  const studKeys = studentInfo ? Object.keys(studentInfo) : [];
+  const studValues = studentInfo ? Object.values(studentInfo) : [];
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("token");
@@ -82,7 +83,7 @@ export default function Profile() {
                   paddingLeft={2}
                   flexShrink={1}
                 >
-                  {studValeus[each]}
+                  {studValues[each]}
                 </Text>
               </Box>
             ))}
